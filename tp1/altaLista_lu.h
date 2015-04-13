@@ -33,8 +33,8 @@
 
 /** Funciones de estudiante **/
 
-	//estudiante *estudianteCrear( char *nombre, char *grupo, unsigned int edad ); //listo
-	//void estudianteBorrar( estudiante *e ); //listo
+	estudiante *estudianteCrear( char *nombre, char *grupo, unsigned int edad ); //listo
+	void estudianteBorrar( estudiante *e ); //listo
 	bool menorEstudiante( estudiante *e1, estudiante *e2 ); //listo
 	void estudianteConFormato( estudiante *e, tipoFuncionModificarString f );
 	void estudianteImprimir( estudiante *e, FILE *file ); //listo
@@ -45,7 +45,7 @@
 	nodo *nodoCrear( void *dato ); //listo
 	void nodoBorrar( nodo *n, tipoFuncionBorrarDato f ); //listo
 	altaLista *altaListaCrear( void ); //listo
-	//void altaListaBorrar( altaLista *l, tipoFuncionBorrarDato f ); //listo
+	void altaListaBorrar( altaLista *l, tipoFuncionBorrarDato f ); //listo
 	void altaListaImprimir( altaLista *l, char *archivo, tipoFuncionImprimirDato f ); //listo
 	
 
@@ -72,7 +72,6 @@
 
 	int cantidadDeNodos (altaLista* l);
 	int sumaEdades (altaLista* l);
-	void hola( char *s );
 
 
 void insertarOrdenado( altaLista *l, void *dato, tipoFuncionCompararDato f );
