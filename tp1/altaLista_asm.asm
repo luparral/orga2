@@ -575,18 +575,10 @@ section .text
 	finDelCiclo:
 		mov r11, [r12+OFFSET_ULTIMO] ;l->ultimo
 		mov r11, [r11 + OFFSET_DATO] ;l->ultimo->dato
-		
-		;;;;;;;;;;;;;;;test
+
 		mov rdi, r11
-		call estudianteImprimir
-		mov rdi, r13
-		call estudianteImprimir
-
-		;;;;;;;;;;;;;;;test
-		; mov rdi, r11
-		; mov rsi, r13
-
-		; call r14
+		mov rsi, r13
+		call r14
 
 		cmp al, TRUE
 		je esMayorQueElUltimo
@@ -752,6 +744,8 @@ section .text
 		mov rbp, rsp
 		push r12
 		push r13
+		push r14
+		push rbx
 
 
 		;guardo los strings: r12 = s1 y r13 = s2
@@ -760,7 +754,7 @@ section .text
 
 		;miro si son iguales
 		call string_iguales
-		cmp rax, TRUE
+		cmp al, TRUE
 		je sonIgualesStringMenor
 		
 		;si no son iguales, inicializo en r14 un contador en 0 y loopeo
@@ -775,16 +769,16 @@ section .text
 
 		;si s1[0] es igual a 0 llegue al final del primer string
 		cmp bl, 0
-		je finStringMenor
+		je maguitoTeAmo
 		
 		;si s2[0] es igual a 0 llegue al final del segundo string
 		cmp cl, 0
-		je finStringMenor
+		je teHagoTodoMaguito
  
  		;me fijo si (s1[i]>s2[i]) o  (s1[i]<s2[i])
 		cmp bl, cl
-		jg s1MayorAs2
 		jl s1MenorAs2
+		jg s1MayorAs2
 		mov al, TRUE
 
 		;sino incremento el contador y vuelvo al loop
@@ -800,12 +794,22 @@ section .text
 		jmp finStringMenor
 
 	finStringMenor:
+		pop rbx
+		pop r14
 		pop r13
 		pop r12	
 		pop rbp
 		ret
 
 	sonIgualesStringMenor:
+		mov al, FALSE
+		jmp finStringMenor
+
+	maguitoTeAmo:
+		mov al, TRUE
+		jmp finStringMenor
+
+	teHagoTodoMaguito:
 		mov al, FALSE
 		jmp finStringMenor
 
