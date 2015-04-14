@@ -14,7 +14,9 @@ extern float edadMedia(altaLista*);
 extern void estudianteConFormato(estudiante*, tipoFuncionModificarString);
 extern char* string_copiar(char*);
 extern void altaListaImprimir(altaLista*, char*, tipoFuncionImprimirDato);
+extern void insertarOrdenado(altaLista*, void*, tipoFuncionCompararDato);
 
+ 
 int main (){
 	
 	// char* test = "hola";
@@ -23,47 +25,57 @@ int main (){
 
 	estudiante* e1 = estudianteCrear("Pepe", "Grupo", 42);
 	estudiante* e2 = estudianteCrear("Zorro", "OtroGrupo", 10);
-	estudiante* e3 = estudianteCrear("Pepe", "OtroGrupoDistinto", 10);
-
 	bool menor1 = menorEstudiante(e1, e2);//true
 	bool menor2 = menorEstudiante(e2, e1);//false
-	bool menor3 = menorEstudiante(e3, e1);//true
+	// estudiante* e3 = estudianteCrear("Pepe", "OtroGrupoDistinto", 10);
+	// estudiante* e4 = estudianteCrear("Ana", "algo", 140);
+	// bool menor3 = menorEstudiante(e3, e1);//true
+	// bool menor4 = menorEstudiante(e4, e3);//true
 	printf("------------Tests de estudianteMenor \n");
 	printf("e1 < e2: %d\n", menor1);
 	printf("e2 < e1: %d\n", menor2);
-	printf("e3 < e1: %d\n", menor3);
+	// printf("e3 < e1: %d\n", menor3);
+	// printf("e4 < e3: %d\n", menor4); //true
 	
 
-	printf("------------Tests de alta lista crear \n");
+	//printf("------------Tests de alta lista crear \n");
 	altaLista* nuevaLista = altaListaCrear();
-	insertarAtras(nuevaLista, e1);
-	insertarAtras(nuevaLista, e2);
-	insertarAtras(nuevaLista, e3);
+	//insertarAtras(nuevaLista, e1);
+	insertarOrdenado(nuevaLista, e1, menorEstudiante);
+	insertarOrdenado(nuevaLista, e2, menorEstudiante);
+	//insertarOrdenado(nuevaLista, e1, algunaFuncionBool);
+	//insertarOrdenado(nuevaLista, e2, algunaFuncionBool);
+	//insertarOrdenado(nuevaLista, e3, (tipoFuncionCompararDato)menorEstudiante);
+	//insertarOrdenado(nuevaLista, e4, (tipoFuncionCompararDato)menorEstudiante);
+	//altaListaBorrar(nuevaLista, (tipoFuncionBorrarDato)estudianteBorrar);
+	//insertarAtras(nuevaLista, e2);
+	//insertarAtras(nuevaLista, e3);
 
-	printf("------------Tests de edad media \n");
-	int suma = sumaEdades(nuevaLista);
-	printf("Suma de edades: %d\n", suma);
+
+
+	// printf("------------Tests de edad media \n");
+	// int suma = sumaEdades(nuevaLista);
+	// printf("Suma de edades: %d\n", suma);
 	
-	int cant = cantidadDeNodos(nuevaLista);
-	printf("Cantidad de nodods: %d\n", cant);
+	// int cant = cantidadDeNodos(nuevaLista);
+	// printf("Cantidad de nodods: %d\n", cant);
 
-	float prom = edadMedia(nuevaLista);
-	printf("Edad Media: %f \n", prom);
+	// float prom = edadMedia(nuevaLista);
+	// printf("Edad Media: %f \n", prom);
 
-	//FILE *file = fopen("testEstudianteImprimir.txt","a");
+	// FILE *file = fopen("testEstudianteImprimir.txt","a");
+	// // // estudianteImprimir(e1,file);
+
+	// // // estudianteConFormato(e1, (tipoFuncionModificarString)hola);
 	// estudianteImprimir(e1,file);
 
-	// estudianteConFormato(e1, (tipoFuncionModificarString)hola);
-	// estudianteImprimir(e1,file);
 
-
-	printf("------------Tests para imprimir alta lista \n");
-	printf("Dir lista: %d \n", nuevaLista);
-	printf("Dir primer nodo: %d \n", (nodo*)nuevaLista->primero);
-	printf("Dir estudiante: %d \n", ((estudiante*)nuevaLista->primero->dato));
+	// printf("------------Tests para imprimir alta lista \n");
+	// printf("Dir lista: %d \n", nuevaLista);
+	// printf("Dir primer nodo: %d \n", (nodo*)nuevaLista->primero);
+	// //printf("Dir estudiante: %d \n", ((estudiante*)nuevaLista->primero->dato));
 
 	altaListaImprimir(nuevaLista, "testImprimirLista.txt", (tipoFuncionImprimirDato)estudianteImprimir);
-
 	// printf("%s %s %d\n", e1->nombre, e1->grupo, e1->edad);
 	// estudianteBorrar(e1);
 	// estudianteBorrar(e2);
@@ -96,6 +108,12 @@ int main (){
 	// char* hola1 = "hola";
 	// char* hola2 = "hola"; 
 
+	//test7
+	// char* ana = "Ana";
+	// char* pepe = "Pepe"; 
+
+
+
 	// bool res1 = string_menor(char1,char2);
 	// printf("a es menor que z: %d \n",res1);
 
@@ -113,6 +131,10 @@ int main (){
 
 	// bool res6 = string_menor(hola1,hola2);
 	// printf("hola es menor que hola: %d \n",res6);
+
+
+	// bool res7 = string_menor(ana,pepe);
+	// printf("Ana es menor que Pepe: %d \n",res7);
 
 	return 0;
 }

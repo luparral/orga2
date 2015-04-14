@@ -40,8 +40,22 @@ void altaListaBorrar( altaLista *l, tipoFuncionBorrarDato f ){
 
   l->primero = NULL;
   l->ultimo = NULL;
-  free(l);
-}
+  /*
+  Tengo una lista con dos
+  1, 2
+  actual 1
+  siguiente 2
+  borrar 1
+  siguiente es nul? no
+  actual 2
+  siguiente nul
+  borrar 2
+  sigiente es nul? si
+  borrar actual
+  
+
+
+  */
 
 
 //ToDo: Chequear

@@ -73,6 +73,7 @@
 	int cantidadDeNodos (altaLista* l);
 	int sumaEdades (altaLista* l);
 	void hola( char *s );
+	bool algunaFuncionBool(estudiante* v1, estudiante*v2);
 
 
 void insertarOrdenado( altaLista *l, void *dato, tipoFuncionCompararDato f );
