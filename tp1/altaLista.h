@@ -34,7 +34,7 @@
 /** Funciones de estudiante **/
 
 	//estudiante *estudianteCrear( char *nombre, char *grupo, unsigned int edad ); //listo
-	//void estudianteBorrar( estudiante *e ); //listo
+	void estudianteBorrar( estudiante *e ); //listo
 	bool menorEstudiante( estudiante *e1, estudiante *e2 ); //listo
 	void estudianteConFormato( estudiante *e, tipoFuncionModificarString f );
 	void estudianteImprimir( estudiante *e, FILE *file ); //listo

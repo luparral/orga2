@@ -15,7 +15,7 @@
 ; AVANZADAS
 	global edadMedia
 	global insertarOrdenado
-	;global filtrarAltaLista
+	global filtrarAltaLista
 
 ; YA IMPLEMENTADAS EN C
 	extern string_iguales
@@ -62,7 +62,7 @@ section .data
 	
 	imprimirEstudianteFormato: DB '%s', 10, 9, '%s', 10, 9, '%d', 10, 0
 	vaciaFormato: db "<vacia>", 10, 0
-	formatoApendear:db "w", 0
+	formatoApendear:db "a", 0
 
 section .text
 
@@ -492,118 +492,6 @@ section .text
 		pop rbp
 		ret
 
-	;/** FUNCIONES AVANZADAS **/  
-	;---------------------------------------------------------------------------------------------------------------
-	;void insertarOrdenado( altaLista *l, void *dato, tipoFuncionCompararDato f )
-		;Preservar RBX, R12, R13, R14, R15
-	insertarOrdenado:
-		push rbp
-		mov rbp, rsp
-		push r12
-		push r13
-		push r14
-		push rbx
-		push r15
-		sub rsp, 8
-
-		;guardo los parametros
-		mov r12, rdi ;lista
-		mov r13, rsi ;dato
-		mov r14, rdx ;f
-
-		;guardo el primero de la lista
-		mov rbx, [r12+OFFSET_PRIMERO] ;nodoActual
-		cmp rbx, NULL
-		je insertarEnListaVacia 
-		jmp insertarEnListaNoVacia
-
-	insertarEnListaVacia:
-		mov rdi, r12
-		mov rsi, r13
-		call insertarAtras
-		jmp terminarDeInsertar
-
-	insertarEnListaNoVacia:
-		;creo nuevo nodo
-		mov rdi, r13
-		call nodoCrear
-		mov r15, rax ;direccion del nuevo nodo
-		jmp cicloInsertarNodo
-
-	cicloInsertarNodo:
-		cmp rbx, NULL ;nodoActual != NULL
-		je finDelCiclo
-
-		;preparo los params para llamar a menorEstudiante
-		mov r9, [rbx+OFFSET_DATO] ;nodoActual->dato
-		mov rdi, r13
-		mov rsi, r9 
-		
-		;llamo a menorEstudiante
-		call r14
-		cmp al, TRUE
-		je elDatoEsMenor
-		jmp elDatoNoEsMenor
-
-
-	elDatoEsMenor:
-		;chequeo si el nodoActual es el primero
-		cmp rbx, [r12+OFFSET_PRIMERO]
-		je esMenorQueElPrimero
-		jmp esMayorQueElPrimero
-
-	elDatoNoEsMenor:
-		mov rbx, [rbx+OFFSET_SIGUIENTE]
-		jmp cicloInsertarNodo
-
-	esMenorQueElPrimero:
-		mov [r12+OFFSET_PRIMERO], r15
-		mov [r15+OFFSET_SIGUIENTE],rbx
-		mov qword [r15+OFFSET_ANTERIOR], NULL
-		mov [rbx + OFFSET_ANTERIOR], rbx
-		jmp finDelCiclo
-
-	esMayorQueElPrimero:
-		mov [r15+OFFSET_SIGUIENTE], rbx
-		mov rcx, [rbx+OFFSET_ANTERIOR]
-		mov [r15+OFFSET_ANTERIOR], rcx
-		mov r10, [rbx+OFFSET_ANTERIOR] ;nodoActual->anterior
-		mov [r10+OFFSET_SIGUIENTE], r15 ;nodoActual->anterior->siguiente
-		mov [rbx+OFFSET_ANTERIOR], r15
-		jmp finDelCiclo
-
-	finDelCiclo:
-		mov r11, [r12+OFFSET_ULTIMO] ;l->ultimo
-		mov r11, [r11 + OFFSET_DATO] ;l->ultimo->dato
-
-		mov rdi, r11
-		mov rsi, r13
-		call r14
-
-		cmp al, TRUE
-		je esMayorQueElUltimo
-		jmp terminarDeInsertar
-
-	esMayorQueElUltimo:
-		mov rbx, [r12+OFFSET_ULTIMO] ;nodoActual = l->ultimo
-		mov qword [r15+OFFSET_SIGUIENTE], NULL
-		mov [r15+OFFSET_ANTERIOR], rbx
-		mov [rbx+OFFSET_SIGUIENTE], r15
-		mov [r12+OFFSET_ULTIMO], r15
-		jmp terminarDeInsertar
-
-	terminarDeInsertar:
-		add rsp, 8
-		pop r15
-		pop rbx
-		pop r14
-		pop r13
-		pop r12
-		pop rbp
-		ret	
-
-
-
 
 	; float edadMedia( altaLista *l )------------------------------------------------------
 	edadMedia:
@@ -769,11 +657,11 @@ section .text
 
 		;si s1[0] es igual a 0 llegue al final del primer string
 		cmp bl, 0
-		je maguitoTeAmo
+		je finString1
 		
 		;si s2[0] es igual a 0 llegue al final del segundo string
 		cmp cl, 0
-		je teHagoTodoMaguito
+		je finString2
  
  		;me fijo si (s1[i]>s2[i]) o  (s1[i]<s2[i])
 		cmp bl, cl
@@ -805,11 +693,11 @@ section .text
 		mov al, FALSE
 		jmp finStringMenor
 
-	maguitoTeAmo:
+	finString1:
 		mov al, TRUE
 		jmp finStringMenor
 
-	teHagoTodoMaguito:
+	finString2:
 		mov al, FALSE
 		jmp finStringMenor
 
@@ -879,4 +767,226 @@ section .text
 		pop rbp
 		ret
 
-	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	; void filtrarAltaLista( altaLista *l, tipoFuncionCompararDato f, void *datoCmp )
+	filtrarAltaLista:
+		push rbp
+		mov	rbp, rsp
+		push rbx
+		push r15
+		push r14
+		push r13
+		push r12
+		sub rsp, 8
+
+		mov r12, rdi ;lista
+		mov r14, rsi ;f
+		mov r13, rdx ;datoCmp
+		mov r15, [r12 + OFFSET_PRIMERO] ;nodoActual
+
+	cicloFiltrarAltaLista:
+		;si nodoActual es NULL termine la lista o es vacia
+		cmp r15, NULL
+		je finCicloFiltrarAltaLista
+
+		;sino, comparo los datos
+		mov rdi, [r15 + OFFSET_DATO] ;datoActual
+		mov rsi, r13 ;datoCmp
+		call r14 ;f(actual,cmp) 
+
+		;si actual < cmp es false: voy a tener que borrar
+		cmp al, FALSE
+		je hayQueBorrarElNodo
+
+		;sino, avanzo en la lista
+		mov r15, [r15 + OFFSET_SIGUIENTE]
+		jmp cicloFiltrarAltaLista
+
+	hayQueBorrarElNodo:
+		;guardo los nodos anterior y siguiente al actual
+		mov rsi, [r15 + OFFSET_ANTERIOR]
+		mov rbx, [r15 + OFFSET_SIGUIENTE]
+		
+		;si el siguiente es null, entonces estoy borrando el ultimo nodo
+		cmp rbx, NULL
+		je borrarElultimoNodo
+
+		;si el anterior es null, entonces estoy borrando el primer nodo
+		cmp rsi, NULL
+		je borrarElPrimerNodo
+		
+		;sino, no es ni el primero ni el ultimo		
+		jmp elNodoABorrarNoEsPrimeroNiUltimo
+
+	elNodoABorrarNoEsPrimeroNiUltimo:
+		;reestablezco el invariante de la lista para los nodos vecinos del que voy a borrar
+		;nodoActual->siguiente->anterior = nodoActual->anterior
+		;nodoActual->anterior->siguiente = nodoActual->siguiente
+		mov [rbx + OFFSET_ANTERIOR], rsi
+		mov [rsi + OFFSET_SIGUIENTE], rbx
+		
+		;borro el nodo
+		mov rdi, r15
+		mov rsi, estudianteBorrar
+		call nodoBorrar
+		
+		;avanzo en la lista
+		mov r15, rbx
+		jmp cicloFiltrarAltaLista
+
+	borrarElultimoNodo:
+		;si el nodo anterior al actual es null, entonces es la lista de un solo nodo, si no, hay mas nodos en la lista
+		mov rbx, [r15 + OFFSET_ANTERIOR]
+		cmp rbx, NULL
+		je esUltimoYUnicoNodo
+		jmp esUltimoPeroNoUnico
+
+	esUltimoPeroNoUnico:
+		;guardo el nodo anterior al ultimo.
+		mov rbx, [r12+OFFSET_ULTIMO]
+		mov rbx, [rbx + OFFSET_ANTERIOR]
+		
+		;borro el ultimo nodo
+		mov rdi, [r12+OFFSET_ULTIMO]
+		mov rsi, estudianteBorrar
+		call nodoBorrar
+
+		;el nodo anterior al borrado es ahora el ultimo de la lista. Se reestablece el invariante.
+		mov qword [rbx + OFFSET_SIGUIENTE], NULL
+		mov [r12 + OFFSET_ULTIMO], rbx
+
+		;como borre al ultimo, termino
+		jmp finCicloFiltrarAltaLista
+
+	esUltimoYUnicoNodo:				
+		;borro el ultimo nodo
+		mov rdi, [r12 + OFFSET_ULTIMO]
+		mov rsi, estudianteBorrar
+		call nodoBorrar
+
+		;reestablezco el invariante de lista vacia y salgo
+		mov qword [r12 + OFFSET_PRIMERO], NULL
+		mov qword [r12 + OFFSET_ULTIMO], NULL
+		jmp finCicloFiltrarAltaLista	
+
+	borrarElPrimerNodo:
+		;si el nodo siguiente al actual es NULL entonces es la lista con un solo nodo, caso contrario, la lista tiene mas de un nodo
+		mov rbx, [r15 + OFFSET_SIGUIENTE]
+		cmp rbx, NULL
+		je esPrimeroYUnicoNodo
+		jmp esPrimeroPeroNoUnico
+
+	esPrimeroPeroNoUnico:
+		;guardo el siguiente al primero
+		mov rbx, [r12+OFFSET_PRIMERO]
+		mov rbx, [rbx + OFFSET_SIGUIENTE]
+		
+		;borro el primer nodo
+		mov rdi, [r12+OFFSET_PRIMERO]
+		mov rsi, estudianteBorrar
+		call nodoBorrar
+
+		;pongo al siguiente del nodo borrado como primero de la lista, reestableciendo el invariante.
+		mov qword [rbx + OFFSET_ANTERIOR], NULL
+		mov [r12 + OFFSET_PRIMERO], rbx
+		
+		;avanzo y vuelvo al ciclo
+		mov r15, rbx
+		jmp cicloFiltrarAltaLista
+
+	esPrimeroYUnicoNodo:				
+		;borro al primer y unico nodo
+		mov rdi, [r12 + OFFSET_PRIMERO]
+		mov rsi, estudianteBorrar
+		call nodoBorrar
+
+		;reestablezo invariante de lista vacia y salgo.
+		mov qword [r12 + OFFSET_PRIMERO], NULL
+		mov qword [r12 + OFFSET_ULTIMO], NULL
+		jmp finCicloFiltrarAltaLista			
+
+
+	finCicloFiltrarAltaLista:
+		add rsp, 8
+		pop r12
+		pop r13
+		pop r14		
+		pop r15
+		pop rbx
+		pop rbp
+		ret
+
+	 ;void insertarOrdenado( altaLista *l, void *dato, tipoFuncionCompararDato f )
+	insertarOrdenado:
+		;Building the stack frame
+		push rbp
+		mov	rbp, rsp
+		;Backuping registers, for the C convention
+		push r12
+		push r13
+		push r14
+		push r15
+		push rbx
+		sub rsp, 8	;Aligning the misaligned stack
+
+			mov r12, rdi						
+			mov r13, rsi 						
+			mov r15, rdx
+			
+			;r14 contendra siempre el puntero al próximo elemento a comparar
+			mov r14, [r12 + OFFSET_PRIMERO]
+			
+			compararSiguienteNodo:
+				cmp r14 , NULL 						;Si en un momento determinado, r14 == NULL
+				je insertarAtrasYSalir				;entonces ya no quedan nodos a comparar, debo insertar al final
+				
+				; mov rbx, [r14 + OFFSET_SIGUIENTE]
+				mov rdi, r13
+				mov rsi, [r14 + OFFSET_DATO]
+				call r15
+				cmp al, TRUE
+				je insertarAntesDeR14
+				
+				mov r14, [r14 + OFFSET_SIGUIENTE]	;r14 = r14.siguiente()
+
+				jmp compararSiguienteNodo		
+
+			insertarAtrasYSalir:
+				mov rdi, r12
+				mov rsi, r13
+				call insertarAtras
+				jmp terminarInsertarOrdenado
+
+			insertarAntesDeR14:
+				mov rdi, r13
+				call nodoCrear
+				mov r15,rax
+
+				mov rbx, [r14 + OFFSET_ANTERIOR]	;Me guardo el anterior a r14 en rbx
+
+				mov [r15 + OFFSET_ANTERIOR], rbx	;r15.anterior() = r14.anterior();
+				mov [r15 + OFFSET_SIGUIENTE], r14 	;Linkeo r14 y r15
+				mov [r14 + OFFSET_ANTERIOR], r15	
+
+				cmp rbx, NULL
+				je insertarAdelante
+				
+				mov [rbx + OFFSET_SIGUIENTE], r15
+				jmp terminarInsertarOrdenado		
+
+			insertarAdelante:
+				mov [r12 + OFFSET_PRIMERO], r15
+
+			terminarInsertarOrdenado:
+
+		;Poping registers, for the C convention
+		add rsp, 8
+		pop rbx
+		pop r15
+		pop r14
+		pop r13
+		pop r12
+		pop rbp
+		ret

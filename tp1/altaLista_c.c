@@ -35,11 +35,70 @@ void hola( char *s ){
 }
 
 bool algunaFuncionBool(estudiante* v1, estudiante*v2){
-  printf("nombre e1: %s grupo e1: %s edad e1: %d \n", v1->nombre, v1->grupo, v1->edad);
-  printf("nombre e2: %s grupo e2: %s edad e2: %d \n", v2->nombre, v2->grupo, v2->edad);
 
   return(v1->edad < v2->edad);
 }
+
+
+
+
+
+// void filtrarAltaLista (altaLista* l, tipoFuncionCompararDato f, void *datoComp){
+// //dato actual > dato comp HAY QUE BORRARLOS
+//   nodo* nodoActual = l->primero;
+//   if(l->primero == NULL){
+//     return;
+//   }
+//   void* datoActual = nodoActual->dato;
+//   if(l->primero == l->ultimo){ //LISTA DE UN SOLO NODO
+//     nodoBorrar(nodoActual, (tipoFuncionBorrarDato)estudianteBorrar);
+//     l->primero = NULL;
+//     l->ultimo = NULL;
+//     return;
+//   }
+// //  printf("datoComp %s\n", ((estudiante*)datoComp)->nombre);
+//   while(nodoActual != NULL){
+//     //printf("Entre al while\n");
+//     if(f(datoComp, datoActual)) {
+//       if(l->primero == l->ultimo){ //LISTA DE UN SOLO NODO
+//         nodoBorrar(nodoActual, (tipoFuncionBorrarDato)estudianteBorrar);
+//         l->primero = NULL;
+//         l->ultimo = NULL;
+//         return;
+//       }
+//       if(nodoActual == l->primero){
+//         l->primero = l->primero->siguiente;
+//         nodoActual->siguiente->anterior = NULL;
+//       } else if(nodoActual == l->ultimo){
+//         l->ultimo = l->ultimo->anterior;
+//         nodoActual->anterior->siguiente = NULL;
+//         nodoBorrar(nodoActual, (tipoFuncionBorrarDato)estudianteBorrar);
+//         return;
+//       }else{
+//         nodoActual->anterior->siguiente = nodoActual->siguiente;
+//         nodoActual->siguiente->anterior = nodoActual->anterior;      
+//       }
+//         nodo* nodoABorrar = nodoActual;
+//         nodoActual = nodoActual->siguiente;
+//         datoActual = nodoActual->dato;
+//         nodoBorrar(nodoABorrar, (tipoFuncionBorrarDato)estudianteBorrar);   
+
+//     }else{
+//       nodoActual = nodoActual->siguiente;
+//       datoActual = nodoActual->dato;
+//     };
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
 
 // void insertarOrdenado( altaLista *l, void *dato, tipoFuncionCompararDato f ){
 //   printf("Voy a insertar a %s\n", ((estudiante*)dato)->nombre);
