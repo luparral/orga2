@@ -289,8 +289,8 @@ section .text
 		push r13
 
 		;guardo los parametros
-		mov r12, rdi ;nodo
-		mov r13, rsi ;funcion borrar
+		mov r12, rdi
+		mov r13, rsi
 
 		;limpio los punteros
 		mov qword [r12 + OFFSET_SIGUIENTE], NULL
@@ -341,9 +341,10 @@ section .text
 		sub rsp, 8
 
 		;guardo los parametros
-		mov r12, rdi
-		mov r13, [r12 + OFFSET_PRIMERO]
-		
+		mov r12, rdi ;lista
+		mov r13, [r12 + OFFSET_PRIMERO] ;nodoActual
+		mov rbx, rsi ;f
+
 		;chequeo si la lista es vacia
 		cmp r13, NULL 
 		jne hayUnElemento ;l->primero != NULL
@@ -354,31 +355,33 @@ section .text
 
 
 	hayUnElemento:
-		;r14 rcx nodoActual = l->primero
-		;r15 rdx nodoSiguiente = l->primero->siguiente
-		;rbx r8 nodoABorrar = nodoActual
+		;r14 nodoActual = l->primero
+		;r15 nodoSiguiente = l->primero->siguiente
+		;rbx nodoABorrar = nodoActual
 		mov r14, [r12 + OFFSET_PRIMERO]
 		mov r15, [r14 + OFFSET_SIGUIENTE]
-		mov rbx, r14
+		mov rdx, r14
 		cmp r15, NULL
 		jne cicloParaBorrar
 		jmp borrarUnicoNodo
 
 	cicloParaBorrar:
-		;r14 rcx : nodoActual = nodoSiguiente
-		;r15 rdx : nodoSiguiente = nodoSiguiente->siguiente
-		;rbx r8: nodoABorrar = nodoActual
+		;r14: nodoActual = nodoSiguiente
+		;r15: nodoSiguiente = nodoSiguiente->siguiente
+		;rbx: nodoABorrar = nodoActual
 		mov r14, r15
 		mov r15, [r14 + OFFSET_SIGUIENTE]
-		mov rdi, rbx
+		mov rdi, rdx
+		mov rsi, rbx
 		call nodoBorrar
-		mov rbx, r14
+		mov rdx, r14
 		cmp r15, NULL
 		jne cicloParaBorrar
 		jmp borrarUnicoNodo
 
 	borrarUnicoNodo:
 		mov rdi, r14
+		mov rsi, rbx
 		call nodoBorrar
 		jmp terminarDeBorrarLista
 
