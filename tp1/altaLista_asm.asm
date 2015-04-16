@@ -289,8 +289,8 @@ section .text
 		push r13
 
 		;guardo los parametros
-		mov r12, rdi
-		mov r13, rsi
+		mov r12, rdi ;nodo
+		mov r13, rsi ;funcion borrar
 
 		;limpio los punteros
 		mov qword [r12 + OFFSET_SIGUIENTE], NULL
@@ -767,10 +767,8 @@ section .text
 		pop rbp
 		ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	; void filtrarAltaLista( altaLista *l, tipoFuncionCompararDato f, void *datoCmp )
+	; void filtrarAltaLista( altaLista *l, tipoFuncionCompararDato f, void *datoCmp )---------------------------------------------
 	filtrarAltaLista:
 		push rbp
 		mov	rbp, rsp
@@ -918,75 +916,81 @@ section .text
 		pop rbp
 		ret
 
-	 ;void insertarOrdenado( altaLista *l, void *dato, tipoFuncionCompararDato f )
+	 ;void insertarOrdenado( altaLista *l, void *dato, tipoFuncionCompararDato f )---------------------------------
 	insertarOrdenado:
-		;Building the stack frame
 		push rbp
 		mov	rbp, rsp
-		;Backuping registers, for the C convention
-		push r12
-		push r13
-		push r14
-		push r15
 		push rbx
-		sub rsp, 8	;Aligning the misaligned stack
+		push r15
+		push r14
+		push r13
+		push r12
+		sub rsp, 8
 
-			mov r12, rdi						
-			mov r13, rsi 						
-			mov r15, rdx
+		mov rbx, rdi ;lista						
+		mov r12, rsi ;dato				
+		mov r15, rdx ;funcion
+
+		mov r14, [rbx + OFFSET_PRIMERO] ;nodoActual
 			
-			;r14 contendra siempre el puntero al próximo elemento a comparar
-			mov r14, [r12 + OFFSET_PRIMERO]
-			
-			compararSiguienteNodo:
-				cmp r14 , NULL 						;Si en un momento determinado, r14 == NULL
-				je insertarAtrasYSalir				;entonces ya no quedan nodos a comparar, debo insertar al final
-				
-				; mov rbx, [r14 + OFFSET_SIGUIENTE]
-				mov rdi, r13
-				mov rsi, [r14 + OFFSET_DATO]
-				call r15
-				cmp al, TRUE
-				je insertarAntesDeR14
-				
-				mov r14, [r14 + OFFSET_SIGUIENTE]	;r14 = r14.siguiente()
+	cicloInsertarOrdenado:
+		;me fijo si termine de recorrer la lista, si es asi, tengo que insertar al final de la lista y terminar el ciclo.
+		cmp r14 , NULL
+		jne laListaNoTermino
+		mov rdi, rbx
+		mov rsi, r12
+		call insertarAtras
+		jmp terminarInsertarOrdenado
 
-				jmp compararSiguienteNodo		
+	laListaNoTermino:	
+		;comparo el dato pasado por parametro con el dato actual:
+		;f(dato, nodoActual->dato)
+		mov rdi, r12
+		mov rsi, [r14 + OFFSET_DATO]
+		call r15
+		;si es menor, voy a insertar adelante del nodoActual
+		cmp al, TRUE
+		je insertarAntesDelNodoActual
+		
+		;sino, avanzo en el ciclo
+		mov r14, [r14 + OFFSET_SIGUIENTE]
+		jmp cicloInsertarOrdenado		
 
-			insertarAtrasYSalir:
-				mov rdi, r12
-				mov rsi, r13
-				call insertarAtras
-				jmp terminarInsertarOrdenado
+	insertarAntesDelNodoActual:
+		mov rdi, r12
+		call nodoCrear
+		mov r15,rax
 
-			insertarAntesDeR14:
-				mov rdi, r13
-				call nodoCrear
-				mov r15,rax
+		mov r13, [r14 + OFFSET_ANTERIOR]
+		;chequeo si el nodo actual es el primero
+		cmp r13, NULL
+		jne insertarAdelanteDeUnNodoCualquiera
+		jmp insertarAdelanteDelPrimero
 
-				mov rbx, [r14 + OFFSET_ANTERIOR]	;Me guardo el anterior a r14 en rbx
 
-				mov [r15 + OFFSET_ANTERIOR], rbx	;r15.anterior() = r14.anterior();
-				mov [r15 + OFFSET_SIGUIENTE], r14 	;Linkeo r14 y r15
-				mov [r14 + OFFSET_ANTERIOR], r15	
+	insertarAdelanteDeUnNodoCualquiera:
+	;reestablezo el invariante de los nodos. La lista mantiene el mismo primero que antes
+		mov [r14 + OFFSET_ANTERIOR], r15	
+		mov [r15 + OFFSET_ANTERIOR], r13
+		mov [r15 + OFFSET_SIGUIENTE], r14
+		mov [r13 + OFFSET_SIGUIENTE], r15
+		jmp terminarInsertarOrdenado	
+	
+	insertarAdelanteDelPrimero:
+	;reestablezo el invariante de la lista y los nodos, el nodo agregado es el nuevo primero
+		mov [r14 + OFFSET_ANTERIOR], r15	
+		mov [r15 + OFFSET_ANTERIOR], r13
+		mov [r15 + OFFSET_SIGUIENTE], r14
+		mov [rbx + OFFSET_PRIMERO], r15
+		jmp terminarInsertarOrdenado
+	
 
-				cmp rbx, NULL
-				je insertarAdelante
-				
-				mov [rbx + OFFSET_SIGUIENTE], r15
-				jmp terminarInsertarOrdenado		
-
-			insertarAdelante:
-				mov [r12 + OFFSET_PRIMERO], r15
-
-			terminarInsertarOrdenado:
-
-		;Poping registers, for the C convention
+	terminarInsertarOrdenado:
 		add rsp, 8
-		pop rbx
-		pop r15
-		pop r14
-		pop r13
 		pop r12
+		pop r13
+		pop r14
+		pop r15
+		pop rbx
 		pop rbp
 		ret

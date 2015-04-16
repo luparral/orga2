@@ -18,44 +18,35 @@ extern void insertarOrdenado(altaLista*, void*, tipoFuncionCompararDato);
 
  
 int main (){
-	
-	// // char* test = "hola";
 
-	// // printf("%s \n",test);
-
-	// estudiante* e1 = estudianteCrear("Pepe", "Grupo", 42);
-	// estudiante* e2 = estudianteCrear("Zorro", "OtroGrupo", 10);
-	// bool menor1 = menorEstudiante(e1, e2);//true
-	// bool menor2 = menorEstudiante(e2, e1);//false
-	// estudiante* e3 = estudianteCrear("Pepe", "OtroGrupoDistinto", 10);
-	// estudiante* e4 = estudianteCrear("Ana", "algo", 140);
-	// estudiante* e5 = estudianteCrear("Ana", "algo", 1);
-	// estudiante* e6 = estudianteCrear("Zzz", "algo", 1);
-	// estudiante* e7 = estudianteCrear("Ana", "algo", 1);
-	// // bool menor3 = menorEstudiante(e3, e1);//true
-	// // bool menor4 = menorEstudiante(e4, e3);//true
-	// printf("------------Tests de estudianteMenor \n");
-	// printf("e1 < e2: %d\n", menor1);
-	// printf("e2 < e1: %d\n", menor2);
-	// // printf("e3 < e1: %d\n", menor3);
-	// // printf("e4 < e3: %d\n", menor4); //true
+	estudiante* estudiante1 = estudianteCrear("Pepe", "Grupo", 42);
+	estudiante* estudiante2 = estudianteCrear("Zorro", "OtroGrupo", 10);
+	bool menor1 = menorEstudiante(estudiante1, estudiante2);//true
+	bool menor2 = menorEstudiante(estudiante2, estudiante1);//false
+	estudiante* estudiante3 = estudianteCrear("Pepe", "OtroGrupoDistinto", 10);
+	estudiante* estudiante4 = estudianteCrear("Ana", "algo", 140);
+	estudiante* estudiante5 = estudianteCrear("Ana", "algo", 1);
+	estudiante* estudiante6 = estudianteCrear("Zzz", "algo", 1);
+	estudiante* estudiante7 = estudianteCrear("Ana", "algo", 1);
+	bool menor3 = menorEstudiante(estudiante3, estudiante1);//true
+	bool menor4 = menorEstudiante(estudiante4, estudiante3);//true
+	printf("------------Tests de estudianteMenor \n");
+	printf("e1 < e2: %d\n", menor1);
+	printf("e2 < e1: %d\n", menor2);
+	printf("e3 < e1: %d\n", menor3);
+	printf("e4 < e3: %d\n", menor4); //true
 	
 
-	// //printf("------------Tests de alta lista crear \n");
-	// altaLista* nuevaLista = altaListaCrear();
-	// //insertarAtras(nuevaLista, e1);
-	// insertarOrdenado(nuevaLista, e1, menorEstudiante);
-	// insertarOrdenado(nuevaLista, e2, menorEstudiante);
-	// //insertarOrdenado(nuevaLista, e1, algunaFuncionBool);
-	// //insertarOrdenado(nuevaLista, e2, algunaFuncionBool);
-	// insertarOrdenado(nuevaLista, e3, (tipoFuncionCompararDato)menorEstudiante);
-	// insertarOrdenado(nuevaLista, e4, (tipoFuncionCompararDato)menorEstudiante);
-	// insertarOrdenado(nuevaLista, e5, (tipoFuncionCompararDato)menorEstudiante);
-	// insertarOrdenado(nuevaLista, e6, (tipoFuncionCompararDato)menorEstudiante);
-	// insertarOrdenado(nuevaLista, e7, (tipoFuncionCompararDato)menorEstudiante);
-	// //altaListaBorrar(nuevaLista, (tipoFuncionBorrarDato)estudianteBorrar);
-	// //insertarAtras(nuevaLista, e2);
-	// //insertarAtras(nuevaLista, e3);
+	printf("------------Tests de alta lista crear \n");
+	altaLista* nuevaLista = altaListaCrear();
+	insertarOrdenado(nuevaLista, estudiante1, (tipoFuncionCompararDato)menorEstudiante);
+	insertarOrdenado(nuevaLista, estudiante2, (tipoFuncionCompararDato)menorEstudiante);
+	insertarOrdenado(nuevaLista, estudiante3, (tipoFuncionCompararDato)menorEstudiante);
+	insertarOrdenado(nuevaLista, estudiante4, (tipoFuncionCompararDato)menorEstudiante);
+	insertarOrdenado(nuevaLista, estudiante5, (tipoFuncionCompararDato)menorEstudiante);
+	insertarOrdenado(nuevaLista, estudiante6, (tipoFuncionCompararDato)menorEstudiante);
+	insertarOrdenado(nuevaLista, estudiante7, (tipoFuncionCompararDato)menorEstudiante);
+	altaListaBorrar(nuevaLista, estudianteBorrar);
 
 
 
@@ -161,25 +152,25 @@ int main (){
 
 
 
-	 	estudiante* e6 = estudianteCrear("Pepe", "algo", 10);
-		estudiante* e7 = estudianteCrear("Rafael", "algo", 10);
-		estudiante* e8 = estudianteCrear("Zorro", "algo", 10);
-		// estudiante* e9 = estudianteCrear("R", "algo", 10);
-		estudiante* e10 = estudianteCrear("A", "algo", 10);
-		// bool menor1 = menorEstudiante(e9, e6);//true
-		// bool menor2 = menorEstudiante(e9, e7);//true
-		// bool menor3 = menorEstudiante(e9, e8);//true
-		// printf("------------Tests de estudianteMenor \n");
-		// printf("R < Pepe: %d\n", menor1);
-		// printf("R < Rafael: %d\n", menor2);
-		// printf("R < Zorro: %d\n", menor3);
+	 // 	estudiante* e6 = estudianteCrear("Pepe", "algo", 10);
+		// estudiante* e7 = estudianteCrear("Rafael", "algo", 10);
+		// estudiante* e8 = estudianteCrear("Zorro", "algo", 10);
+		// // estudiante* e9 = estudianteCrear("R", "algo", 10);
+		// estudiante* e10 = estudianteCrear("A", "algo", 10);
+		// // bool menor1 = menorEstudiante(e9, e6);//true
+		// // bool menor2 = menorEstudiante(e9, e7);//true
+		// // bool menor3 = menorEstudiante(e9, e8);//true
+		// // printf("------------Tests de estudianteMenor \n");
+		// // printf("R < Pepe: %d\n", menor1);
+		// // printf("R < Rafael: %d\n", menor2);
+		// // printf("R < Zorro: %d\n", menor3);
 
-	 	insertarOrdenado(listaParafiltrar, e6, menorEstudiante);
-	 	insertarOrdenado(listaParafiltrar, e7, menorEstudiante);
-	 	//insertarOrdenado(listaParafiltrar, e8, menorEstudiante);
-	 	altaListaImprimir(listaParafiltrar, "LUCIA.txt", estudianteImprimir);
-	 	filtrarAltaLista(listaParafiltrar, menorEstudiante, e7);
-	 	altaListaImprimir(listaParafiltrar, "filtrado.txt", estudianteImprimir);
+	 // 	insertarOrdenado(listaParafiltrar, e6, menorEstudiante);
+	 // 	insertarOrdenado(listaParafiltrar, e7, menorEstudiante);
+	 // 	//insertarOrdenado(listaParafiltrar, e8, menorEstudiante);
+	 // 	altaListaImprimir(listaParafiltrar, "LUCIA.txt", estudianteImprimir);
+	 // 	filtrarAltaLista(listaParafiltrar, menorEstudiante, e7);
+	 // 	altaListaImprimir(listaParafiltrar, "filtrado.txt", estudianteImprimir);
 
 
 
