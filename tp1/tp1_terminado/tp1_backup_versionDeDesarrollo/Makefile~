@@ -1,0 +1,22 @@
+CC=c99
+CFLAGS=-Wall -Wextra -pedantic -O0 -ggdb -lm
+OBJS=altaLista_c.o altaLista_asm.o
+OBJSLU=altaLista_c_lu.c altaLista_asm_lu.o
+TESTOBJS=tester.o
+NASM=nasm
+NASMFLAGS=-f elf64 -g -F DWARF
+
+mainLu: $(OBJSLU) 
+
+main: $(OBJS)
+
+tester: $(TESTOBJS) $(OBJS)
+
+%.o: %.asm
+	$(NASM) $(NASMFLAGS) $< -o $@
+
+all: tester main
+
+clean:
+	rm -f *.o
+	rm -f main tester

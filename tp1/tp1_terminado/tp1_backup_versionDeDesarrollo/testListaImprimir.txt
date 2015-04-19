@@ -1,0 +1,18 @@
+SanataNombre
+	SanataGrupo
+	1
+SanataNombre
+	SanataGrupo
+	2
+SanataNombre
+	SanataGrupo
+	3
+SanataNombre
+	SanataGrupo
+	25
+SanataNombre
+	SanataGrupo
+	125
+SanataNombre
+	SanataGrupo
+	255
