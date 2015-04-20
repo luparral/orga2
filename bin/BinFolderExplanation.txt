@@ -1,0 +1,1 @@
+Esta carpeta existe ya que acá se guardan los archivos compilados generados con el Makefile.
