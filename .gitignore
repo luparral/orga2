@@ -25,6 +25,7 @@
 
 # Gedit temp files
 *.*~
+*.swp
 
 # LaTeX temporary files
 *.aux
