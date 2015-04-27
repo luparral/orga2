@@ -21,32 +21,25 @@ punpckhbw xmm2, xmm7 ;0|P0a|0|P0b|0|P0c|0|P0d|0|P1a|0|P1b|0|P1c|0|P1d  H
 
 pxor xmm7, xmm7
 movdqu xmm3, xmm10
-punpcklbw xmm0, xmm7 ;0|0|0|P3a|0|0|0|P3b|0|0|0|P3c|0|0|0|P3d  L
-punpcklbw xmm3, xmm7 ;0|0|0|P2a|0|0|0|P2b|0|0|0|P2c|0|0|0|P2d  H
+punpcklwd xmm10, xmm7 ;0|0|0|P3a|0|0|0|P3b|0|0|0|P3c|0|0|0|P3d  L
+punpcklwd xmm3, xmm7 ;0|0|0|P2a|0|0|0|P2b|0|0|0|P2c|0|0|0|P2d  H
 
 pxor xmm7, xmm7
 movdqu xmm4, xmm2
-punpcklbw xmm2, xmm7 ;0|0|0|P1a|0|0|0|P1b|0|0|0|P1c|0|0|0|P1d  L
-punpcklbw xmm4, xmm7 ;0|0|0|P0a|0|0|0|P0b|0|0|0|P0c|0|0|0|P0d  H
+punpcklwd xmm2, xmm7 ;0|0|0|P1a|0|0|0|P1b|0|0|0|P1c|0|0|0|P1d  L
+punpcklwd xmm4, xmm7 ;0|0|0|P0a|0|0|0|P0b|0|0|0|P0c|0|0|0|P0d  H
 
-cvtdq2pd xmm5, xmm10 ;convert packed dword int to packed double FP
-cvtdq2pd xmm6, xmm3
-cvtdq2pd xmm7, xmm2
-cvtdq2pd xmm8, xmm4
+cvtdq2ps xmm5, xmm10 ;convert packed dword int to packed double FP
+cvtdq2ps xmm6, xmm3
+cvtdq2ps xmm7, xmm2
+cvtdq2ps xmm8, xmm4
 
 mulps xmm5, _value
 mulps xmm6, _value
 mulps xmm7, _value
 mulps xmm8, _value
 
-;tengo que volver a convertir a int?
-
-packusdw xmm5, xmm6
-packusdw xmm7, xmm8
-
-packuswb xmm5, xmm7
-
-;en xmm5 tengo los primeros 4 pixeles ya multiplicados por _value
+; ahora desempaqueto xmm1
 
 pxor xmm7, xmm7
 movdqu xmm2, xmm1 ;copio xmm1
@@ -57,37 +50,45 @@ punpckhbw xmm2, xmm7 ;0|Pp0a|0|Pp0b|0|Pp0c|0|Pp0d|0|Pp1a|0|Pp1b|0|Pp1c|0|Pp1d  H
 
 pxor xmm7, xmm7
 movdqu xmm3, xmm1
-punpcklbw xmm1, xmm7 ;0|0|0|Pp3a|0|0|0|Pp3b|0|0|0|Pp3c|0|0|0|Pp3d  L
-punpcklbw xmm3, xmm7 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  H
+punpcklwd xmm1, xmm7 ;0|0|0|Pp3a|0|0|0|Pp3b|0|0|0|Pp3c|0|0|0|Pp3d  L
+punpcklwd xmm3, xmm7 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  H
 
 pxor xmm7, xmm7
 movdqu xmm4, xmm2
-punpcklbw xmm2, xmm7 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  L
-punpcklbw xmm4, xmm7 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  H
+punpcklwd xmm2, xmm7 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  L
+punpcklwd xmm4, xmm7 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  H
 
-cvtdq2pd xmm9, xmm1 ;convert packed dword int to packed double FP
-cvtdq2pd xmm6, xmm3
-cvtdq2pd xmm7, xmm2
-cvtdq2pd xmm8, xmm4
+;convierto de int a float
+
+cvtdq2ps xmm9, xmm1 ;convert packed dword int to packed double FP
+cvtdq2ps xmm10, xmm3
+cvtdq2ps xmm11, xmm2
+cvtdq2ps xmm12, xmm4
+
+
+;multiplico
 
 mulps xmm9, _1MenosValue
-mulps xmm6, _1MenosValue
-mulps xmm7, _1MenosValue
-mulps xmm8, _1MenosValue
+mulps xmm10, _1MenosValue
+mulps xmm11, _1MenosValue
+mulps xmm12, _1MenosValue
 
-;tengo que volver a convertir a int?
-
-packusdw xmm9, xmm6
-packusdw xmm7, xmm8
-
-packuswb xmm9, xmm7
-
-;en xmm9 tengo los primeros 4 pixeles ya multiplicados por _value
+;sumo con el registro analogo de xmm0
 
 addps xmm5, xmm9
+addps xmm6, xmm10
+addps xmm7, xmm11
+addps xmm8, xmm12
+
+packusdw xmm5, xmm6
+packusdw xmm7, xmm8
+
+packuswb xmm5, xmm7
+
 movups xmm0, xmm5 ;pongo el resultado en xmm0, es decir, voy pisando data1 
 
 movups xmm0, [xmm0+16] ;me muevo en xmm0 (data1)
 movups xmm1, [xmm1+16] ;me muevo en xmm1 (data1)
 
 loop .ciclo
+	
