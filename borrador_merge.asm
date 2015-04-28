@@ -10,6 +10,9 @@ section .text
 ; xmm0 = P0a|P0b|P0c|P0d|P1a|P1b|P1c|P1d|P2a|P2b|P2c|P2d|P3a|P3b|P3c|P3d
 ; xmm1 = Pp0a|Pp0b|Pp0c|Pp0d|Pp1a|Pp1b|Pp1c|Pp1d|Pp2a|Pp2b|Pp2c|Pp2d|Pp3a|Pp3b|Pp3c|Pp3d
 
+
+
+
 movdqu xmm10, xmm0 ;copio xmm0 en xmm10 para no arruinar xmm0 porque en este devuelvo
 
 pxor xmm7, xmm7
