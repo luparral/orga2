@@ -7,12 +7,14 @@
 
 ;cvtsi2ss
 
-;section .rodata
-;	_value: byte value, value, value, value
-;	_1menosValue: byte 1-value, 1-value, 1-value, 1-value
+section .rodata
+	uno: dq 1.0
 
 ; void ASM_merge1(uint32_t w, uint32_t h, uint8_t* data1, uint8_t* data2, float value)
+
 global ASM_merge1
+
+section .text
 ASM_merge1:
 	push rbp
 	mov rbp, rsp
@@ -30,9 +32,9 @@ ASM_merge1:
 
 	;registro xmm15 =  [value|value|value|value] para multiplicar
 	pxor xmm15, xmm15
-	movq xmm15, xmm0
+	movq xmm15, xmm0 ;investigar si no es mov para double 
 	pslldq xmm15, 4
-	movq xmm15, xmm0
+	movq xmm15, xmm10
 	pslldq xmm15, 4
 	movq xmm15, xmm0
 	pslldq xmm15, 4
@@ -40,7 +42,7 @@ ASM_merge1:
 	
 	; xmm0 = 1 - value
 	pxor xmm1, xmm1
-	mov byte xmm1, 1
+	movq xmm1, [uno] ;0000 0000 0000 0001
 	subsd xmm1, xmm0
 	movq xmm0, xmm1
 	 
@@ -60,7 +62,7 @@ ASM_merge1:
 	mul ebx ; ebx*eax -> res = p.a en edx - p.b en eax
 	xor r13, r13
 	mov r13d, edx
-	shl r13, 4
+	shl r13, 4 ;chequear cuanto shiftea shl 4B o 4bits?
 	mov r13d, eax 
 
 	;en r13 tengo r12 * r13
@@ -77,32 +79,31 @@ ASM_merge1:
 	.ciclo
 		cmp rcx, 0
 		je .terminarMerge
-		movq xmm0, r14 ; [P_a_1 | P_a_2 | P_a_3 | P_a_4]
-		movq xmm1, r15 ; [P_b_1 | P_b_2 | P_b_3 | P_b_4]
+		movdqu xmm0, [r14] ; [P_a_3 | P_a_2 | P_a_1 | P_a_0]
+		movdqu xmm1, [r15] ; [P_b_3 | P_b_2 | P_b_1 | P_b_0]
 		pxor xmm7, xmm7
 
-		movdqu xmm10, xmm0 ;copio xmm0 en xmm10 para no arruinar xmm0 porque en este devuelvo
+		;movdqu xmm10, xmm0 ;copio xmm0 en xmm10 para no arruinar xmm0 porque en este devuelvo
 
-		movdqu xmm2, xmm10 ;copio xmm0
-		punpcklbw xmm10, xmm7 ;0|P2a|0|P2b|0|P2c|0|P2d|0|P3a|0|P3b|0|P3c|0|P3d  L
-		punpckhbw xmm2, xmm7 ;0|P0a|0|P0b|0|P0c|0|P0d|0|P1a|0|P1b|0|P1c|0|P1d  H
+		movdqu xmm2, xmm0 ;copio xmm10
+		punpcklbw xmm0, xmm7 ;0|P1a|0|P1b|0|P1c|0|P1d|0|P0a|0|P0b|0|P0c|0|P0d  L
+		punpckhbw xmm2, xmm7 ;0|P3a|0|P3b|0|P3c|0|P3d|0|P2a|0|P2b|0|P2c|0|P2d  H
 
 		;ahora tengo que desempaquetar una vez mas de word a double word
 
-		pxor xmm7, xmm7
-		movdqu xmm3, xmm10
-		punpcklwd xmm10, xmm7 ;0|0|0|P3a|0|0|0|P3b|0|0|0|P3c|0|0|0|P3d  L
-		punpckhwd xmm3, xmm7 ;0|0|0|P2a|0|0|0|P2b|0|0|0|P2c|0|0|0|P2d  H
+		movdqu xmm3, xmm0
+		punpcklwd xmm0, xmm7 ;0|0|0|P0a|0|0|0|P0b|0|0|0|P0c|0|0|0|P0d  L
+		punpckhwd xmm3, xmm7 ;0|0|0|P1a|0|0|0|P1b|0|0|0|P1c|0|0|0|P1d  H
 
-		pxor xmm7, xmm7
 		movdqu xmm4, xmm2
-		punpcklwd xmm2, xmm7 ;0|0|0|P1a|0|0|0|P1b|0|0|0|P1c|0|0|0|P1d  L
-		punpckhwd xmm4, xmm7 ;0|0|0|P0a|0|0|0|P0b|0|0|0|P0c|0|0|0|P0d  H
+		punpcklwd xmm2, xmm7 ;0|0|0|P2a|0|0|0|P2b|0|0|0|P2c|0|0|0|P2d  L
+		punpckhwd xmm4, xmm7 ;0|0|0|P3a|0|0|0|P3b|0|0|0|P3c|0|0|0|P3d  H
 
-		cvtdq2ps xmm5, xmm10 ;convert packed dword int to packed double FP
-		cvtdq2ps xmm6, xmm3
-		cvtdq2ps xmm7, xmm2
-		cvtdq2ps xmm8, xmm4
+		;convert packed dword int to packed double FP
+		cvtdq2ps xmm5, xmm0  ;P0
+		cvtdq2ps xmm6, xmm3  ;P1
+		cvtdq2ps xmm7, xmm2  ;P2
+		cvtdq2ps xmm8, xmm4  ;P3
 
 		mulps xmm5, xmm15
 		mulps xmm6, xmm15
@@ -113,42 +114,39 @@ ASM_merge1:
 
 		pxor xmm7, xmm7
 		movdqu xmm2, xmm1 ;copio xmm1
-		punpcklbw xmm1, xmm7 ;0|Pp2a|0|Pp2b|0|Pp2c|0|Pp2d|0|Pp3a|0|Pp3b|0|Pp3c|0|Pp3d  L
-		punpckhbw xmm2, xmm7 ;0|Pp0a|0|Pp0b|0|Pp0c|0|Pp0d|0|Pp1a|0|Pp1b|0|Pp1c|0|Pp1d  H
+		punpcklbw xmm1, xmm7;0|Pp1a|0|Pp1b|0|Pp1c|0|Pp1d|0|Pp0a|0|Pp0b|0|Pp0c|0|Pp0d  L
+		punpckhbw xmm2, xmm7 ;0|Pp3a|0|Pp3b|0|Pp3c|0|Pp3d|0|Pp2a|0|Pp2b|0|Pp2c|0|Pp2d  H
 
 		;ahora tengo que desempaquetar una vez mas de word a double word
 
 		pxor xmm7, xmm7
 		movdqu xmm3, xmm1
-		punpcklwd xmm1, xmm7 ;0|0|0|Pp3a|0|0|0|Pp3b|0|0|0|Pp3c|0|0|0|Pp3d  L
-		punpckhwd xmm3, xmm7 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  H
+		punpcklwd xmm1, xmm7 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  L
+		punpckhwd xmm3, xmm7 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  H
 
 		pxor xmm7, xmm7
 		movdqu xmm4, xmm2
-		punpcklwd xmm2, xmm7 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  L
-		punpckhwd xmm4, xmm7 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  H
+		punpcklwd xmm2, xmm7 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  L
+		punpckhwd xmm4, xmm7 ;0|0|0|Pp3a|0|0|0|Pp3b|0|0|0|Pp3c|0|0|0|Pp3d  H
 
 		;convierto de int a float
-
-		cvtdq2ps xmm9, xmm1 ;convert packed dword int to packed double FP
-		cvtdq2ps xmm10, xmm3
-		cvtdq2ps xmm11, xmm2
-		cvtdq2ps xmm12, xmm4
-
+		;convert packed dword int to packed double FP
+		cvtdq2ps xmm9, xmm1 ;Pp0
+		cvtdq2ps xmm10, xmm3 ;Pp1
+		cvtdq2ps xmm11, xmm2 ;Pp2
+		cvtdq2ps xmm12, xmm4 ;Pp3
 
 		;multiplico
-
 		mulps xmm9, xmm14
 		mulps xmm10, xmm14
 		mulps xmm11, xmm14
 		mulps xmm12, xmm14
 
 		;sumo con el registro analogo de xmm0
-
-		addps xmm5, xmm9
-		addps xmm6, xmm10
-		addps xmm7, xmm11
-		addps xmm8, xmm12
+		addps xmm5, xmm9 ;P0*value + Pp0*(1-value)
+		addps xmm6, xmm10 ;P1*value + Pp1*(1-value)
+		addps xmm7, xmm11 ;P2*value + Pp2*(1-value)
+		addps xmm8, xmm12 ;P3*value + Pp3*(1-value)
 
 		;convierto nuevamente a int
 		CVTPS2DQ xmm5, xmm5
@@ -156,12 +154,12 @@ ASM_merge1:
 		CVTPS2DQ xmm7, xmm7
 		CVTPS2DQ xmm8, xmm8
 
-		packusdw xmm5, xmm6
-		packusdw xmm7, xmm8
+		packusdw xmm5, xmm6 ;[P1|P0]
+		packusdw xmm7, xmm8 ;[P3|P2]
 
-		packuswb xmm5, xmm7
+		packuswb xmm5, xmm7 ;[P3|P2|P1|P0]
 
-		movups xmm0, xmm5 ;pongo el resultado en xmm0, es decir, voy pisando data1 
+		movups [r14], xmm5
 
 		add r14, 16 ;me muevo en xmm0 (data1)
 		add r15, 16 ;me muevo en xmm1 (data1)
