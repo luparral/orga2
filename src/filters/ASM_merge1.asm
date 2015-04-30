@@ -8,7 +8,9 @@
 ;cvtsi2ss
 
 section .rodata
-	uno: dq 1.0
+	uno: dd 1.0
+	cero: dq 0.0
+	puntoCinco: dd 0.5
 
 ; void ASM_merge1(uint32_t w, uint32_t h, uint8_t* data1, uint8_t* data2, float value)
 
@@ -31,30 +33,21 @@ ASM_merge1:
 	;xmm0 sigue siendo value
 
 	;registro xmm15 =  [value|value|value|value] para multiplicar
-	pxor xmm15, xmm15
-	movq xmm15, xmm0 ;investigar si no es mov para double 
-	pslldq xmm15, 4
-	movq xmm15, xmm10
-	pslldq xmm15, 4
-	movq xmm15, xmm0
-	pslldq xmm15, 4
-	movq xmm15, xmm0
 	
-	; xmm0 = 1 - value
+	;;TEMP!!
+	;movq xmm0, [uno]
+	;;TEMP!!
+	movups xmm9, xmm0 ;copio value
+	shufps xmm0, xmm0, 0x00
+	movups xmm15, xmm0
+
 	pxor xmm1, xmm1
-	movq xmm1, [uno] ;0000 0000 0000 0001
-	subsd xmm1, xmm0
-	movq xmm0, xmm1
-	 
+	movups xmm1, [uno] ;0000 0000 0000 0001
+	subps xmm1, xmm9 ;1-value
+	
+	shufps xmm1, xmm1, 0x00
 	;registro xmm14 = [1-value|1-value|1-value|1-value] para multiplicar
-	pxor xmm14, xmm14
-	movq xmm14, xmm0
-	pslldq xmm14, 4
-	movq xmm14, xmm0
-	pslldq xmm14, 4
-	movq xmm14, xmm0
-	pslldq xmm14, 4
-	movq xmm14, xmm0
+	movups xmm14, xmm1
 
 	;calculo el tamanio del vector
 	mov eax, r12d
@@ -77,15 +70,19 @@ ASM_merge1:
 	;m1[ih][iw][ii] = (uint8_t)(value * ((float)m1[ih][iw][ii]) + (1.0-value) * ((float)m2[ih][iw][ii]));
 
 	.ciclo
+		;xmm14 = 1-value
+		;xmm15 = value
 		cmp rcx, 0
 		je .terminarMerge
-		movdqu xmm0, [r14] ; [P_a_3 | P_a_2 | P_a_1 | P_a_0]
-		movdqu xmm1, [r15] ; [P_b_3 | P_b_2 | P_b_1 | P_b_0]
+
+		;[0 1 2 3]
+
+
+		movdqu xmm0, [r14] ; [P_a_3 | P_a_2 | P_a_1 | P_a_0] ;data1
+		movdqu xmm1, [r15] ; [P_b_3 | P_b_2 | P_b_1 | P_b_0] ;data2
 		pxor xmm7, xmm7
 
-		;movdqu xmm10, xmm0 ;copio xmm0 en xmm10 para no arruinar xmm0 porque en este devuelvo
-
-		movdqu xmm2, xmm0 ;copio xmm10
+		movdqu xmm2, xmm0 ;copio xmm0
 		punpcklbw xmm0, xmm7 ;0|P1a|0|P1b|0|P1c|0|P1d|0|P0a|0|P0b|0|P0c|0|P0d  L
 		punpckhbw xmm2, xmm7 ;0|P3a|0|P3b|0|P3c|0|P3d|0|P2a|0|P2b|0|P2c|0|P2d  H
 
@@ -110,24 +107,22 @@ ASM_merge1:
 		mulps xmm7, xmm15
 		mulps xmm8, xmm15
 
-		; ahora desempaqueto xmm1
+		;ahora desempaqueto xmm1
 
-		pxor xmm7, xmm7
+		pxor xmm13, xmm13
 		movdqu xmm2, xmm1 ;copio xmm1
-		punpcklbw xmm1, xmm7;0|Pp1a|0|Pp1b|0|Pp1c|0|Pp1d|0|Pp0a|0|Pp0b|0|Pp0c|0|Pp0d  L
-		punpckhbw xmm2, xmm7 ;0|Pp3a|0|Pp3b|0|Pp3c|0|Pp3d|0|Pp2a|0|Pp2b|0|Pp2c|0|Pp2d  H
+		punpcklbw xmm1, xmm13;0|Pp1a|0|Pp1b|0|Pp1c|0|Pp1d|0|Pp0a|0|Pp0b|0|Pp0c|0|Pp0d  L
+		punpckhbw xmm2, xmm13 ;0|Pp3a|0|Pp3b|0|Pp3c|0|Pp3d|0|Pp2a|0|Pp2b|0|Pp2c|0|Pp2d  H
 
 		;ahora tengo que desempaquetar una vez mas de word a double word
 
-		pxor xmm7, xmm7
 		movdqu xmm3, xmm1
-		punpcklwd xmm1, xmm7 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  L
-		punpckhwd xmm3, xmm7 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  H
+		punpcklwd xmm1, xmm13 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  L
+		punpckhwd xmm3, xmm13 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  H
 
-		pxor xmm7, xmm7
 		movdqu xmm4, xmm2
-		punpcklwd xmm2, xmm7 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  L
-		punpckhwd xmm4, xmm7 ;0|0|0|Pp3a|0|0|0|Pp3b|0|0|0|Pp3c|0|0|0|Pp3d  H
+		punpcklwd xmm2, xmm13 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  L
+		punpckhwd xmm4, xmm13 ;0|0|0|Pp3a|0|0|0|Pp3b|0|0|0|Pp3c|0|0|0|Pp3d  H
 
 		;convierto de int a float
 		;convert packed dword int to packed double FP
@@ -149,17 +144,17 @@ ASM_merge1:
 		addps xmm8, xmm12 ;P3*value + Pp3*(1-value)
 
 		;convierto nuevamente a int
-		CVTPS2DQ xmm5, xmm5
-		CVTPS2DQ xmm6, xmm6
-		CVTPS2DQ xmm7, xmm7
-		CVTPS2DQ xmm8, xmm8
+		cvtps2dq xmm5, xmm5
+		cvtps2dq xmm6, xmm6
+		cvtps2dq xmm7, xmm7
+		cvtps2dq xmm8, xmm8
 
 		packusdw xmm5, xmm6 ;[P1|P0]
 		packusdw xmm7, xmm8 ;[P3|P2]
 
 		packuswb xmm5, xmm7 ;[P3|P2|P1|P0]
 
-		movups [r14], xmm5
+		movdqu [r14], xmm5
 
 		add r14, 16 ;me muevo en xmm0 (data1)
 		add r15, 16 ;me muevo en xmm1 (data1)
@@ -167,5 +162,5 @@ ASM_merge1:
 		jmp .ciclo
 
 	.terminarMerge
-		push rbp
+		pop rbp
   		ret
