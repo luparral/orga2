@@ -10,6 +10,7 @@
 section .rodata
 	uno: dd 1.0
 
+
 ; void ASM_merge1(uint32_t w, uint32_t h, uint8_t* data1, uint8_t* data2, float value)
 
 global ASM_merge1
@@ -32,12 +33,12 @@ ASM_merge1:
 
 	;registro xmm15 =  [value|value|value|value] para multiplicar
 	
-	movups xmm9, xmm0 ;copio value
+	movss xmm9, xmm0 ;copio value
 	shufps xmm0, xmm0, 0x00
 	movups xmm15, xmm0
 
 	pxor xmm1, xmm1
-	movups xmm1, [uno] ;0000 0000 0000 0001
+	movss xmm1, [uno] ;0000 0000 0000 0001
 	subps xmm1, xmm9 ;1-value
 	
 	shufps xmm1, xmm1, 0x00
@@ -73,7 +74,7 @@ ASM_merge1:
 		;[0 1 2 3]
 
 
-		movdqu xmm0, [r14] ; [P_a_3 | P_a_2 | P_a_1 | P_a_0] ;data1
+		movdqu xmm0, [r14] ; [P_a_3 | P_a_2 | P_a_1 | P_a_0] ;data1;abgr
 		movdqu xmm1, [r15] ; [P_b_3 | P_b_2 | P_b_1 | P_b_0] ;data2
 		pxor xmm7, xmm7
 

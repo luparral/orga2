@@ -6,6 +6,12 @@
 ; ************************************************************************* ;
 section .rodata
 	uno: dd 1.0
+	dosCincoSeis: dd 32768.0
+
+;multiplico value * un millon ;se puede multiplicar con instruccion de float *256 // 1024 mas precision
+;paso a int
+;multiplico por el pixeles
+;divido el resultado por un millon para cada pixel *shift de 8 (divido por 256)
 
 ; void ASM_merge2(uint32_t w, uint32_t h, uint8_t* data1, uint8_t* data2, float value)
 global ASM_merge2
@@ -25,18 +31,31 @@ ASM_merge2:
 	mov r15, rcx ; r15 = data2
 	;xmm0 sigue siendo value
 
+	pxor xmm1, xmm1
+	movss xmm1, [dosCincoSeis]
+	mulss xmm0, xmm1
+	CVTTPS2DQ xmm0, xmm0 ; convierto value*256 a int
+
 	;registro xmm15 =  [value|value|value|value] para multiplicar
-	movups xmm9, xmm0 ;copio value
-	shufps xmm0, xmm0, 0x00
-	movups xmm15, xmm0
+	movdqu xmm9, xmm0 ;copio value
+	pshufd xmm0, xmm0, 0x00
+	
+	movdqu xmm15, xmm0
 
 	pxor xmm1, xmm1
-	movups xmm1, [uno] ;0000 0000 0000 0001
-	subps xmm1, xmm9 ;1-value
+	
+	movss xmm1, [uno] ;0000 0000 0000 0001
+	movss xmm2, [dosCincoSeis]
+	
+	mulss xmm1, xmm2 ; multiplico 1*256
+	CVTTPS2DQ xmm1, xmm1;convierto 1*256 a int	
 
-	shufps xmm1, xmm1, 0x00
+	psubd xmm1, xmm9 ;1-value
+
+
+	pshufd xmm1, xmm1, 0x00
 	;registro xmm14 = [1-value|1-value|1-value|1-value] para multiplicar
-	movups xmm14, xmm1
+	movdqu xmm14, xmm1
 
 	;calculo el tamanio del vector
 	mov eax, r12d
@@ -64,8 +83,6 @@ ASM_merge2:
 		cmp rcx, 0
 		je .terminarMerge
 
-		;[0 1 2 3]
-
 		movdqu xmm0, [r14] ; [P_a_3 | P_a_2 | P_a_1 | P_a_0] ;data1
 		movdqu xmm1, [r15] ; [P_b_3 | P_b_2 | P_b_1 | P_b_0] ;data2
 		pxor xmm7, xmm7
@@ -84,71 +101,58 @@ ASM_merge2:
 		punpcklwd xmm2, xmm7 ;0|0|0|P1a|0|0|0|P1b|0|0|0|P1c|0|0|0|P1d  L
 		punpckhwd xmm4, xmm7 ;0|0|0|P0a|0|0|0|P0b|0|0|0|P0c|0|0|0|P0d  H
 
-		;convert packed dword int to packed double FP
-		cvtdq2ps xmm5, xmm0  ;P3
-		cvtdq2ps xmm6, xmm3  ;P2
-		cvtdq2ps xmm7, xmm2  ;P1
-		cvtdq2ps xmm8, xmm4  ;P0
-
-		mulps xmm5, xmm15
-		mulps xmm6, xmm15
-		mulps xmm7, xmm15
-		mulps xmm8, xmm15
-
-		;convierto a int nuevamente
-		cvtps2dq xmm5, xmm5
-		cvtps2dq xmm6, xmm6
-		cvtps2dq xmm7, xmm7
-		cvtps2dq xmm8, xmm8
+		;multiplico ints
+		pmulld xmm0, xmm15
+		pmulld xmm3, xmm15
+		pmulld xmm2, xmm15
+		pmulld xmm4, xmm15
+		
+		psrad xmm0, 15
+		psrad xmm3, 15
+		psrad xmm2, 15
+		psrad xmm4, 15
 
 		;ahora desempaqueto xmm1
 
 		pxor xmm13, xmm13
-		movdqu xmm2, xmm1 ;copio xmm1
+		movdqu xmm5, xmm1 ;copio xmm1
 		punpcklbw xmm1, xmm13;0|Pp3a|0|Pp3b|0|Pp3c|0|Pp3d|0|Pp2a|0|Pp2b|0|Pp2c|0|Pp2d  L
-		punpckhbw xmm2, xmm13 ;0|Pp1a|0|Pp1b|0|Pp1c|0|Pp1d|0|Pp0a|0|Pp0b|0|Pp0c|0|Pp0d  H
+		punpckhbw xmm5, xmm13 ;0|Pp1a|0|Pp1b|0|Pp1c|0|Pp1d|0|Pp0a|0|Pp0b|0|Pp0c|0|Pp0d  H
 
 		;ahora tengo que desempaquetar una vez mas de word a double word
 
-		movdqu xmm3, xmm1
+		movdqu xmm6, xmm1
 		punpcklwd xmm1, xmm13 ;0|0|0|Pp3a|0|0|0|Pp3b|0|0|0|Pp3c|0|0|0|Pp3d  L
-		punpckhwd xmm3, xmm13 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  H
+		punpckhwd xmm6, xmm13 ;0|0|0|Pp2a|0|0|0|Pp2b|0|0|0|Pp2c|0|0|0|Pp2d  H
 
-		movdqu xmm4, xmm2
-		punpcklwd xmm2, xmm13 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  L
-		punpckhwd xmm4, xmm13 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  H
-
-		;convierto de int a float
-		;convert packed dword int to packed double FP
-		cvtdq2ps xmm9, xmm1 ;Pp3
-		cvtdq2ps xmm10, xmm3 ;Pp2
-		cvtdq2ps xmm11, xmm2 ;Pp1
-		cvtdq2ps xmm12, xmm4 ;Pp0
+		movdqu xmm8, xmm5
+		punpcklwd xmm5, xmm13 ;0|0|0|Pp1a|0|0|0|Pp1b|0|0|0|Pp1c|0|0|0|Pp1d  L
+		punpckhwd xmm8, xmm13 ;0|0|0|Pp0a|0|0|0|Pp0b|0|0|0|Pp0c|0|0|0|Pp0d  H
 
 		;multiplico
-		mulps xmm9, xmm14
-		mulps xmm10, xmm14
-		mulps xmm11, xmm14
-		mulps xmm12, xmm14
 
-		;convierto a int nuevamente
-		cvtps2dq xmm9, xmm9
-		cvtps2dq xmm10, xmm10
-		cvtps2dq xmm11, xmm11
-		cvtps2dq xmm12, xmm12
+		pmulld xmm1, xmm14
+		pmulld xmm6, xmm14
+		pmulld xmm5, xmm14
+		pmulld xmm8, xmm14
+
+		psrad xmm1, 15
+		psrad xmm6, 15
+		psrad xmm5, 15
+		psrad xmm8, 15
 
 		;sumo con el registro analogo de xmm0
-		paddd xmm5, xmm9 ;P3*value + Pp3*(1-value)
-		paddd xmm6, xmm10 ;P2*value + Pp2*(1-value)
-		paddd xmm7, xmm11 ;P1*value + Pp1*(1-value)
-		paddd xmm8, xmm12 ;P0*value + Pp0*(1-value)
+		paddd xmm0, xmm1 ;P3*value + Pp3*(1-value)
+		paddd xmm3, xmm6 ;P2*value + Pp2*(1-value)
+		paddd xmm2, xmm5 ;P1*value + Pp1*(1-value)
+		paddd xmm4, xmm8 ;P0*value + Pp0*(1-value)
 
-		packusdw xmm5, xmm6 ;[P3|P2]
-		packusdw xmm7, xmm8 ;[P1|P0]
+		packusdw xmm0, xmm3 ;[P3|P2]
+		packusdw xmm2, xmm4 ;[P1|P0]
 
-		packuswb xmm5, xmm7 ;[P3|P2|P1|P0]
+		packuswb xmm0, xmm2 ;[P3|P2|P1|P0]
 
-		movdqu [r14], xmm5
+		movdqu [r14], xmm0
 
 		add r14, 16 ;me muevo en xmm0 (data1)
 		add r15, 16 ;me muevo en xmm1 (data1)
