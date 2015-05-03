@@ -19,6 +19,7 @@ tresSesenta: dd 360.00
 quinientosDiez: dd 510.0
 topeSuperior: dd 255.0001
 
+section .text
 ASM_hsl2:
 	;Hay registros salvados innecesariamente. Esto es para facilitar la hora del desarrollo.
 	;La pila queda alineada, cuando se termine de desarrollar se acomoda y ya
@@ -188,11 +189,18 @@ ASM_hsl2:
 					jmp recortarH
 
 				recortarH:
-					movdqu xmm4, xmm1
-					movss  xmm5, [tresSesenta]
+					;if(xmm4 >= xmm5) h = h - 360
 
-					;FALTA ESTO
+					movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
+					movss  xmm5, [tresSesenta] 	;xmm5 = |basura,basura,basura, 360|
 
+					cmpps xmm4, xmm5, 5
+					movdqu xmm5, xmm4 		;xmm5 = |basura,basura,basura,FFF si true   000 sino|
+					movdqu xmm4, xmm1 		;xmm4 = |basura,basura,basura,  h |
+
+					pand xmm5, xmm5 		;xmm5 = |basura,basura,basura,h si true   0 sino|
+
+					;JOYA AHORA NECESITO RESTAR 360 A H SI ES TRUE Y 0 SINO
 
 			calculoDeL:
 				pxor xmm4, xmm4
