@@ -190,7 +190,7 @@ ASM_hsl2:
 				recortarH:
 					;if(xmm4 >= xmm5) h = h - 360
 
-					movdqu xmm4, xmm1 			;xmm1 = |basura,basura,basura,  h |
+					movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
 					movss  xmm5, [tresSesenta] 	;xmm5 = |basura,basura,basura, 360|
 
 					cmpps xmm4, xmm5, 5
