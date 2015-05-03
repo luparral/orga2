@@ -78,13 +78,14 @@ push r15
     ;hay que tenerlo en cuenta tambien para los pixeles en la linea de la columna, rdx +4 debe alcanzar
     ;luego ya se puede ir sumando de a width*4, hasta que este en la anteultima linea (height-1)
 
-    mov r12, rdi                    ;r12: ancho de la imagen en bytes
-    mov r13, rsi                    ;r13: alto de la imagen en bytes
+    mov r12, rdi                    ;r12: ancho de la imagen en pixeles
+    mov r13, rsi                    ;r13: alto de la imagen en pixeles
     mov rbx, rdx                    ;rbx; *imagen
 
+    lea rdi, [r12*4]                ;rdi: ancho de la imagen en bytes :)
     call malloc                     ;rbp: *vector1 de una linea de ancho
     mov rbp, rax
-    mov rdi, r12
+    lea rdi, [r12*4]
     call malloc                     ;rax: *vector2 de una linea de ancho
 
     xor r14, r14                    ;r14: contador para el alto
@@ -97,24 +98,25 @@ push r15
         add r15, 2
 
         ;guardar r_0 y r_1
-        ;copiar_row0 rbp, rbx, r12
-        ;copiar_row1 rax, rbx+r12*4, r12 ;rax: vector con linea siguiente
-        ;mov r10, rbp
-        ;mov r11, rax
+        copiar_row0 rbp, rbx, r12
+        copiar_row1 rax, rbx+r12*4, r12 ;rax: vector con linea siguiente
+
+        mov r10, rbp
+        mov r11, rax
 
         .ciclo_ancho:
 
             ;traigo los 4 pixeles de top y les hago unpck
-            ;movdqu xmm0, [r10]          ;xmm0: |7p|6p|5p|4p|3p|2p|1p|0p|
-            movdqu xmm0, [rbx]          ;xmm0: |7p|6p|5p|4p|3p|2p|1p|0p|
+            movdqu xmm0, [r10]          ;xmm0: |7p|6p|5p|4p|3p|2p|1p|0p|
+            ;movdqu xmm0, [rbx]          ;xmm0: |7p|6p|5p|4p|3p|2p|1p|0p|
             pxor xmm1, xmm1
             movdqu xmm1, xmm0
             punpcklbw xmm0, xmm15       ;xmm0: |0|r1|0|g1|0|b1|0|a1|0|r0|0|g0|0|b0|0|a0| 1ra fila
             punpckhbw xmm1, xmm15       ;xmm1: |0|r3|0|g3|0|b3|0|a3|0|r2|0|g2|0|b2|0|a2| 1ra fila
 
             ;traigo los 4 pixeles de middle y les hago unpck
-            ;movdqu xmm2, [r11]
-            movdqu xmm2, [rbx+r12*4]
+            movdqu xmm2, [r11]
+            ;movdqu xmm2, [rbx+r12*4]
             pxor xmm3, xmm3
             movdqu xmm3, xmm2
             punpcklbw xmm2, xmm15       ;xmm2: |0|r1|0|g1|0|b1|0|a1|0|r0|0|g0|0|b0|0|a0| 2da fila
@@ -169,8 +171,8 @@ push r15
             ;movq xmm0, [azul_y_rojo]
             movq [rbx+r12*4+4], xmm0
             add rbx, 8
-            ;add r10, 8
-            ;add r11, 8
+            add r10, 8
+            add r11, 8
             add r15, 2
             cmp r15, r12
         jne .ciclo_ancho
@@ -179,9 +181,10 @@ push r15
         cmp r14, r13
     jne .ciclo_alto
 
-    ;mov rdi, rbp
+    mov rdi, rbp
+    mov r12, rax
     ;call free
-    ;mov rdi, rax
+    mov rdi, r12
     ;call free
 ;end codigo
 
