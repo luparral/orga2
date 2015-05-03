@@ -18,7 +18,7 @@ ASM_hsl1:
 	push rbp
 	mov rbp, rsp
 	push rbx
-	sub rsp, 8
+	push r15
 	;rdi = w
 	;rsi = h
 	;rdx = data
@@ -26,11 +26,10 @@ ASM_hsl1:
 	;xmm1 = ss
 	;xmm2 = ll
 
-	mov rbx, rdx ;preservo data
+	mov r15, rdx ;preservo data
 	movups xmm15, xmm0 ;libero los registros xmm0 que son para pasar en param por c
 	movups xmm14, xmm1
 	movups xmm13, xmm2
-
 
 	;calculo el tamanio del vector
 	mov eax, edi
@@ -50,7 +49,7 @@ ASM_hsl1:
 		cmp rcx, 0
 		je .terminarCiclo
 		
-		mov rdi, rbx ;puntero a donde empieza la imagen
+		mov rdi, r15 ;puntero a donde empieza la imagen
 		sub rsp, 16
 		mov rsi, rbp
 
@@ -83,13 +82,13 @@ ASM_hsl1:
 
 		movdqu [rbp], xmm0
 		mov rdi, rbp
-		mov rsi, rbx
+		mov rsi, r15
 		call hslTOrgb
 		add rsp, 16
 
 
 	.terminarCiclo
-	add rsp, 8
+	pop r15
 	pop rbx
 	pop rbp
   	ret
