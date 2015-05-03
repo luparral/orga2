@@ -19,6 +19,9 @@ ASM_hsl1:
 	mov rbp, rsp
 	push rbx
 	push r15
+	mov R8, rsp
+	sub rsp, 16
+	
 	;rdi = w
 	;rsi = h
 	;rdx = data
@@ -50,11 +53,10 @@ ASM_hsl1:
 		je .terminarCiclo
 		
 		mov rdi, r15 ;puntero a donde empieza la imagen
-		sub rsp, 16
-		mov rsi, rbp
+		mov rsi, r8
 
 		call rgbTOhsl
-		movups xmm0, [rbp]
+		movups xmm0, [r8]
 		
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
@@ -80,14 +82,17 @@ ASM_hsl1:
 		;Tengo en xmm0 el valor final procesado
 
 
-		movdqu [rbp], xmm0
-		mov rdi, rbp
+		movdqu [r8], xmm0
+		mov rdi, r8
 		mov rsi, r15
 		call hslTOrgb
-		add rsp, 16
-
+		
+		add r15, 4 ;me muevo un pixel en la imagen
+		sub rcx, 4 ;decremento el contador
+		jmp .ciclo
 
 	.terminarCiclo
+	add rsp, 16
 	pop r15
 	pop rbx
 	pop rbp
