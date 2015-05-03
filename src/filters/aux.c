@@ -15,6 +15,8 @@ void rgbTOhsl(uint8_t *src, float *dst) {
   int r = (int)src[1];
   int g = (int)src[2];
   int b = (int)src[3];
+  //src tiene 4 bytes, pero rgb los tiene casteados a ints (empaquetados)
+  //[a,r,g,b] => xmm: [000a, 000b, 000c, 000d]
   int cmax = max(b,g,r);
   int cmin = min(b,g,r);
   float d = (float)(cmax -cmin);
