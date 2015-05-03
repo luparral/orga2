@@ -19,6 +19,7 @@ tresSesenta: dd 360.00
 quinientosDiez: dd 510.0
 topeSuperior: dd 255.0001
 
+section .text
 ASM_hsl2:
 	;Hay registros salvados innecesariamente. Esto es para facilitar la hora del desarrollo.
 	;La pila queda alineada, cuando se termine de desarrollar se acomoda y ya
