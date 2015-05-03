@@ -193,14 +193,15 @@ ASM_hsl2:
 
 					movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
 					movss  xmm5, [tresSesenta] 	;xmm5 = |basura,basura,basura, 360|
+					movss  xmm6, [tresSesenta] 	;xmm6 = |basura,basura,basura, 360|
 
-					cmpps xmm4, xmm5, 5
-					movdqu xmm5, xmm4 		;xmm5 = |basura,basura,basura,FFF si true   000 sino|
-					movdqu xmm4, xmm1 		;xmm4 = |basura,basura,basura,  h |
+					cmpps xmm4, xmm5, 5 	;if(h >= 360) = if(xmm4 >= xmm5)
+									 		;xmm4 = |basura,basura,basura,FFF si true   000 sino|
 
-					pand xmm5, xmm5 		;xmm5 = |basura,basura,basura,h si true   0 sino|
+					pand xmm4, xmm6 		;xmm4 = |basura,basura,basura,360 si true   0 sino|
 
-					;JOYA AHORA NECESITO RESTAR 360 A H SI ES TRUE Y 0 SINO
+					subss xmm1, xmm4 		;xmm1 = |basura,basura,basura,h - 360 si true   h-0 sino|
+
 
 			calculoDeL:
 				pxor xmm4, xmm4
