@@ -5,7 +5,7 @@
 ;                                                                           ;
 ; ************************************************************************* ;
 ; YA IMPLEMENTADAS EN C
-	
+
 	;void rgbTOhsl(uint8_t *src, float *dst)
 	extern hslTOrgb
 	;void hslTOrgb(float *src, uint8_t *dst)
@@ -17,46 +17,53 @@ section .text
 ASM_hsl1:
 	push rbp
 	mov rbp, rsp
-	push rbx
 	sub rsp, 8
-	;rdi = w
-	;rsi = h
-	;rdx = data
-	;xmm0 = hh
-	;xmm1 = ss
-	;xmm2 = ll
+	push rbx
+	push r12
+	push r13
+	push r14
+	push r15
 
-	mov rbx, rdx ;preservo data
+
+	mov r12, rdi
+	mov r13, rsi
+	mov r14, rdx
 	movups xmm15, xmm0 ;libero los registros xmm0 que son para pasar en param por c
 	movups xmm14, xmm1
 	movups xmm13, xmm2
+	;r12 = w
+	;r13 = h
+	;r14 = *data
+	;xmm15 = hh
+	;xmm14 = ss
+	;xmm13 = ll
 
 
-	;calculo el tamanio del vector
+	;calculo el tamanio de la imagen
 	mov eax, edi
-	mov ebx, esi
-	mul ebx ; ebx*eax -> res = p.a en edx - p.b en eax
-	xor r13, r13
-	mov r13d, edx
-	shl r13, 4
-	mov r13d, eax 
+	mul esi ; h(rdi)*w(rsi) -> res = p.a en edx - p.b en eax
+	xor r15, r15
+	mov r15d, edx
+	shl r15, 4
+	mov r15d, eax
 
-	;en r13 tengo rdi * rsi
+	;en r15 tengo rdi * rsi
 	;rdi(w)*rsi(h)*4 /16 = (w*h)/4
-	mov rcx, r13
-	
-	.ciclo
-		;voy a iterar la imagen de pixel
-		cmp rcx, 0
+	xor rbx, rbx
+
+	.ciclo:
+		;voy a iterar cada pixel de la imagen
+		cmp rbx, r15
 		je .terminarCiclo
-		
-		mov rdi, rbx ;puntero a donde empieza la imagen
+
+		lea rdi, [r14+rbx*4] ;puntero al pixel a transformar en la imagen, avanzo de a 4 bytes
 		sub rsp, 16
 		mov rsi, rbp
 
 		call rgbTOhsl
 		movups xmm0, [rbp]
-		
+
+
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
 		;armar un registro xmm1 = [00|LL|SS|HH]
@@ -83,15 +90,19 @@ ASM_hsl1:
 
 		movdqu [rbp], xmm0
 		mov rdi, rbp
-		mov rsi, rbx
+		lea rsi, [r14+rbx*4]
 		call hslTOrgb
 		add rsp, 16
+		inc rbx
+		jmp .ciclo
 
 
-	.terminarCiclo
-	add rsp, 8
+	.terminarCiclo:
+	pop r15
+	pop r14
+	pop r13
+	pop r12
 	pop rbx
+	add rsp, 8
 	pop rbp
   	ret
-  
-
