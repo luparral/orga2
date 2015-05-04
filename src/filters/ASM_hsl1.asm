@@ -28,7 +28,8 @@ ASM_hsl1:
 	mov r12, rdi
 	mov r13, rsi
 	mov r14, rdx
-	movups xmm15, xmm0 ;libero los registros xmm0 que son para pasar en param por c
+
+	movups xmm15, xmm0 		;libero los registros xmm0 que son para pasar en param por c
 	movups xmm14, xmm1
 	movups xmm13, xmm2
 	;r12 = w
@@ -41,31 +42,31 @@ ASM_hsl1:
 
 	;calculo el tamanio de la imagen
 	mov eax, edi
-	mul esi ; h(rdi)*w(rsi) -> res = p.a en edx - p.b en eax
+	mul esi 				;h(rdi)*w(rsi) -> res = p.a en edx - p.b en eax
 	xor r15, r15
 	mov r15d, edx
 	shl r15, 4
-	mov r15d, eax
+	mov r15d, eax			;r15: h(rdi)*w(rsi) = full size image (en px)
 
-	;en r15 tengo rdi * rsi
-	;rdi(w)*rsi(h)*4 /16 = (w*h)/4
-	xor rbx, rbx
+	xor rbx, rbx			;uso rbx de contador
 
+	;voy a iterar cada pixel de la imagen
 	.ciclo:
-		;voy a iterar cada pixel de la imagen
 		cmp rbx, r15
 		je .terminarCiclo
 
 		lea rdi, [r14+rbx*4] ;puntero al pixel a transformar en la imagen, avanzo de a 4 bytes
-		sub rsp, 16
+		sub rsp, 16			;uso el espacio del stack frame para guardar el pixel transformado
 		mov rsi, rbp
-
 		call rgbTOhsl
+
 		movups xmm0, [rbp]
 
 
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
+
+
 		;armar un registro xmm1 = [00|LL|SS|HH]
 		;sumar xmm1 y xmm0 de modo que quede xmm0 = [a|l+LL|s+SS|h+HH]
 		;copiar xmm0 en xmm7
@@ -91,7 +92,8 @@ ASM_hsl1:
 		movdqu [rbp], xmm0
 		mov rdi, rbp
 		lea rsi, [r14+rbx*4]
-		call hslTOrgb
+		call hslTOrgb		;vuelvo a transformar a rgb
+
 		add rsp, 16
 		inc rbx
 		jmp .ciclo
