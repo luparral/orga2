@@ -19,7 +19,10 @@ ASM_hsl1:
 	mov rbp, rsp
 	push rbx
 	push r15
-	mov R8, rsp
+	push r14
+	push r12
+	
+	mov r14, rsp
 	sub rsp, 16
 	
 	;rdi = w
@@ -44,22 +47,24 @@ ASM_hsl1:
 	mov r13d, eax 
 
 	;en r13 tengo rdi * rsi
-	;rdi(w)*rsi(h)*4 /16 = (w*h)/4
-	mov rcx, r13
+	mov r12d, r13d
 	
+
 	.ciclo
 		;voy a iterar la imagen de pixel
-		cmp rcx, 0
+		cmp r12, 0
 		je .terminarCiclo
 		
 		mov rdi, r15 ;puntero a donde empieza la imagen
-		mov rsi, r8
+		mov rsi, r14
 
 		call rgbTOhsl
-		movups xmm0, [r8]
+		movups xmm0, [r14]
 		
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
+
+		
 		;armar un registro xmm1 = [00|LL|SS|HH]
 		;sumar xmm1 y xmm0 de modo que quede xmm0 = [a|l+LL|s+SS|h+HH]
 		;copiar xmm0 en xmm7
@@ -82,20 +87,23 @@ ASM_hsl1:
 		;Tengo en xmm0 el valor final procesado
 
 
-		movdqu [r8], xmm0
-		mov rdi, r8
+		movdqu [r14], xmm0
+		mov rdi, r14
 		mov rsi, r15
 		call hslTOrgb
 		
 		add r15, 4 ;me muevo un pixel en la imagen
-		sub rcx, 4 ;decremento el contador
+		sub r12, 4 ;decremento el contador
 		jmp .ciclo
 
 	.terminarCiclo
-	add rsp, 16
-	pop r15
-	pop rbx
-	pop rbp
-  	ret
-  
+		add rsp, 16
+		
+		pop r12
+		pop r14
+		pop r15
+		pop rbx
+		pop rbp
+	  	ret
+ 
 
