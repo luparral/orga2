@@ -13,6 +13,7 @@ extern free
     xor r8, r8
     lea r9, [%2]
     mov rcx, %3
+    shr rcx, 2
 
     .ciclo1:
         movdqu xmm0, [r9+r8]
@@ -28,6 +29,7 @@ extern free
     xor r8, r8
     lea r9, [%2]
     mov rcx, %3
+    shr rcx, 2
 
     .ciclo2:
         movdqu xmm0, [r9+r8]
@@ -162,8 +164,8 @@ push r15
             divps xmm1, xmm2
 
             ;convierto de float a integer
-            cvtps2dq xmm0, xmm0         ;xmm0: resultado del 1er pixel |00|r0
-            cvtps2dq xmm1, xmm1         ;xmm1: resultado del 2do pixel
+            cvttps2dq xmm0, xmm0         ;xmm0: resultado del 1er pixel |00|r0
+            cvttps2dq xmm1, xmm1         ;xmm1: resultado del 2do pixel
 
             packusdw xmm0, xmm1         ;xmm0: |00r1|00b1|00g1|00a1|00r0|00b0|00g0|00a0|
             packuswb xmm0, xmm0         ;xmm0: |00|00|00|00|00|00|00|r1|b1|g1|a1|r0|b0|g0|a0|
@@ -183,9 +185,9 @@ push r15
 
     mov rdi, rbp
     mov r12, rax
-    ;call free
+    call free
     mov rdi, r12
-    ;call free
+    call free
 ;end codigo
 
 

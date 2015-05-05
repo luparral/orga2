@@ -13,18 +13,23 @@
 
 ; void ASM_hsl1(uint32_t w, uint32_t h, uint8_t* data, float hh, float ss, float ll)
 global ASM_hsl1
+
+section .data
+
+comparar: dd	360.0, 1.0, 1.0, 0.0
+
 section .text
 ASM_hsl1:
 	push rbp
 	mov rbp, rsp
+	sub rsp, 24
 	push rbx
 	push r15
 	push r14
 	push r13
 	push r12
 
-	mov rbx, rsp
-	sub rsp, 24
+	lea rbx, [rbp-16]
 
 	mov r13, rdi
 	mov r14, rsi
@@ -49,6 +54,9 @@ ASM_hsl1:
 	mov r8d, eax			;r8 = r13(w)*r14(h)
 	mov r12, r8				;r12 = r13(w)*r14(h) preservo porque r8 se puede perder
 
+
+	movdqu xmm10, [comparar]
+
 	;voy a iterar cada pixel (r12) de la imagen
 	.ciclo:
 		cmp r12, 0
@@ -62,12 +70,14 @@ ASM_hsl1:
 
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
-		pxor xmm4, xmm4
-		movss xmm4, xmm13
-		pslldq xmm4, 4
-		movss xmm4, xmm14
-		pslldq xmm4, 4
-		movss xmm4, xmm15
+		pxor xmm4, xmm4				;xmm4 = |00|00|00|00|
+		movss xmm4, xmm13			;xmm4 = |00|00|00|LL|
+		pslldq xmm4, 4				;xmm4 = |00|00|LL|00|
+		movss xmm4, xmm14			;xmm4 = |00|00|LL|SS|
+		pslldq xmm4, 4				;xmm4 = |00|LL|SS|00|
+		movss xmm4, xmm15			;xmm4 = |00|LL|SS|HH|
+
+		addps xmm0, xmm4			;xmm0 = |a|l+LL|s+SS|h+HH|
 
 
 
@@ -104,12 +114,12 @@ ASM_hsl1:
 		jmp .ciclo
 
 	.terminarCiclo:
-		add rsp, 24
 
 		pop r12
 		pop r13
 		pop r14
 		pop r15
 		pop rbx
+		add rsp, 24
 		pop rbp
 	  	ret

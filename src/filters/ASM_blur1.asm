@@ -13,6 +13,7 @@ extern free
     xor r8, r8
     lea r9, [%2]
     mov rcx, %3
+    shr rcx, 2
 
     .ciclo1:
         movdqu xmm0, [r9+r8]
@@ -28,6 +29,7 @@ extern free
     xor r8, r8
     lea r9, [%2]
     mov rcx, %3
+    shr rcx, 2
 
     .ciclo2:
         movdqu xmm0, [r9+r8]
@@ -181,9 +183,9 @@ push r15
 
     mov rdi, rbp
     mov r12, rax
-    ;call free
+    call free
     mov rdi, r12
-    ;call free
+    call free
 ;end codigo
 
 
