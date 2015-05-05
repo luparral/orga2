@@ -17,51 +17,48 @@ section .text
 ASM_hsl1:
 	push rbp
 	mov rbp, rsp
-	sub rsp, 8
 	push rbx
-	push r12
-	push r13
-	push r14
 	push r15
+	push r14
+	push r13
+	push r12
 
+	mov rbx, rsp
+	sub rsp, 24
 
-	mov r12, rdi
-	mov r13, rsi
-	mov r14, rdx
-
-	movups xmm15, xmm0 		;libero los registros xmm0 que son para pasar en param por c
+	mov r13, rdi
+	mov r14, rsi
+	mov r15, rdx
+	movups xmm15, xmm0
 	movups xmm14, xmm1
 	movups xmm13, xmm2
-	;r12 = w
-	;r13 = h
-	;r14 = *data
+	;r13 = w
+	;r14 = h
+	;r15 = data
 	;xmm15 = hh
 	;xmm14 = ss
 	;xmm13 = ll
 
 
-	;calculo el tamanio de la imagen
-	mov eax, edi
-	mul esi 				;h(rdi)*w(rsi) -> res = p.a en edx - p.b en eax
-	xor r15, r15
-	mov r15d, edx
-	shl r15, 4
-	mov r15d, eax			;r15: h(rdi)*w(rsi) = full size image (en px)
+	;calculo el tamanio de la imagen en pixeles
+	mov eax, r13d
+	mul r14d 				;r13(w)*r14(h) -> res = p.a en edx - p.b en eax
+	xor r8, r8
+	mov r8d, edx
+	shl r8, 4
+	mov r8d, eax			;r8 = r13(w)*r14(h)
+	mov r12, r8				;r12 = r13(w)*r14(h) preservo porque r8 se puede perder
 
-	xor rbx, rbx			;uso rbx de contador
-
-	;voy a iterar cada pixel de la imagen
+	;voy a iterar cada pixel (r12) de la imagen
 	.ciclo:
-		cmp rbx, r15
+		cmp r12, 0
 		je .terminarCiclo
 
-		lea rdi, [r14+rbx*4] ;puntero al pixel a transformar en la imagen, avanzo de a 4 bytes
-		sub rsp, 16			;uso el espacio del stack frame para guardar el pixel transformado
-		mov rsi, rbp
+		mov rdi, r15 		;puntero a donde empieza la imagen
+		mov rsi, rbx
+
 		call rgbTOhsl
-
-		movups xmm0, [rbp]
-
+		movups xmm0, [rbx]
 
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
@@ -89,22 +86,22 @@ ASM_hsl1:
 		;Tengo en xmm0 el valor final procesado
 
 
-		movdqu [rbp], xmm0
-		mov rdi, rbp
-		lea rsi, [r14+rbx*4]
-		call hslTOrgb		;vuelvo a transformar a rgb
+		movdqu [rbx], xmm0
+		mov rdi, rbx
+		mov rsi, r15
+		call hslTOrgb
 
-		add rsp, 16
-		inc rbx
+		add r15, 4 ;me muevo un pixel en la imagen
+		sub r12, 4 ;decremento el contador
 		jmp .ciclo
 
-
 	.terminarCiclo:
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop rbx
-	add rsp, 8
-	pop rbp
-  	ret
+		add rsp, 24
+
+		pop r12
+		pop r13
+		pop r14
+		pop r15
+		pop rbx
+		pop rbp
+	  	ret
