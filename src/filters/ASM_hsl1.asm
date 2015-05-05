@@ -62,6 +62,14 @@ ASM_hsl1:
 
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
+		pxor xmm4, xmm4
+		movss xmm4, xmm13
+		pslldq xmm4, 4
+		movss xmm4, xmm14
+		pslldq xmm4, 4
+		movss xmm4, xmm15
+
+
 
 
 		;armar un registro xmm1 = [00|LL|SS|HH]
