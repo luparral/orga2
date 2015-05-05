@@ -5,7 +5,7 @@
 ;                                                                           ;
 ; ************************************************************************* ;
 ; YA IMPLEMENTADAS EN C
-	
+
 	;void rgbTOhsl(uint8_t *src, float *dst)
 	extern hslTOrgb
 	;void hslTOrgb(float *src, uint8_t *dst)
@@ -17,49 +17,56 @@ section .text
 ASM_hsl1:
 	push rbp
 	mov rbp, rsp
+	sub rsp, 8
 	push rbx
+	push r12
+	push r13
+	push r14
 	push r15
-	mov R8, rsp
-	sub rsp, 16
-	
-	;rdi = w
-	;rsi = h
-	;rdx = data
-	;xmm0 = hh
-	;xmm1 = ss
-	;xmm2 = ll
 
-	mov r15, rdx ;preservo data
-	movups xmm15, xmm0 ;libero los registros xmm0 que son para pasar en param por c
+
+	mov r12, rdi
+	mov r13, rsi
+	mov r14, rdx
+
+	movups xmm15, xmm0 		;libero los registros xmm0 que son para pasar en param por c
 	movups xmm14, xmm1
 	movups xmm13, xmm2
+	;r12 = w
+	;r13 = h
+	;r14 = *data
+	;xmm15 = hh
+	;xmm14 = ss
+	;xmm13 = ll
 
-	;calculo el tamanio del vector
+
+	;calculo el tamanio de la imagen
 	mov eax, edi
-	mov ebx, esi
-	mul ebx ; ebx*eax -> res = p.a en edx - p.b en eax
-	xor r13, r13
-	mov r13d, edx
-	shl r13, 4
-	mov r13d, eax 
+	mul esi 				;h(rdi)*w(rsi) -> res = p.a en edx - p.b en eax
+	xor r15, r15
+	mov r15d, edx
+	shl r15, 4
+	mov r15d, eax			;r15: h(rdi)*w(rsi) = full size image (en px)
 
-	;en r13 tengo rdi * rsi
-	;rdi(w)*rsi(h)*4 /16 = (w*h)/4
-	mov rcx, r13
-	
-	.ciclo
-		;voy a iterar la imagen de pixel
-		cmp rcx, 0
+	xor rbx, rbx			;uso rbx de contador
+
+	;voy a iterar cada pixel de la imagen
+	.ciclo:
+		cmp rbx, r15
 		je .terminarCiclo
-		
-		mov rdi, r15 ;puntero a donde empieza la imagen
-		mov rsi, r8
 
+		lea rdi, [r14+rbx*4] ;puntero al pixel a transformar en la imagen, avanzo de a 4 bytes
+		sub rsp, 16			;uso el espacio del stack frame para guardar el pixel transformado
+		mov rsi, rbp
 		call rgbTOhsl
-		movups xmm0, [r8]
-		
+
+		movups xmm0, [rbp]
+
+
 		;;;;;suma;;;;;;
 		;en xmm0 tengo [a|l|s|h]
+
+
 		;armar un registro xmm1 = [00|LL|SS|HH]
 		;sumar xmm1 y xmm0 de modo que quede xmm0 = [a|l+LL|s+SS|h+HH]
 		;copiar xmm0 en xmm7
@@ -82,20 +89,22 @@ ASM_hsl1:
 		;Tengo en xmm0 el valor final procesado
 
 
-		movdqu [r8], xmm0
-		mov rdi, r8
-		mov rsi, r15
-		call hslTOrgb
-		
-		add r15, 4 ;me muevo un pixel en la imagen
-		sub rcx, 4 ;decremento el contador
+		movdqu [rbp], xmm0
+		mov rdi, rbp
+		lea rsi, [r14+rbx*4]
+		call hslTOrgb		;vuelvo a transformar a rgb
+
+		add rsp, 16
+		inc rbx
 		jmp .ciclo
 
-	.terminarCiclo
-	add rsp, 16
+
+	.terminarCiclo:
 	pop r15
+	pop r14
+	pop r13
+	pop r12
 	pop rbx
+	add rsp, 8
 	pop rbp
   	ret
-  
-
