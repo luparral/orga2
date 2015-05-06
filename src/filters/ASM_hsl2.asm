@@ -28,7 +28,6 @@ bitDeSigno: dd 0x7FFF
 
 section .text
 ; void ASM_hsl2(uint32_t w, uint32_t h, uint8_t* data, float hh, float ss, float ll)
-global ASM_hsl2
 ASM_hsl2:
 	
 
@@ -58,16 +57,15 @@ rgbTOhsl:
 			xor rbx, rbx
 
 			;Backupeo los parametros en mis propios registros
-			mov 	 rbx, rdi
 			movdqu   xmm13, [rsi + 16]	;xmm13 = hh
 			movdqu   xmm14, [rsi + 32]	;xmm14 = ss
 			movdqu   xmm15, [rsi + 48]	;xmm15 = ll
 
 			;Guardo cada croma
-			mov r11b, 	[rbx + 0]   ;r11b = transparencia
-			mov r8b, 	[rbx + 1] 	;r8b  = r
-			mov r9b,	[rbx + 2]	;r9b  = g
-			mov r10b, 	[rbx + 3]	;r10b = b
+			mov r11b, 	[rdi + 0]   ;r11b = transparencia
+			mov r8b, 	[rdi + 1] 	;r8b  = r
+			mov r9b,	[rdi + 2]	;r9b  = g
+			mov r10b, 	[rdi + 3]	;r10b = b
 
 			cmp r8b, r9b
 			jg r8bMayor
