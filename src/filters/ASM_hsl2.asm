@@ -34,7 +34,7 @@ ASM_hsl2:
   ret
   
 ;void rgbTOhsl(uint8_t *src, float *dst)
-rgbTOhsl:
+rgbTOhslASM:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -278,7 +278,7 @@ rgbTOhsl:
 
 
 ;void hslTOrgb(float *src, uint8_t *dst)
-hslTOrgb:
+hslTOrgbASM:
 	push rbp
 	mov rbp, rsp
 	push r12
