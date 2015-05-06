@@ -75,6 +75,13 @@ ASM_hsl2:
 		mov rsi, rbx
 		call rgbTOhslASM
 
+		movups xmm0, [rbx]
+		movdqu [rbx], xmm0
+		mov rdi, rbx
+		mov rsi, r15
+		call hslTOrgbASM
+
+
 		add r15, 4 ;me muevo un pixel en la imagen
 		sub r12, 4 ;decremento el contador
 		jmp .ciclo
