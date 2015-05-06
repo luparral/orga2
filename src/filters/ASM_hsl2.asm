@@ -286,9 +286,9 @@ hslTOrgb:
 			;Guardar los parámetros
 
 			movdqu xmm0, [rdi + 0 ]
-			movdqu xmm0, [rdi + 16]
-			movdqu xmm0, [rdi + 32]
-			movdqu xmm0, [rdi + 48]
+			movdqu xmm1, [rdi + 16]
+			movdqu xmm2, [rdi + 32]
+			movdqu xmm3, [rdi + 48]
 			
 			;Cálculo de c, x y m
 			;
