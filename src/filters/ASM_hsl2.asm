@@ -25,6 +25,8 @@ tresSesenta: dd 360.00
 quinientosDiez: dd 510.0
 topeSuperior: dd 255.0001
 bitDeSigno: dd 0x7FFF
+comparar: dd	360.0, 1.0, 1.0, 0.0
+ceros: dd 0.0, 0.0, 0.0, 0.0
 
 section .text
 ; void ASM_hsl2(uint32_t w, uint32_t h, uint8_t* data, float hh, float ss, float ll)
