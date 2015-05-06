@@ -76,42 +76,27 @@ push r15
     xor r14, r14                    ;r14: contador para el alto
     add r14, 2
 
+    copiar_row rbp, rbx, r12
+    copiar_row rax, rbx+r12*4, r12  ;rax: vector con linea siguiente
+
     pxor xmm15, xmm15
-    xor r10, r10
 
     .ciclo_alto:
         xor r15, r15                ;r15: contador para el ancho
         add r15, 2
 
-        ;guardar r_0 y r_1
-        cmp r10, 0
-        je .primer_linea
-        jne .siguientes_lineas
-
-        .primer_linea:
-            copiar_row rbp, rbx, r12
-            jmp .seguir
-        .siguientes_lineas:
-            copiar_row rbp, rax, r12
-
-        .seguir:
-        copiar_row rax, rbx+r12*4, r12 ;rax: vector con linea siguiente
-
-        mov r10, rbp
-        mov r11, rax
-
         .ciclo_ancho:
 
             ;traigo los 4 pixeles de top y les hago unpck
-            movdqu xmm0, [r10]          ;xmm0: |7p|6p|5p|4p|3p|2p|1p|0p|
-            ;movdqu xmm0, [rbx]          ;xmm0: |7p|6p|5p|4p|3p|2p|1p|0p|
+            movdqu xmm0, [rbp+r15*4-8]  ;xmm0: |3p|2p|1p|0p|
+            ;movdqu xmm0, [rbx]
             pxor xmm1, xmm1
             movdqu xmm1, xmm0
             punpcklbw xmm0, xmm15       ;xmm0: |0|r1|0|g1|0|b1|0|a1|0|r0|0|g0|0|b0|0|a0| 1ra fila
             punpckhbw xmm1, xmm15       ;xmm1: |0|r3|0|g3|0|b3|0|a3|0|r2|0|g2|0|b2|0|a2| 1ra fila
 
             ;traigo los 4 pixeles de middle y les hago unpck
-            movdqu xmm2, [r11]
+            movdqu xmm2, [rax+r15*4-8]
             ;movdqu xmm2, [rbx+r12*4]
             pxor xmm3, xmm3
             movdqu xmm3, xmm2
@@ -161,18 +146,21 @@ push r15
             cvttps2dq xmm0, xmm0         ;xmm0: resultado del 1er pixel |00|r0
             cvttps2dq xmm1, xmm1         ;xmm1: resultado del 2do pixel
 
-            packusdw xmm0, xmm1         ;xmm0: |00r1|00b1|00g1|00a1|00r0|00b0|00g0|00a0|
-            packuswb xmm0, xmm0         ;xmm0: |00|00|00|00|00|00|00|r1|b1|g1|a1|r0|b0|g0|a0|
+            packusdw xmm0, xmm1          ;xmm0: |00r1|00b1|00g1|00a1|00r0|00b0|00g0|00a0|
+            packuswb xmm0, xmm0          ;xmm0: |00|00|00|00|00|00|00|r1|b1|g1|a1|r0|b0|g0|a0|
 
             ;movq xmm0, [azul_y_rojo]
             movq [rbx+r12*4+4], xmm0
             add rbx, 8
-            add r10, 8
-            add r11, 8
             add r15, 2
+
             cmp r15, r12
         jne .ciclo_ancho
         add rbx, 8
+
+        copiar_row rbp, rax, r12
+        copiar_row rax, rbx+r12*4, r12  ;rax: vector con linea siguiente
+
         inc r14
         cmp r14, r13
     jne .ciclo_alto
