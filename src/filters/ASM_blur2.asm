@@ -7,38 +7,21 @@
 extern malloc
 extern free
 
-;char* copiar_row0(uint8_t* dest, uint8_t* src, uint32_t w)
-%macro copiar_row0 3
+;char* copiar_row(uint8_t* dest, uint8_t* src, uint32_t w)
+%macro copiar_row 3
     ;codigo
     xor r8, r8
     lea r9, [%2]
     mov rcx, %3
     shr rcx, 2
 
-    .ciclo1:
+    %%ciclo:
         movdqu xmm0, [r9+r8]
         movdqu [%1+r8], xmm0
         add r8, 16
-    loop .ciclo1
+    loop %%ciclo
     ;end_codigo
 %endmacro
-
-;char* copiar_row1(uint8_t* dest, uint8_t* src, uint32_t w)
-%macro copiar_row1 3
-    ;codigo
-    xor r8, r8
-    lea r9, [%2]
-    mov rcx, %3
-    shr rcx, 2
-
-    .ciclo2:
-        movdqu xmm0, [r9+r8]
-        movdqu [%1+r8], xmm0
-        add r8, 16
-    loop .ciclo2
-    ;end_codigo
-%endmacro
-
 
 %define SIZE    4
 
@@ -94,14 +77,25 @@ push r15
     add r14, 2
 
     pxor xmm15, xmm15
+    xor r10, r10
 
     .ciclo_alto:
         xor r15, r15                ;r15: contador para el ancho
         add r15, 2
 
         ;guardar r_0 y r_1
-        copiar_row0 rbp, rbx, r12
-        copiar_row1 rax, rbx+r12*4, r12 ;rax: vector con linea siguiente
+        cmp r10, 0
+        je .primer_linea
+        jne .siguientes_lineas
+
+        .primer_linea:
+            copiar_row rbp, rbx, r12
+            jmp .seguir
+        .siguientes_lineas:
+            copiar_row rbp, rax, r12
+
+        .seguir:
+        copiar_row rax, rbx+r12*4, r12 ;rax: vector con linea siguiente
 
         mov r10, rbp
         mov r11, rax
