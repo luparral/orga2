@@ -96,7 +96,7 @@ ASM_hsl1:
 		
 		pxor xmm11, xmm11 ;asegurarse que xmm11 no se utiliza mas
 		movups xmm11, xmm0 ;preservo xmm0
-		cmpps xmm0, xmm3 ;comparo de nuevo contra 0
+		cmpps xmm0, xmm3, 0 ;comparo de nuevo contra 0
 		pand xmm0, xmm8 ;donde era igual a 0, pongo el resultado del else if en xmm8
 
 		addps xmm0, xmm11 ;en xmm0 me queda el resultado final?
