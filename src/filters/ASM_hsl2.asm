@@ -10,14 +10,20 @@ global ASM_hsl2
 
 section .data
 
+align 16
 uno: dd 1.0
 dos: dd 2.0
 cuatro: dd 4.0
 seis: dd 6.0
 sesenta: dd 60.0
+cientoVeinte: dd 120.00
+cientoOchenta: dd 180.00
+dosCuanrenta: dd 240.00
+trecientos: dd 300.00
 tresSesenta: dd 360.00
 quinientosDiez: dd 510.0
 topeSuperior: dd 255.0001
+bitDeSigno: dd 0x7FFF
 
 section .text
 ASM_hsl2:
@@ -230,7 +236,10 @@ ASM_hsl2:
 		            movss xmm5, [uno] 		;xmm5 = 1.0
 		            subss xmm4, xmm5 		;xmm4 = (2.0 * l) - 1.0
 
-		            ;FALTA: convertir xmm4 a fabs(xmm4) ACA 
+		            ;FALTA: convertir xmm4 a fabs(xmm4) ACA
+		            ;xmm4 = fabs(xmm4)
+		            movd xmm5, [bitDeSigno]
+		            pand xmm4, xmm5
 
 		            subss xmm5, xmm4 			;xmm5 = 1 - fabs( (2.0 * l) - 1.0 )
 		            pxor xmm4, xmm4
@@ -241,17 +250,6 @@ ASM_hsl2:
 		            divss xmm4, xmm5 		;xmm4 = d / ( ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f )
 
 		            movdqu xmm3, xmm4 		;s = d / ( ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f )
-
-
-		;SUMA
-
-
-	    ;CONVERT HSL TO RGB
-
-
-
-
-
 		fin:
 
 	add rsp, 8
@@ -277,7 +275,7 @@ hslTOrgb:
 	push r15
 	sub rsp, 8
 
-		;CONVERT RGB TO HSL
+		;CONVERT HSL TO RGB
 
 			;Limpio todos los registros
 			xor r9, r9
@@ -288,10 +286,174 @@ hslTOrgb:
 			xor r14, r14
 			xor r15, r15
 			xor rbx, rbx
-			pxor xmm0, xmm0
-
-			;Calculo de RGB
 			
+			;Cálculo de c, x y m
+			;
+			;	Parametros:
+			;		xmm0 = (float) transparencia
+			;		xmm1 = h
+			;		xmm2 = s
+			;		xmm3 = l
+
+			pxor xmm4,xmm4
+			pxor xmm5, xmm5
+
+			movdqu xmm4, xmm3
+			movss xmm5, [dos]
+			mulps xmm4, xmm5
+			movss xmm5, [uno]
+			subss xmm4, xmm5
+
+			movd xmm5, [bitDeSigno]
+		    pand xmm4, xmm5
+
+		    movdqu xmm5, xmm4
+		    movss xmm4, [uno]
+		    subss xmm4, xmm5
+		    movdqu xmm5, xmm2
+		    mulps xmm4, xmm5
+		    movdqu xmm7, xmm4
+
+    		;xmm7 = c
+
+		    pxor xmm4, xmm4
+		    pxor xmm5, xmm5
+		    pxor xmm6, xmm6
+
+		    movdqu xmm4, xmm1
+		    movss xmm5, [sesenta]
+		    divss xmm4, xmm5      ;xmm4 = h/60
+		    movdqu xmm6, xmm4 	  ;xmm6 = h/60
+		   
+		    movss xmm5, [dos]     ;xmm5 = 2.0
+		    divss xmm6, xmm5      ;xmm6 = (h/60) / 2
+
+		    ;fmod = numer - tquot * denom = (h/60)   -   (truncated(h/60) / 2)) * 2
+			;Hasta aca....                = (h/60)   -   xmm6       * 2
+		    ;ACA TRUNCAR A 0 EL XMM6 (XMM6 is the truncated (rounded towards zero) result of: (h/60) / 2)
+
+		    mulps xmm6, xmm5 		;xmm6 = (truncated(h/60) / 2)) * 2
+			subss xmm4, xmm6 		;xmm4 = (h/60) - (truncated(h/60) / 2)) * 2 = fmod(h/60 , 2)
+
+			movss xmm5, [uno]
+			subss xmm4, xmm5 		;xmm4 = fmod(h/60 , 2) - 1
+
+            movd xmm6, [bitDeSigno]
+            pand xmm4, xmm6 		;xmm4 = fabs( fmod(h/60 , 2)-1 )
+
+            subss xmm5, xmm4 		;xmm5 = 1 - fabs( fmod(h/60 , 2)-1 )
+            movdqu xmm4, xmm7 		;xmm4 = c
+
+            mulps xmm4, xmm5 		;xmm4 = c * ( 1 - fabs( fmod(h/60 , 2)-1 ) )
+            movdqu xmm8, xmm4 
+
+            ;xmm8 = x
+
+            pxor xmm4, xmm4
+		    pxor xmm5, xmm5
+
+		    movdqu xmm4, xmm7	;xmm4 = c
+		    movss xmm5, [dos] 	;xmm5 = 2.0
+		    divss xmm4, xmm5 	;xmm4 = c/2
+		    movss xmm5, [uno] 	;xmm5 = 1.0
+
+		    subss xmm5, xmm4 	;xmm5 = 1.0  -  ( c/2 )
+		    movdqu xmm9, xmm5
+
+		    ;xmm9 = m
+
+
+
+		    ;Cálculo de RGB
+			;
+			;	Resúmen de contenido de registros:
+			;		xmm0 = (float) transparencia
+			;		xmm1 = h
+			;		xmm2 = s
+			;		xmm3 = l
+			;		xmm7 = c
+			;		xmm8 = x
+			;		xmm9 = m
+			;
+			;	Variables a usar para RGB:
+			;		r12 contendrá a (float) transparencia
+			;		r13 contendrá a R
+			;		r14 contendrá a G
+			;		r15 contendrá a B
+
+
+				;if(0 <= h < 60)
+				movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
+				movss  xmm5, [sesenta] 		;xmm5 = |basura,basura,basura, 60 |
+				pxor xmm6, xmm6 			;xmm6 = 0
+					cmpps xmm5, xmm4, 6 	;if(60 > h); xmm5 = FFF si true   000 sino
+					cmpps xmm4, xmm6, 5 	;if(h >= 0); xmm4 = FFF si true   000 sino
+					pand xmm4, xmm5 		;xmm4 = FFF si (300 <= h < 360)   != FFF sino
+					jmp calculoDeEscala
+
+				;if(60 <= h < 120)
+				movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
+				movss  xmm5, [cientoVeinte] ;xmm5 = |basura,basura,basura, 60 |
+				movss xmm6, [sesenta] 		;xmm6 = 0
+					cmpps xmm5, xmm4, 6 	;if(60 > h); xmm5 = FFF si true   000 sino
+					cmpps xmm4, xmm6, 5 	;if(h >= 0); xmm4 = FFF si true   000 sino
+					pand xmm4, xmm5 		;xmm4 = FFF si (300 <= h < 360)   != FFF sino
+					jmp calculoDeEscala
+
+				;if(120 <= h < 180)
+				movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
+				movss  xmm5, [cientoOchenta];xmm5 = |basura,basura,basura, 60 |
+				movss xmm6, [cientoVeinte] 	;xmm6 = 0
+					cmpps xmm5, xmm4, 6 	;if(60 > h); xmm5 = FFF si true   000 sino
+					cmpps xmm4, xmm6, 5 	;if(h >= 0); xmm4 = FFF si true   000 sino
+					pand xmm4, xmm5 		;xmm4 = FFF si (300 <= h < 360)   != FFF sino
+					jmp calculoDeEscala
+
+				;if(180 <= h < 240)
+				movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
+				movss  xmm5, [dosCuanrenta] ;xmm5 = |basura,basura,basura, 60 |
+				movss xmm6, [cientoOchenta] ;xmm6 = 0
+					cmpps xmm5, xmm4, 6 	;if(60 > h); xmm5 = FFF si true   000 sino
+					cmpps xmm4, xmm6, 5 	;if(h >= 0); xmm4 = FFF si true   000 sino
+					pand xmm4, xmm5 		;xmm4 = FFF si (300 <= h < 360)   != FFF sino
+					jmp calculoDeEscala
+
+				;if(240 <= h < 300)
+				movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
+				movss  xmm5, [trecientos] 	;xmm5 = |basura,basura,basura, 60 |
+				movss xmm6, [dosCuanrenta] 	;xmm6 = 0
+					cmpps xmm5, xmm4, 6 	;if(60 > h); xmm5 = FFF si true   000 sino
+					cmpps xmm4, xmm6, 5 	;if(h >= 0); xmm4 = FFF si true   000 sino
+					pand xmm4, xmm5 		;xmm4 = FFF si (300 <= h < 360)   != FFF sino
+					jmp calculoDeEscala
+
+				;if(300 <= h < 360)
+				movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
+				movss  xmm5, [tresSesenta] 	;xmm5 = |basura,basura,basura, 60 |
+				movss xmm6, [trecientos] 	;xmm6 = 0
+					cmpps xmm5, xmm4, 6 	;if(60 > h); xmm5 = FFF si true   000 sino
+					cmpps xmm4, xmm6, 5 	;if(h >= 0); xmm4 = FFF si true   000 sino
+					pand xmm4, xmm5 		;xmm4 = FFF si (300 <= h < 360)   != FFF sino
+					jmp calculoDeEscala
+
+			calculoDeEscala:
+			;Cálculo de escala
+			;
+			;	Resúmen de contenido de registros:
+			;		xmm0 = (float) transparencia
+			;		xmm1 = h
+			;		xmm2 = s
+			;		xmm3 = l
+			;		xmm7 = c
+			;		xmm8 = x
+			;		xmm9 = m
+			;
+			;	Variables para RGB:
+			;		r12 -> (float) transparencia
+			;		r13 -> contendrá a R
+			;		r14 -> contendrá a G
+			;		r15 -> contendrá a B
+
 
 
 	add rsp, 8
