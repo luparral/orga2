@@ -29,7 +29,65 @@ bitDeSigno: dd 0x7FFF
 section .text
 ; void ASM_hsl2(uint32_t w, uint32_t h, uint8_t* data, float hh, float ss, float ll)
 ASM_hsl2:
-	
+	push rbp
+	mov rbp, rsp
+	sub rsp, 24
+	push rbx
+	push r15
+	push r14
+	push r13
+	push r12
+
+	lea rbx, [rbp-16]
+
+	mov r13, rdi
+	mov r14, rsi
+	mov r15, rdx
+	movss xmm15, xmm0
+	movss xmm14, xmm1
+	movss xmm13, xmm2
+	;r13 = w
+	;r14 = h
+	;r15 = data
+	;xmm15 = hh
+	;xmm14 = ss
+	;xmm13 = ll
+
+
+	;calculo el tamanio de la imagen en pixeles
+	mov eax, r13d
+	mul r14d 				;r13(w)*r14(h) -> res = p.a en edx - p.b en eax
+	xor r8, r8
+	mov r8d, edx
+	shl r8, 4
+	mov r8d, eax			;r8 = r13(w)*r14(h)
+	mov r12, r8				;r12 = r13(w)*r14(h) preservo porque r8 se puede perder
+
+
+	movdqu xmm10, [comparar]
+	movdqu xmm3, [ceros]
+	;voy a iterar cada pixel (r12) de la imagen
+	.ciclo:
+		cmp r12, 0
+		je .terminarCiclo
+
+		mov rdi, r15 		;puntero a donde empieza la imagen
+		mov rsi, rbx
+		call rgbTOhslASM
+
+		add r15, 4 ;me muevo un pixel en la imagen
+		sub r12, 4 ;decremento el contador
+		jmp .ciclo
+
+	.terminarCiclo:
+
+		pop r12
+		pop r13
+		pop r14
+		pop r15
+		pop rbx
+		add rsp, 24
+		pop rbp
 
   ret
   
