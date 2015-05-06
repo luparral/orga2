@@ -27,7 +27,15 @@ topeSuperior: dd 255.0001
 bitDeSigno: dd 0x7FFF
 
 section .text
+; void ASM_hsl2(uint32_t w, uint32_t h, uint8_t* data, float hh, float ss, float ll)
+global ASM_hsl2
 ASM_hsl2:
+	
+
+  ret
+  
+;void rgbTOhsl(uint8_t *src, float *dst)
+rgbTOhsl:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -50,12 +58,10 @@ ASM_hsl2:
 			xor rbx, rbx
 
 			;Backupeo los parametros en mis propios registros
-			mov 	 r12d, edi
-			mov 	 r13d, esi
-			mov 	 rbx, rdx
-			movdqu   xmm13, xmm0 		;xmm13 = hh
-			movdqu   xmm14, xmm1 		;xmm14 = ss
-			movdqu   xmm15, xmm2 		;xmm15 = ll
+			mov 	 rbx, rdi
+			movdqu   xmm13, [rsi + 16]	;xmm13 = hh
+			movdqu   xmm14, [rsi + 32]	;xmm14 = ss
+			movdqu   xmm15, [rsi + 48]	;xmm15 = ll
 
 			;Guardo cada croma
 			mov r11b, 	[rbx + 0]   ;r11b = transparencia
@@ -271,7 +277,8 @@ ASM_hsl2:
 	pop rbp
 
   ret
-  
+
+
 ;void hslTOrgb(float *src, uint8_t *dst)
 hslTOrgb:
 	push rbp
@@ -556,3 +563,5 @@ hslTOrgb:
 	pop rbp
 
   ret
+
+
