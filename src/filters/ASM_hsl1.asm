@@ -16,9 +16,9 @@ global ASM_hsl1
 
 section .data
 
-comparar: dd	0.0, 360.0, 1.0, 1.0,
-vuelta_atras: dd	0.0, -360.0, 1.0, 1.0
-vuelta_adelante: dd		0.0, 360.0, 0.0, 0.0
+comparar: dd 0.0, 360.0, 1.0, 1.0
+vuelta_atras: dd 0.0, -360.0, 1.0, 1.0
+vuelta_adelante: dd	0.0, 360.0, 0.0, 0.0
 
 section .text
 ASM_hsl1:
@@ -51,10 +51,6 @@ ASM_hsl1:
 	mov r12, r8				;r12 = r13(w)*r14(h) preservo porque r8 se puede perder
 
 
-	movdqu xmm10, [comparar]
-	pxor xmm11, xmm11
-	movdqu xmm2, [vuelta_atras]
-	movdqu xmm3, [vuelta_adelante]
 	;voy a iterar cada pixel (r12) de la imagen
 	.ciclo:
 		cmp r12, 0
@@ -78,6 +74,12 @@ ASM_hsl1:
 		addps xmm0, xmm1		;xmm0 = |l+LL|s+SS|h+HH|aa|
 		movups xmm7, xmm0       ;xmm7 = |l+LL|s+SS|h+HH|aa|
 		movups xmm8, xmm0       ;xmm8 = |l+LL|s+SS|h+HH|aa|
+
+		;traigo mascaras
+		movdqu xmm10, [comparar]
+		pxor xmm11, xmm11
+		movdqu xmm2, [vuelta_atras]
+		movdqu xmm3, [vuelta_adelante]
 
 		pxor xmm5, xmm5
 		movlhps xmm5, xmm0		;xmm5 = |h+HH|aa|00|00|
