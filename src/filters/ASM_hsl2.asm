@@ -24,7 +24,7 @@ trecientos: dd 300.00
 tresSesenta: dd 360.00
 quinientosDiez: dd 510.0
 topeSuperior: dd 255.0001
-bitDeSigno: dd 0x7FFF
+bitDeSigno: dd 0x7FFFFFFF
 comparar: dd	360.0, 1.0, 1.0, 0.0
 ceros: dd 0.0, 0.0, 0.0, 0.0
 
@@ -122,6 +122,8 @@ rgbTOhslASM:
 			xor r13, r13
 			xor r14, r14
 			xor r15, r15
+			xor rcx, rcx
+			xor rdx, rdx
 			xor rbx, rbx
 
 			;Backupeo los parametros en mis propios registros
@@ -181,15 +183,15 @@ rgbTOhslASM:
 
 				;Resumen de variables
 
-				;cl 	= min(r,g,b)
-			  	;dl 	= max(r,g,b)
-			  	;bl 	= max(r,g,b) - min(r,g,b)
+				;cl 	= min(r,g,b) 55
+			  	;dl 	= max(r,g,b) 158
+			  	;bl 	= max(r,g,b) - min(r,g,b) 103
 			  	;xmm12 	= d = (float) (max(r,g,b) - min(r,g,b))
 
-			  	;r11b = transparencia
-			 	;r8b  = r
-				;r9b  = g
-				;r10b = b
+			  	;r11b = transparencia 255
+			 	;r8b  = r    55
+				;r9b  = g    81
+				;r10b = b 	 158
 
 				;xmm0 representará la transparencia
 				;xmm1 representará a h
@@ -310,7 +312,7 @@ rgbTOhslASM:
 					;xmm2 = l
 
 				calculoDeS:
-					cmp cl, dl
+					cmp rcx, rdx
 					je fin
 
 					pxor xmm4,xmm4
@@ -325,19 +327,23 @@ rgbTOhslASM:
 		            movss xmm5, [uno] 		;xmm5 = 1.0
 		            subss xmm4, xmm5 		;xmm4 = (2.0 * l) - 1.0
 
-		            movd xmm5, [bitDeSigno] 	;xmm4 = fabs(xmm4)
+		            pxor xmm5, xmm5
+		            movss xmm5, [bitDeSigno] 	;xmm4 = fabs( (2.0 * l) - 1.0 )
 		            pand xmm4, xmm5
 
-		            subss xmm5, xmm4 			;xmm5 = 1 - fabs( (2.0 * l) - 1.0 )
-		            pxor xmm4, xmm4
-		            movss xmm4, [topeSuperior] 	;xmm4 = 255.0001f
-		            divss xmm5, xmm4 			;xmm5 = ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f
+		            pxor xmm5, xmm5
+		            movss xmm5, [uno]
+		            subss xmm5, xmm4 		;xmm5 = 1 - fabs( (2.0 * l) - 1.0 )
 
 		            movdqu xmm4, xmm12 		;xmm4 = d = xmm12 = (float) (max(r,g,b) - min(r,g,b))
-		            divss xmm4, xmm5 		;xmm4 = d / ( ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f )
+		            divss xmm4, xmm5 		;xmm4 = d / ( 1 - fabs( (2.0 * l) - 1.0 ) )
 
-		            movdqu xmm3, xmm4 		;s = d / ( ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f )
-		
+		            pxor xmm5, xmm5
+		            movss xmm5, [topeSuperior] 	;xmm5 = 255.0001f
+		            divss xmm4, xmm5 			;xmm4 = ( d / (1 - fabs((2.0 * l) - 1.0)) )  / 255.0001f
+
+		            movdqu xmm3, xmm4
+
 		            ;xmm3 = s
 
 		        ;En resumen:
