@@ -351,6 +351,11 @@ rgbTOhslASM:
 		        ; xmm1 = h
 		        ; xmm2 = l
 		        ; xmm3 = s
+
+		        movss [rsi + 0], xmm0
+		        movss [rsi + 4], xmm1
+		        movss [rsi + 8], xmm3
+		        movss [rsi + 12], xmm2
 		fin:
 
 	add rsp, 8
