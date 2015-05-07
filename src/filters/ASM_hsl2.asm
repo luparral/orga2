@@ -128,11 +128,6 @@ rgbTOhslASM:
 			xor rdx, rdx
 			xor rbx, rbx
 
-			;Backupeo los parametros en mis propios registros
-			movdqu   xmm13, [rsi + 16]	;xmm13 = hh
-			movdqu   xmm14, [rsi + 32]	;xmm14 = ss
-			movdqu   xmm15, [rsi + 48]	;xmm15 = ll
-
 			;Guardo cada croma
 			mov r11b, 	[rdi + 0]   ;r11b = transparencia
 			mov r8b, 	[rdi + 1] 	;r8b  = r
