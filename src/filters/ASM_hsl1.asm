@@ -63,7 +63,7 @@ ASM_hsl1:
 		call rgbTOhsl
 		movups xmm0, [rbx]		;xmm0 = |l|s|h|a| valores transformados a hsl
 
-		;;;;;suma;;;;;;
+		;armo los datos sumados
 		pxor xmm1, xmm1			;xmm1 = |00|00|00|00|
 		movss xmm1, xmm13		;xmm1 = |00|00|00|LL|
 		pslldq xmm1, 4			;xmm1 = |00|00|LL|00|
@@ -79,10 +79,11 @@ ASM_hsl1:
 
 		;traigo mascaras
 		movups xmm10, [comparar]
-		movups xmm11, [ceros]
+		pxor xmm11, xmm11
 		movups xmm2, [vuelta_atras]
 		movups xmm3, [vuelta_adelante]
 
+		;preparo datos con mascaras
 		pxor xmm5, xmm5
 		movlhps xmm5, xmm0		;xmm5 = |h+HH|aa|00|00|
 		psrldq xmm5, 8			;xmm5 = |00|00|h+HH|aa|
@@ -90,34 +91,35 @@ ASM_hsl1:
 		addps xmm5, xmm2		;xmm5 = |1|1|h+HH-360|aa|
 		addps xmm6, xmm3		;xmm6 = |0|0|h+HH+360|aa|
 
-;		|255, 224,85437, 0,483567864, 1,31764698|
-		;xmm10 = 0.0, 360.0, 1.0, 1.0
+		;logica de suma
+		;if h+HH>=360 || s+SS>1 || l+LL>1
+			;5 = greater equal
+		cmpps xmm0, xmm10, 5	;xmm0 = |1|0|0|1|
+		pand xmm0, xmm5			;xmm0 = |1|0|0|aa|
 
-;		if h+HH >= 360
-			;mayor o igual
-			cmpps xmm0, xmm10, 5	;xmm0 = |1|0|0|1|
-			pand xmm0, xmm5			;xmm0 = |1|0|0|aa|
+		;if 0<=h+HH<360 || 0<=s+SS<1 || 0<=l+LL<1
+			;1 = less than
+		cmpps xmm7, xmm10, 1	;xmm7 = |0|1|1|0|
+			;5 = greater equal
+		cmpps xmm8, xmm11, 5	;xmm8 =	|0|1|1|1|
+		pand xmm7, xmm8			;xmm7 = |0|0|1|0|
+		pand xmm7, xmm1			;xmm7 = |00|00|h+HH|0|
 
-;		if 0 <= h+HH < 360
-			;less than
-			cmpps xmm7, xmm10, 1	;xmm7 = |0|1|1|0|
-			;greater equal
-			cmpps xmm8, xmm11, 5	;xmm8 =	|0|1|1|1|
-			pand xmm7, xmm8			;xmm7 = |0|0|1|0|
-			pand xmm7, xmm1			;xmm7 = |00|00|h+HH|0|
-;		if h+HH <= 0
-			;less than
-			cmpps xmm1,	xmm11, 1	;xmm1 = |1|0|0|0|
-			pand xmm1, xmm6			;xmm1 = |0|0|0|0|
+		;if h+HH<0 || s+SS<0 || l+LL<0
+			;1 = less than
+		cmpps xmm1,	xmm11, 1	;xmm1 = |1|0|0|0|
+		pand xmm1, xmm6			;xmm1 = |0|0|0|0|
 
-			por xmm0, xmm7		;xmm0 = |00|1|hh+HH|aa|
-			por xmm0, xmm1		;xmm0 =	|00|1|hh+HH|aa|
+		;sumo todos los valores con las mascaras aplicadas
+		por xmm0, xmm7		;xmm0 = |00|1|hh+HH|aa|
+		por xmm0, xmm1		;xmm0 =	|00|1|hh+HH|aa|
 
-
+		;deposito cuidadosamente el resultado
 		movdqu [rbx], xmm0
 		mov rdi, rbx
 		mov rsi, r15
 		call hslTOrgb
+		;c'est voila
 
 		add r15, 4 				;me muevo un pixel en la imagen
 		sub r12, 1 				;decremento el contador
@@ -133,35 +135,3 @@ ASM_hsl1:
 	add rsp, 24
 	pop rbp
   	ret
-
-
-
-
-
-
-
-;;;idea!!!
-
-
-		;armar un registro xmm1 = [00|LL|SS|HH]
-		;sumar xmm1 y xmm0 de modo que quede xmm0 = [a|l+LL|s+SS|h+HH]
-		;copiar xmm0 en xmm7
-		;armar este registro: xmm2 = [0|1|1|360] para comparar mayor o igual
-		; ojo, el alfa puede estar mal
-		;armar este registro: xmm3 = [0|0|0|0] para comparar por menor
-
-		;armar este registro: xmm4 = [a|l+LL|s+SS|h+HH] (es una copia de xmm0)
-
-		;cmpps xmm0, xmm2, 5 (5 = not less)
-		; en xmm0 queda una mascara donde 1 = true, 0 = false
-		;armar este registro: xmm5 = [0|1|1|h+HH-360]
-		;pand xmm0, xmm5 ; en xmm0 queda donde habia ceros 0 y el valor correspondiente en xmm5 donde habia 1.
-		;armar este registro: xmm6 = [0|0|0|h+HH+360]
-		;cmpps xmm7, xmm3, 1 (1= less)
-		;en xmm7 queda una mascara donde 1 =true, 0 = false
-		;pand xmm7, xmm6 ;en xmm7 queda donde habia ceros 0 y el valor correspondiente en xmm6 donde habia 1
-		;si sumo xmm0 con xmm7 me queda todo con valores, y donde hay ceros es el else.
-		;puedo hacer un cmpps mas, con 0 y si es igual le pongo como hicimos antes una mascara que tenga los valores del else.
-		;pongo con un shuffle o algo el alfa al principio, porque creo que lo perdi
-
-		;Tengo en xmm0 el valor final procesado
