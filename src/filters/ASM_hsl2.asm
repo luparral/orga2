@@ -24,7 +24,7 @@ trecientos: dd 300.00
 tresSesenta: dd 360.00
 quinientosDiez: dd 510.0
 topeSuperior: dd 255.0001
-bitDeSigno: dd 0x7FFF
+bitDeSigno: dd 0x7FFFFFFF
 comparar: dd	360.0, 1.0, 1.0, 0.0
 ceros: dd 0.0, 0.0, 0.0, 0.0
 
@@ -114,6 +114,7 @@ rgbTOhslASM:
 		;CONVERT RGB TO HSL
 
 			;Limpio todos los registros
+			xor r8, r8
 			xor r9, r9
 			xor r10, r10
 			xor r11, r11
@@ -121,6 +122,8 @@ rgbTOhslASM:
 			xor r13, r13
 			xor r14, r14
 			xor r15, r15
+			xor rcx, rcx
+			xor rdx, rdx
 			xor rbx, rbx
 
 			;Backupeo los parametros en mis propios registros
@@ -134,30 +137,30 @@ rgbTOhslASM:
 			mov r9b,	[rdi + 2]	;r9b  = g
 			mov r10b, 	[rdi + 3]	;r10b = b
 
-			cmp r8b, r9b
+			cmp r8, r9
 			jg r8bMayor
-			cmp r9b, r10b
+			cmp r9, r10
 			jg r9bMaximo
-			jl r10bMaximo
+			jmp r10bMaximo
 
 			r8bMayor:
-				cmp r8b, r10b
+				cmp r8, r10
 			  	jg r8bMaximo
 			  	jl r10bMaximo
 
 			r8bMaximo:
 			  	mov dl, r8b
-			  	cmp r9b, r10b 
+			  	cmp r9, r10 
 			  	jl r9bMinimo
 			  	jmp r10bMinimo
 			r9bMaximo:
 			  	mov dl, r9b
-			  	cmp r8b, r10b 
+			  	cmp r8, r10 
 			  	jl r8bMinimo
 			  	jmp r10bMinimo
 			r10bMaximo:
 			  	mov dl, r10b
-			  	cmp r8b, r9b 
+			  	cmp r8, r9 
 			  	jl r8bMinimo
 			  	jmp r9bMinimo
 
@@ -180,15 +183,15 @@ rgbTOhslASM:
 
 				;Resumen de variables
 
-				;cl 	= min(r,g,b)
-			  	;dl 	= max(r,g,b)
-			  	;bl 	= max(r,g,b) - min(r,g,b)
+				;cl 	= min(r,g,b) 55
+			  	;dl 	= max(r,g,b) 158
+			  	;bl 	= max(r,g,b) - min(r,g,b) 103
 			  	;xmm12 	= d = (float) (max(r,g,b) - min(r,g,b))
 
-			  	;r11b = transparencia
-			 	;r8b  = r
-				;r9b  = g
-				;r10b = b
+			  	;r11b = transparencia 255
+			 	;r8b  = r    55
+				;r9b  = g    81
+				;r10b = b 	 158
 
 				;xmm0 representará la transparencia
 				;xmm1 representará a h
@@ -206,26 +209,29 @@ rgbTOhslASM:
 					pxor xmm4, xmm4
 					pxor xmm5, xmm5
 
-				  	cmp cl, dl 			;if(min(r,g,b) == max(r,g,b))
+				  	cmp rcx, rdx		;if(min(r,g,b) == max(r,g,b))
 				  	je calculoDeL 		; 	h = 0; 
 				  						;	calcularL();
 
-				  	cmp dl, r8b 		;if(max(r,g,b) == r)
+				  	cmp rdx, r8 		;if(max(r,g,b) == r)
 				  	je maxEsR 			;	goto maxEsR
 
-				  	cmp dl, r9b 		;if(max(r,g,b) == g)
+				  	cmp rdx, r9 		;if(max(r,g,b) == g)
 				  	je maxEsG 			;	goto maxEsG
 
-				  	cmp dl, r10b 		;if(max(r,g,b) == b)
+				  	cmp rdx, r10 		;if(max(r,g,b) == b)
 					je maxEsB 			;	goto maxEsB
 
 
 					maxEsR:
 						; h = 60 * ( (g-b)/d + 6 )
-						mov r15b, r9b
-						sub r15b, r10b 		;r15b = g-b
+						cvtsi2ss xmm4, r9
+						cvtsi2ss xmm6, r10
+						subss xmm4, xmm6
 
-						cvtsi2ss xmm4, r15 	;xmm4 = (float) (g-b)
+						; mov r15b, r9b
+						; sub r15b, r10b 		;r15b = g-b
+						; cvtsi2ss xmm4, r15 	;xmm4 = (float) (g-b)
 						divss xmm4, xmm12 	;xmm4 = (g-b)/d
 						movss xmm5, [seis]
 						addss xmm4, xmm5 	;xmm4 = (g-b)/d + 6
@@ -238,10 +244,13 @@ rgbTOhslASM:
 
 					maxEsG:
 						; h = 60 * ( (b-r)/d + 2 )
-						mov r15b, r10b
-						sub r15b, r8b 		;r15b = b-r
-						
-						cvtsi2ss xmm4, r15 	;xmm4 = (float) (b-r)
+						cvtsi2ss xmm4, r10
+						cvtsi2ss xmm6, r8
+						subss xmm4, xmm6
+
+						; mov r15b, r10b
+						; sub r15b, r8b 		;r15b = b-r
+						;cvtsi2ss xmm4, r15 	;xmm4 = (float) (b-r)
 						divss xmm4, xmm12 	;xmm4 = (b-r)/d
 						movss xmm5, [dos]
 						addss xmm4, xmm5 	;xmm4 = (b-r)/d + 2
@@ -254,10 +263,13 @@ rgbTOhslASM:
 
 					maxEsB:
 						; h = 60 * ( (r-g)/d + 4 )
-						mov r15b, r8b
-						sub r15b, r9b 		;r15b = r-g
-						
-						cvtsi2ss xmm4, r15 	;xmm4 = (float) (r-g)
+						cvtsi2ss xmm4, r8
+						cvtsi2ss xmm6, r9
+						subss xmm4, xmm6
+
+						; mov r15b, r8b
+						; sub r15b, r9b 		;r15b = r-g
+						;cvtsi2ss xmm4, r15 	;xmm4 = (float) (r-g)
 						divss xmm4, xmm12 	;xmm4 = (r-g)/d
 						movss xmm5, [cuatro]
 						addss xmm4, xmm5 	;xmm4 = (r-g)/d + 4
@@ -284,19 +296,23 @@ rgbTOhslASM:
 
 				calculoDeL:
 					pxor xmm4, xmm4
+					pxor xmm5, xmm5
 
-					xor rax, rax
-					mov al, dl
-					add ax, cx 		;ax = cmax + cmin
+					cvtsi2ss xmm4, rdx  ;xmm4 = cmax
+					cvtsi2ss xmm5, rcx 	;xmm5 = cmin
+					addss xmm4, xmm5 	;xmm4 = cmax + cmin
+					; xor rax, rax
+					; mov al, dl
+					; add ax, cx 		;ax = cmax + cmin
 					
-					cvtsi2ss xmm2, rax 				;xmm2 = cmax + cmin
+					movdqu xmm2, xmm4 				;xmm2 = cmax + cmin
 					movss xmm4, [quinientosDiez] 	;xmm4 = 510.0
 					divss xmm2, xmm4				;xmm2 = l = xmm2/xmm4
 
 					;xmm2 = l
 
 				calculoDeS:
-					cmp cl, dl
+					cmp rcx, rdx
 					je fin
 
 					pxor xmm4,xmm4
@@ -311,19 +327,23 @@ rgbTOhslASM:
 		            movss xmm5, [uno] 		;xmm5 = 1.0
 		            subss xmm4, xmm5 		;xmm4 = (2.0 * l) - 1.0
 
-		            movd xmm5, [bitDeSigno] 	;xmm4 = fabs(xmm4)
+		            pxor xmm5, xmm5
+		            movss xmm5, [bitDeSigno] 	;xmm4 = fabs( (2.0 * l) - 1.0 )
 		            pand xmm4, xmm5
 
-		            subss xmm5, xmm4 			;xmm5 = 1 - fabs( (2.0 * l) - 1.0 )
-		            pxor xmm4, xmm4
-		            movss xmm4, [topeSuperior] 	;xmm4 = 255.0001f
-		            divss xmm5, xmm4 			;xmm5 = ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f
+		            pxor xmm5, xmm5
+		            movss xmm5, [uno]
+		            subss xmm5, xmm4 		;xmm5 = 1 - fabs( (2.0 * l) - 1.0 )
 
 		            movdqu xmm4, xmm12 		;xmm4 = d = xmm12 = (float) (max(r,g,b) - min(r,g,b))
-		            divss xmm4, xmm5 		;xmm4 = d / ( ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f )
+		            divss xmm4, xmm5 		;xmm4 = d / ( 1 - fabs( (2.0 * l) - 1.0 ) )
 
-		            movdqu xmm3, xmm4 		;s = d / ( ( 1 - fabs( (2.0 * l) - 1.0 ) ) / 255.0001f )
-		
+		            pxor xmm5, xmm5
+		            movss xmm5, [topeSuperior] 	;xmm5 = 255.0001f
+		            divss xmm4, xmm5 			;xmm4 = ( d / (1 - fabs((2.0 * l) - 1.0)) )  / 255.0001f
+
+		            movdqu xmm3, xmm4
+
 		            ;xmm3 = s
 
 		        ;En resumen:
