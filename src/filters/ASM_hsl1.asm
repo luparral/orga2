@@ -80,10 +80,10 @@ ASM_hsl1:
 		movups xmm8, xmm0       ;xmm8 = |l+LL|s+SS|h+HH|aa|
 
 		pxor xmm5, xmm5
-		movlps xmm5, xmm0		;xmm5 = |0|0|h+HH|aa|
+		movlhps xmm5, xmm0		;xmm5 = |h+HH|aa|00|00|
+		psrldq xmm5, 8			;xmm5 = |00|00|h+HH|aa|
+		movups xmm6, xmm5		;xmm6 = |00|00|h+HH|aa|
 		addps xmm5, xmm2		;xmm5 = |1|1|h+HH-360|aa|
-		pxor xmm6, xmm6
-		movlps xmm6, xmm0		;xmm6 = |0|0|h+HH|aa|
 		addps xmm6, xmm3		;xmm6 = |0|0|h+HH+360|aa|
 
 		cmpps xmm0, xmm10, 5	;not less than = mayor o igual
