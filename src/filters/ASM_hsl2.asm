@@ -275,9 +275,6 @@ rgbTOhslASM:
 						cvtsi2ss xmm6, r10
 						subss xmm4, xmm6
 
-						; mov r15b, r9b
-						; sub r15b, r10b 		;r15b = g-b
-						; cvtsi2ss xmm4, r15 	;xmm4 = (float) (g-b)
 						divss xmm4, xmm12 	;xmm4 = (g-b)/d
 						movss xmm5, [seis]
 						addss xmm4, xmm5 	;xmm4 = (g-b)/d + 6
@@ -294,9 +291,6 @@ rgbTOhslASM:
 						cvtsi2ss xmm6, r8
 						subss xmm4, xmm6
 
-						; mov r15b, r10b
-						; sub r15b, r8b 		;r15b = b-r
-						;cvtsi2ss xmm4, r15 	;xmm4 = (float) (b-r)
 						divss xmm4, xmm12 	;xmm4 = (b-r)/d
 						movss xmm5, [dos]
 						addss xmm4, xmm5 	;xmm4 = (b-r)/d + 2
@@ -313,9 +307,6 @@ rgbTOhslASM:
 						cvtsi2ss xmm6, r9
 						subss xmm4, xmm6
 
-						; mov r15b, r8b
-						; sub r15b, r9b 		;r15b = r-g
-						;cvtsi2ss xmm4, r15 	;xmm4 = (float) (r-g)
 						divss xmm4, xmm12 	;xmm4 = (r-g)/d
 						movss xmm5, [cuatro]
 						addss xmm4, xmm5 	;xmm4 = (r-g)/d + 4
@@ -347,9 +338,6 @@ rgbTOhslASM:
 					cvtsi2ss xmm4, rdx  ;xmm4 = cmax
 					cvtsi2ss xmm5, rcx 	;xmm5 = cmin
 					addss xmm4, xmm5 	;xmm4 = cmax + cmin
-					; xor rax, rax
-					; mov al, dl
-					; add ax, cx 		;ax = cmax + cmin
 					
 					movdqu xmm2, xmm4 				;xmm2 = cmax + cmin
 					movss xmm4, [quinientosDiez] 	;xmm4 = 510.0
