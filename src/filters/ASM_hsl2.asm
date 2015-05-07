@@ -379,10 +379,17 @@ hslTOrgbASM:
 
 			;Guardar los parámetros
 
-			movdqu xmm0, [rdi + 0 ]
-			movdqu xmm1, [rdi + 16]
-			movdqu xmm2, [rdi + 32]
-			movdqu xmm3, [rdi + 48]
+			pxor xmm0, xmm0
+			pxor xmm1, xmm1
+			pxor xmm2, xmm2
+			pxor xmm3, xmm3
+			pxor xmm4, xmm4
+			pxor xmm5, xmm5
+
+			movss xmm0, [rdi + 0 ]
+			movss xmm1, [rdi + 4 ]
+			movss xmm2, [rdi + 8 ]
+			movss xmm3, [rdi + 12]
 			
 			;Cálculo de c, x y m
 			;
@@ -392,23 +399,23 @@ hslTOrgbASM:
 			;		xmm2 = s
 			;		xmm3 = l
 
-			pxor xmm4,xmm4
+			movdqu xmm5, xmm3
+
+			movdqu xmm4, xmm3 	;xmm4 = l
+			movss xmm5, [dos] 		;xmm5 = 2.0
+			mulps xmm4, xmm5 	;xmm4 = 2.0 * l
+			movss xmm5, [uno]  		;xmm5 = 1.0
+			subss xmm4, xmm5 	;xmm4 = (2 * l) - 1
+
 			pxor xmm5, xmm5
+			movd xmm5, [bitDeSigno] 
+		    pand xmm4, xmm5 	;xmm4 = fabs( (2 * l) - 1 )
 
-			movdqu xmm4, xmm3
-			movss xmm5, [dos]
-			mulps xmm4, xmm5
-			movss xmm5, [uno]
-			subss xmm4, xmm5
-
-			movd xmm5, [bitDeSigno]
-		    pand xmm4, xmm5
-
-		    movdqu xmm5, xmm4
-		    movss xmm4, [uno]
-		    subss xmm4, xmm5
-		    movdqu xmm5, xmm2
-		    mulps xmm4, xmm5
+		    movdqu xmm5, xmm4 		;xmm5 = fabs( (2 * l) - 1 )
+		    movss xmm4, [uno]  	;xmm4 = 1
+		    subss xmm4, xmm5 	;xmm4 = 1 - (fabs( (2 * l) - 1 ))
+		    movdqu xmm5, xmm2 		;xmm5 = s
+		    mulps xmm4, xmm5 		;xmm4 = s * (1 - (fabs( (2 * l) - 1 )))
 		    movdqu xmm7, xmm4
 
     		;xmm7 = c
@@ -417,21 +424,26 @@ hslTOrgbASM:
 		    pxor xmm5, xmm5
 		    pxor xmm6, xmm6
 
-		    movdqu xmm4, xmm1
+		    movdqu xmm4, xmm1 	  ;xmm4 = h
 		    movss xmm5, [sesenta]
 		    divss xmm4, xmm5      ;xmm4 = h/60
-		    movdqu xmm6, xmm4 	  ;xmm6 = h/60
-		   
-		    movss xmm5, [dos]     ;xmm5 = 2.0
-		    divss xmm6, xmm5      ;xmm6 = (h/60) / 2
+		    
+		   ;--------------------------------
+		    ;double fmod (double a, double b) = a - tquot * b
+		    ;Where tquot is the truncated (i.e., rounded towards zero) result of: numer/denom. 
 
-		    ;fmod = numer - tquot * denom = (h/60)   -   (truncated(h/60) / 2)) * 2
-			;Hasta aca....                = (h/60)   -   xmm6       * 2
-		    ;ACA TRUNCAR A 0 EL XMM6 (XMM6 is the truncated (rounded towards zero) result of: (h/60) / 2)
+		    movdqu xmm4, xmm4
+		    movdqu xmm6, xmm4 	  ;xmm6 = h/60
+		    movss xmm5, [dos]     ;xmm5 = 2.0
+
+			    ;HACER LA DIVISION (H/60) / 2 TRUNCADA Y DEJARLA EN XMM6(tquot)
+			    divss xmm6, xmm5      ;xmm6 = (h/60) / 2
+			    roundss xmm6, xmm6, 1
 
 		    mulps xmm6, xmm5 		;xmm6 = (truncated(h/60) / 2)) * 2
 			subss xmm4, xmm6 		;xmm4 = (h/60) - (truncated(h/60) / 2)) * 2 = fmod(h/60 , 2)
 
+			;----------------------------------------
 			movss xmm5, [uno]
 			subss xmm4, xmm5 		;xmm4 = fmod(h/60 , 2) - 1
 
@@ -441,7 +453,7 @@ hslTOrgbASM:
             subss xmm5, xmm4 		;xmm5 = 1 - fabs( fmod(h/60 , 2)-1 )
             movdqu xmm4, xmm7 		;xmm4 = c
 
-            mulps xmm4, xmm5 		;xmm4 = c * ( 1 - fabs( fmod(h/60 , 2)-1 ) )
+            mulps xmm4, xmm5 		;xmm4 = c * ( 1 - fabs(fmod(h/60 ,2)-1) )
             movdqu xmm8, xmm4 
 
             ;xmm8 = x
@@ -450,11 +462,11 @@ hslTOrgbASM:
 		    pxor xmm5, xmm5
 
 		    movdqu xmm4, xmm7	;xmm4 = c
-		    movss xmm5, [dos] 	;xmm5 = 2.0
+		    movss xmm5, [dos] 		;xmm5 = 2.0
 		    divss xmm4, xmm5 	;xmm4 = c/2
-		    movss xmm5, [uno] 	;xmm5 = 1.0
 
-		    subss xmm5, xmm4 	;xmm5 = 1.0  -  ( c/2 )
+		    movss xmm5, xmm3 	;xmm5 = l
+		    subss xmm5, xmm4 	;xmm5 = l  -  ( c/2 )
 		    movdqu xmm9, xmm5
 
 		    ;xmm9 = m
@@ -473,6 +485,7 @@ hslTOrgbASM:
 			;		xmm1 = h
 			;		xmm2 = s
 			;		xmm3 = l
+			;
 			;		xmm7 = c
 			;		xmm8 = x
 			;		xmm9 = m
@@ -484,7 +497,6 @@ hslTOrgbASM:
 			;		xmm13 contendrá a R
 			;		xmm14 contendrá a G
 			;		xmm15 contendrá a B
-
 
 				;if(0 <= h < 60)
 				movdqu xmm4, xmm1 			;xmm4 = |basura,basura,basura,  h |
@@ -602,25 +614,26 @@ hslTOrgbASM:
 			;		xmm13 -> contendrá a R
 			;		xmm14 -> contendrá a G
 			;		xmm15 -> contendrá a B
+			;		r: 0.000000  g: 0.555427  b: 0.121691
 
 				movdqu xmm12, xmm0 		;xmm12 -> (float) transparencia
 				addss xmm13, xmm9 		;xmm13 = xmm13 + xmm9.  r = (r+m)
 				addss xmm14, xmm9 		;xmm14 = xmm14 + xmm9.  g = (g+m)
 				addss xmm15, xmm9 		;xmm15 = xmm15 + xmm9.  b = (b+m)
 
-				movss xmm10, [dosCincoCinco] 	;xmm10 = 255.00
+				;r+m: 0.439934  b+m: 0.561624  g+m: 0.995360
 
+				movss xmm10, [dosCincoCinco] 	;xmm10 = 255.00
 				mulps xmm13, xmm10 		;xmm13 = xmm13 * 255.00.  r = (r+m) * 255.00
 				mulps xmm14, xmm10 		;xmm14 = xmm14 * 255.00.  g = (g+m) * 255.00
 				mulps xmm15, xmm10 		;xmm15 = xmm15 * 255.00.  b = (b+m) * 255.00
 
-
+				;(r+m)*255.0f: 112.183121  (b+m)*255.0f: 143.214188  (g+m)*255.0f: 253.816895
 			;En este punto tenemos
 				;xmm12 = (float) transparencia
 				;xmm13 = (float) R
 				;xmm14 = (float) G
 				;xmm15 = (float) B
-
 
 				;Limpio todos los registros
 				xor r12, r12
@@ -632,16 +645,18 @@ hslTOrgbASM:
 				cvtss2si r13, xmm13
 				cvtss2si r14, xmm14
 				cvtss2si r15, xmm15
-
 				;R12 = transparencia
 				;R13 = R
 				;R14 = G
 				;R15 = B
 
-				mov [rsi + 0], r12b
-				mov [rsi + 1], r13b
-				mov [rsi + 2], r14b
-				mov [rsi + 3], r15b
+				;dst[0]: 255  dst[1]: 119  dst[2]: 147  dst[3]: 246
+				mov [rsi], r12b   ;transparencia
+				mov [rsi + 1], r13b   ;R
+				mov [rsi + 3], r14b   ;G
+				mov [rsi + 2], r15b   ;B
+
+				;112.183121 143.214188 253.816895 0.000000
 
 	pop r15
 	pop r14
@@ -650,5 +665,3 @@ hslTOrgbASM:
 	pop rbp
 
   ret
-
-
