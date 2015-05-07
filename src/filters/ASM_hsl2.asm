@@ -129,21 +129,11 @@ rgbTOhslASM:
 			movdqu   xmm14, [rsi + 32]	;xmm14 = ss
 			movdqu   xmm15, [rsi + 48]	;xmm15 = ll
 
-	;{255, 55, 81, 158, 
-	; a     b    g   r
-	;255, 62, 88, 165, 255, 62, 90, 167, 255, 74, 102, 179}
-
 			;Guardo cada croma
 			mov r11b, 	[rdi + 0]   ;r11b = transparencia
- 			;mov r10b, [rdi + 1]	;r10b = b 158 //r
- 			mov r8b, [rdi + 1] ;r //test
- 			mov r9b, [rdi + 2]	;r9b = g 81 //g
-			;mov r8b, [rdi + 3] ;r8b = r 55 //b
-			mov r10b, [rdi + 3] ;b //test
-
-			;r8 = 55 (r)
-			;r9 = 81 (g)
-			;r10 = 158 (b)
+			mov r8b, 	[rdi + 1] 	;r8b  = r
+			mov r9b,	[rdi + 2]	;r9b  = g
+			mov r10b, 	[rdi + 3]	;r10b = b
 
 			cmp r8, r9
 			jg r8bMayor
@@ -191,9 +181,9 @@ rgbTOhslASM:
 
 				;Resumen de variables
 
-				;cl 	= min(r,g,b) = 158
-			  	;dl 	= max(r,g,b) = 81
-			  	;bl 	= max(r,g,b) - min(r,g,b) = 179
+				;cl 	= min(r,g,b)
+			  	;dl 	= max(r,g,b)
+			  	;bl 	= max(r,g,b) - min(r,g,b)
 			  	;xmm12 	= d = (float) (max(r,g,b) - min(r,g,b))
 
 			  	;r11b = transparencia
@@ -205,20 +195,6 @@ rgbTOhslASM:
 				;xmm1 representará a h
 				;xmm2 representará a l 
 				;xmm3 representará a s
-
-
-				;;;;;;;;;;;debug
-				;r8 = 55 (r)
-				;r9 = 81 (g)
-				;r10 = 158 (b)
-
-				;h = 60 * ( (r-g)/d + 4 )
-
-				;bl = 103
-				;cl = 55
-				;dl = 158
-
-
 			  	pxor xmm0, xmm0
 			  	pxor xmm1, xmm1
 			  	pxor xmm2, xmm2
@@ -231,7 +207,7 @@ rgbTOhslASM:
 					pxor xmm4, xmm4
 					pxor xmm5, xmm5
 
-				  	cmp rcx, rdx 			;if(min(r,g,b) == max(r,g,b))
+				  	cmp rcx, rdx		;if(min(r,g,b) == max(r,g,b))
 				  	je calculoDeL 		; 	h = 0; 
 				  						;	calcularL();
 
@@ -247,10 +223,13 @@ rgbTOhslASM:
 
 					maxEsR:
 						; h = 60 * ( (g-b)/d + 6 )
-						mov r15b, r9b
-						sub r15b, r10b 		;r15b = g-b
+						cvtsi2ss xmm4, r9
+						cvtsi2ss xmm6, r10
+						subss xmm4, xmm6
 
-						cvtsi2ss xmm4, r15 	;xmm4 = (float) (g-b)
+						; mov r15b, r9b
+						; sub r15b, r10b 		;r15b = g-b
+						; cvtsi2ss xmm4, r15 	;xmm4 = (float) (g-b)
 						divss xmm4, xmm12 	;xmm4 = (g-b)/d
 						movss xmm5, [seis]
 						addss xmm4, xmm5 	;xmm4 = (g-b)/d + 6
@@ -263,10 +242,13 @@ rgbTOhslASM:
 
 					maxEsG:
 						; h = 60 * ( (b-r)/d + 2 )
-						mov r15b, r10b
-						sub r15b, r8b 		;r15b = b-r
-						
-						cvtsi2ss xmm4, r15 	;xmm4 = (float) (b-r)
+						cvtsi2ss xmm4, r10
+						cvtsi2ss xmm6, r8
+						subss xmm4, xmm6
+
+						; mov r15b, r10b
+						; sub r15b, r8b 		;r15b = b-r
+						;cvtsi2ss xmm4, r15 	;xmm4 = (float) (b-r)
 						divss xmm4, xmm12 	;xmm4 = (b-r)/d
 						movss xmm5, [dos]
 						addss xmm4, xmm5 	;xmm4 = (b-r)/d + 2
@@ -277,30 +259,14 @@ rgbTOhslASM:
 						movdqu xmm1, xmm4 	;h = 60 * ( (g-b)/d + 2 )
 						jmp recortarH
 
-				;;;;;;;;;;;debug
-				;r8 = 55 (r)
-				;r9 = 81 (g)
-				;r10 = 158 (b)
-
-				;h = 60 * ( (r-g)/d + 4 )
-
-				;bl = 103
-				;cl = 55
-				;dl = 158
-
-
-
-				;;;; CHEQUEAR SI ESTA BIEN PUESTA LA ETIQUETA
 					maxEsB:
 						; h = 60 * ( (r-g)/d + 4 )
-						cvtsi2ss xmm5, r8
+						cvtsi2ss xmm4, r8
 						cvtsi2ss xmm6, r9
-						subss xmm5, xmm6
-						movdqu xmm4, xmm5
-						pxor xmm5, xmm5
-						;mov r15b, r8b
-						;sub r15b, r9b 		;r15b = r-g
-						
+						subss xmm4, xmm6
+
+						; mov r15b, r8b
+						; sub r15b, r9b 		;r15b = r-g
 						;cvtsi2ss xmm4, r15 	;xmm4 = (float) (r-g)
 						divss xmm4, xmm12 	;xmm4 = (r-g)/d
 						movss xmm5, [cuatro]
@@ -325,21 +291,19 @@ rgbTOhslASM:
 						subss xmm1, xmm4 		;xmm1 = |basura,basura,basura,h - 360 si true   h-0 sino|
 
 					;xmm1 = h
-				; {255, 55, 81, 158
-				;   a    b    g    r
+
 				calculoDeL:
-
-				;bl = 103
-				;cl = 55
-				;dl = 158
-				
 					pxor xmm4, xmm4
+					pxor xmm5, xmm5
 
-					xor rax, rax
-					mov al, dl
-					add ax, cx 		;ax = cmax + cmin
+					cvtsi2ss xmm4, rdx  ;xmm4 = cmax
+					cvtsi2ss xmm5, rcx 	;xmm5 = cmin
+					addss xmm4, xmm5 	;xmm4 = cmax + cmin
+					; xor rax, rax
+					; mov al, dl
+					; add ax, cx 		;ax = cmax + cmin
 					
-					cvtsi2ss xmm2, rax 				;xmm2 = cmax + cmin
+					movdqu xmm2, xmm4 				;xmm2 = cmax + cmin
 					movss xmm4, [quinientosDiez] 	;xmm4 = 510.0
 					divss xmm2, xmm4				;xmm2 = l = xmm2/xmm4
 
