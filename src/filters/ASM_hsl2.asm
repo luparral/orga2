@@ -25,7 +25,7 @@ tresSesenta: dd 360.00
 quinientosDiez: dd 510.0
 topeSuperior: dd 255.0001
 bitDeSigno: dd 0x7FFFFFFF
-ceros: dd 0.0, 0.0, 0.0, 0.0
+
 comparar: dd 0.0, 360.0, 1.0, 1.0
 vuelta_atras: dd 0.0, -360.0, 1.0, 1.0
 vuelta_adelante: dd	0.0, 360.0, 0.0, 0.0

@@ -15,21 +15,7 @@
 global ASM_hsl1
 
 section .data
-uno: dd 1.0
-dos: dd 2.0
-cuatro: dd 4.0
-seis: dd 6.0
-sesenta: dd 60.0
-cientoVeinte: dd 120.00
-cientoOchenta: dd 180.00
-dosCuanrenta: dd 240.00
-dosCincoCinco: dd 255.00
-trecientos: dd 300.00
-tresSesenta: dd 360.00
-quinientosDiez: dd 510.0
-topeSuperior: dd 255.0001
-bitDeSigno: dd 0x7FFFFFFF
-ceros: dd 0.0, 0.0, 0.0, 0.0
+
 comparar: dd 0.0, 360.0, 1.0, 1.0
 vuelta_atras: dd 0.0, -360.0, 1.0, 1.0
 vuelta_adelante: dd	0.0, 360.0, 0.0, 0.0
