@@ -38,21 +38,21 @@ section .text
 ASM_hsl1:
 	push rbp
 	mov rbp, rsp
-	sub rsp, 24
+	sub rsp, 40
 	push rbx
 	push r15
 	push r14
 	push r13
 	push r12
 
-	lea rbx, [rbp-16]		;rbx: 16 bytes reservados para el calculo de un pixel a hsl
+	lea rbx, [rbp-40]		;rbx: 16 bytes reservados para el calculo de un pixel a hsl
 
 	mov r13, rdi			;r13 = w
 	mov r14, rsi			;r14 = h
 	mov r15, rdx			;r15 = data
-	movss xmm15, xmm0		;xmm15 = hh
-	movss xmm14, xmm1		;xmm14 = ss
-	movss xmm13, xmm2		;xmm13 = ll
+	movss [rbp-24], xmm0	;[rbp-24] = hh
+	movss [rbp-20], xmm1	;[rbp-20] = ss
+	movss [rbp-16], xmm2	;[rbp-16] = ll
 
 
 	;calculo el tamanio de la imagen en pixeles
@@ -78,12 +78,17 @@ ASM_hsl1:
 
 		;armo los datos sumados
 		pxor xmm1, xmm1			;xmm1 = |00|00|00|00|
-		movss xmm1, xmm13		;xmm1 = |00|00|00|LL|
-		pslldq xmm1, 4			;xmm1 = |00|00|LL|00|
-		movss xmm1, xmm14		;xmm1 = |00|00|LL|SS|
-		pslldq xmm1, 4			;xmm1 = |00|LL|SS|00|
-		movss xmm1, xmm15		;xmm1 = |00|LL|SS|HH|
-		pslldq xmm1, 4			;xmm1 = |LL|SS|HH|aa|
+		pxor xmm2, xmm2
+		pxor xmm3, xmm3
+		movss xmm1, [rbp-16]	;xmm1 = |00|00|00|LL|
+		pslldq xmm1, 12			;xmm1 = |00|00|LL|00|
+		movss xmm2, [rbp-20]	;xmm1 = |00|00|LL|SS|
+		pslldq xmm2, 8			;xmm1 = |00|LL|SS|00|
+		movss xmm3, [rbp-24]	;xmm1 = |00|LL|SS|HH|
+		pslldq xmm3, 4			;xmm1 = |LL|SS|HH|aa|
+
+		addps xmm1, xmm2
+		addps xmm1, xmm3
 
 		addps xmm0, xmm1		;xmm0 = |l+LL|s+SS|h+HH|aa|
 		movups xmm7, xmm0       ;xmm7 = |l+LL|s+SS|h+HH|aa|
@@ -145,6 +150,6 @@ ASM_hsl1:
 	pop r14
 	pop r15
 	pop rbx
-	add rsp, 24
+	add rsp, 40
 	pop rbp
   	ret
