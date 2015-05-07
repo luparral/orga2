@@ -74,6 +74,8 @@ ASM_hsl1:
 		addps xmm0, xmm1		;xmm0 = |l+LL|s+SS|h+HH|aa|
 		movups xmm7, xmm0       ;xmm7 = |l+LL|s+SS|h+HH|aa|
 		movups xmm8, xmm0       ;xmm8 = |l+LL|s+SS|h+HH|aa|
+		movups xmm9, xmm0		;xmm9 = |l+LL|s+SS|h+HH|aa|
+		movups xmm1, xmm0		;xmm1 = |l+LL|s+SS|h+HH|aa|
 
 		;traigo mascaras
 		movdqu xmm10, [comparar]
@@ -88,17 +90,29 @@ ASM_hsl1:
 		addps xmm5, xmm2		;xmm5 = |1|1|h+HH-360|aa|
 		addps xmm6, xmm3		;xmm6 = |0|0|h+HH+360|aa|
 
-		cmpps xmm0, xmm10, 5	;not less than = mayor o igual
-		pand xmm0, xmm5 		;en xmm0 queda donde habia ceros 0 y el valor correspondiente en xmm5 donde habia 1.
-		cmpps xmm7, xmm11, 1	;less than
-		pand xmm7, xmm6 		;en xmm7 queda donde habia ceros 0 y el valor correspondiente en xmm6 donde habia 1
-		addps xmm0, xmm7
+;		|-3|0.5|-5|255
+		;xmm10 = 0.0, 360.0, 1.0, 1.0
 
-		movups xmm7, xmm0 		;preservo xmm0
-		cmpps xmm0, xmm11, 0 	;comparo de nuevo contra 0
-		pand xmm0, xmm8 		;donde era igual a 0, pongo el resultado del else if en xmm8
+;		if h+HH >= 360
+			;mayor o igual
+			cmpps xmm0, xmm10, 5	;xmm0 = |0|0|0|1|
+			pand xmm0, xmm5			;xmm0 = |0|0|0|aa|
 
-		addps xmm0, xmm7 		;en xmm0 me queda el resultado final?
+;		if 0 <= h+HH < 360
+			;less than
+			cmpss xmm7, xmm10, 1	;xmm7 = |1|1|1|0|
+			;greater equal
+			cmpss xmm8, xmm11, 5	;xmm8 =	|0|1|0|1|
+			pand xmm7, xmm8			;xmm7 = |0|1|0|0|
+			pand xmm7, xmm1			;xmm7 = |00|0.5|00|0|
+;		if h+HH <= 0
+			;less than
+			cmpss xmm1,	xmm11, 1	;xmm1 = |1|0|1|0|
+			pand xmm1, xmm6			;xmm1 = |0|0|hh+HH+360|0|
+
+			por xmm0, xmm7		;xmm0 = |00|0.5|00|aa|
+			por xmm0, xmm1		;xmm0 =	|00|0.5|hh+HH+360|aa|
+
 
 		movdqu [rbx], xmm0
 		mov rdi, rbx
