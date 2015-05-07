@@ -16,10 +16,9 @@ global ASM_hsl1
 
 section .data
 
-comparar: dd	360.0, 1.0, 1.0, 0.0
-ceros: dd 0.0, 0.0, 0.0, 0.0
-vuelta_atras: dd -360.0, 1.0, 1.0, 0.0
-vuelta_adelante: dd 360.0, 0.0, 0.0, 0.0
+comparar: dd	0.0, 360.0, 1.0, 1.0,
+vuelta_atras: dd	0.0, -360.0, 1.0, 1.0
+vuelta_adelante: dd		0.0, 360.0, 0.0, 0.0
 
 section .text
 ASM_hsl1:
@@ -53,7 +52,7 @@ ASM_hsl1:
 
 
 	movdqu xmm10, [comparar]
-	movdqu xmm11, [ceros]
+	pxor xmm11, xmm11
 	movdqu xmm2, [vuelta_atras]
 	movdqu xmm3, [vuelta_adelante]
 	;voy a iterar cada pixel (r12) de la imagen
@@ -65,7 +64,7 @@ ASM_hsl1:
 		mov rsi, rbx
 
 		call rgbTOhsl
-		movups xmm0, [rbx]		;xmm0 = |a|l|s|h| valores transformados a hsl
+		movups xmm0, [rbx]		;xmm0 = |l|s|h|a| valores transformados a hsl
 
 		;;;;;suma;;;;;;
 		pxor xmm1, xmm1			;xmm1 = |00|00|00|00|
@@ -74,19 +73,22 @@ ASM_hsl1:
 		movss xmm1, xmm14		;xmm1 = |00|00|LL|SS|
 		pslldq xmm1, 4			;xmm1 = |00|LL|SS|00|
 		movss xmm1, xmm15		;xmm1 = |00|LL|SS|HH|
+		pslldq xmm1, 4			;xmm1 = |LL|SS|HH|aa|
 
-		addps xmm0, xmm1		;xmm0 = |a|l+LL|s+SS|h+HH|
-		movups xmm7, xmm0       ;xmm7 = |a|l+LL|s+SS|h+HH|
-		movups xmm8, xmm0       ;xmm8 = |a|l+LL|s+SS|h+HH|
+		addps xmm0, xmm1		;xmm0 = |l+LL|s+SS|h+HH|aa|
+		movups xmm7, xmm0       ;xmm7 = |l+LL|s+SS|h+HH|aa|
+		movups xmm8, xmm0       ;xmm8 = |l+LL|s+SS|h+HH|aa|
 
-		movss xmm5, xmm0		;xmm5 = |0|0|0|h+HH|
-		addps xmm5, xmm2		;xmm5 = |0|1|1|h+HH-360|
-		movss xmm6, xmm0		;xmm6 = |0|0|0|h+HH|
-		addps xmm5, xmm3		;xmm6 = |0|0|0|h+HH+360|
+		pxor xmm5, xmm5
+		movlps xmm5, xmm0		;xmm5 = |0|0|h+HH|aa|
+		addps xmm5, xmm2		;xmm5 = |1|1|h+HH-360|aa|
+		pxor xmm6, xmm6
+		movlps xmm6, xmm0		;xmm6 = |0|0|h+HH|aa|
+		addps xmm6, xmm3		;xmm6 = |0|0|h+HH+360|aa|
 
-		cmpps xmm0, xmm10, 5
+		cmpps xmm0, xmm10, 5	;not less than = mayor o igual
 		pand xmm0, xmm5 		;en xmm0 queda donde habia ceros 0 y el valor correspondiente en xmm5 donde habia 1.
-		cmpps xmm7, xmm11, 1
+		cmpps xmm7, xmm11, 1	;less than
 		pand xmm7, xmm6 		;en xmm7 queda donde habia ceros 0 y el valor correspondiente en xmm6 donde habia 1
 		addps xmm0, xmm7
 
