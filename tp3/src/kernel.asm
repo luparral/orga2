@@ -60,16 +60,66 @@ modo_protegido:
     xor eax, eax
     mov ax, 0x48                ;index 9, gdt/ldt 0, rpl 00
     mov ds, ax
+    mov ss, ax                  ; stack segment same as data segment
+
+    ; Cargo video
+    xor eax, eax
+    mov ax, 01100000b           ;index 12, video
+    mov fs, ax
 
     ; Establecer la base de la pila
-    ;xor eax, eax
-    ;mov ax, 0x27
+    xor eax, eax
+    mov eax, 0x27000
+    mov esp, eax
+    mov ebp, eax
+    ;0x27000
+    ;mov ax, 0x48
     ;mov ss, ax
 
     ; Imprimir mensaje de bienvenida
     imprimir_texto_mp iniciando_mp_msg, iniciando_mp_len, 0x07, 0, 0
 
     ; Inicializar el juego
+
+    ;pinto fondo de gris
+    push 80
+    push 50
+    push 0
+    push 0
+    push 0x77
+    push 0x00
+    call screen_pintar_rect
+    add esp, 6*4
+
+    ;pinto lineas con comandos abajo en negro
+    push 80
+    push 50
+    push 0
+    push 45
+    push 0x00
+    push 0x00
+    call screen_pintar_rect
+    add esp, 6*4
+
+    ;pinto panel primer jugador
+    push 10                 ;ancho
+    push 5                  ;alto
+    push 30                 ;columna
+    push 45                 ;fila
+    push 0x99
+    push 0x00
+    call screen_pintar_rect
+    add esp, 6*4
+
+    ;pinto panel segundo jugador
+    push 10                 ;ancho
+    push 5                  ;alto
+    push 40                 ;columna
+    push 45                 ;fila
+    push 0xCC
+    push 0x00
+    call screen_pintar_rect
+    add esp, 6*4
 
     ; Inicializar pantalla
 
@@ -111,3 +161,5 @@ modo_protegido:
 
 %include "a20.asm"
 extern GDT_DESC
+extern screen_pintar_rect
+extern screen_pintar_linea_h
