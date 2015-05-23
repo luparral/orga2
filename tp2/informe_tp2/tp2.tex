@@ -1,0 +1,73 @@
+\documentclass[10pt, a4paper,english,spanish]{article}
+%\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc} % para poder usar tildes en archivos UTF-8
+\usepackage[spanish]{babel} % para que comandos como \today den el resultado en castellano
+\usepackage[conEntregas]{caratula}
+\usepackage{fullpage} %small margins
+\usepackage[parfill]{parskip} %genera saltos entre parrafos
+\usepackage{color}
+\definecolor{gray}{gray}{0.35}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{soul}
+\usepackage{amsmath} %big brackets
+\usepackage[pdftex]{graphicx}
+\lstset{
+    numbers=left,
+    breaklines=true,
+    tabsize=2,
+    basicstyle=\ttfamily\color{gray},
+}
+\setlength{\parindent}{8pt}
+\usepackage{mathtools}
+\usepackage[margin=50pt]{geometry}
+\usepackage{amsfonts}
+\usepackage{flafter}
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\setlength{\parindent}{0pt} %remueve indent
+
+%paquete para setear colores a las tablas para graficar registros
+\usepackage{xcolor,colortbl}
+%define de colores
+\definecolor{Orange}{rgb}{1, 0.64, 0}
+\definecolor{Green}{rgb}{0.32,1,0.62}
+%define de columnas
+\newcolumntype{o}{>{\columncolor{Orange}}c}
+\newcolumntype{g}{>{\columncolor{Green}}c}
+
+\begin{document}
+
+\materia{Organización del Computador II}
+\submateria{Trabajo Práctico Nro. 2}
+\titulo{Filtros de imágenes - Grupo: SnakeII/Nokia1100}
+\fecha{\today}
+\integrante{Pablo Gomez}{156/13}{mago-1986@hotmail.com}
+\integrante{Lucia Parral}{162/13}{luciaparral@gmail.com}
+\integrante{Petr Romachov}{412/13}{promachov@gmail.com}
+\maketitle
+\newpage
+
+\tableofcontents
+
+\newpage
+\input{introduccion/introduccion}
+
+\newpage
+% Comienzo Blur
+\input{blur/blur}
+% Fin Blur
+
+\newpage
+% Comienzo Merge
+\input{merge/merge}
+% Fin Merge
+
+\newpage	
+% Comienzo HSL
+\input{hsl/hsl}
+% Fin HSL
+
+\end{document}

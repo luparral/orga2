@@ -1,0 +1,82 @@
+\section{Merge}
+\subsection{Introducción}
+\textit{Merge} es un procedimiento en el cual se mezclan dos imágenes. Se reciben como inputs las imágenes a mergear, y luego se realiza un promedio ponderado (a partir de un valor recibido por parámetro) entre los píxeles de ambas imágenes, generando como salida una imagen que contiene el merge de las mismas.\\
+La fórmula a partir de la cual se procesan los píxeles de las imágenes a mergear, sean estas A y B y donde value es el valor pasado por parámetro es:  
+
+\begin{verbatim}
+         A[j][i][k] = value * A[j][i][k] + (1-value) * B[j][i][k];
+\end{verbatim}
+
+Donde \textit{k} itera sobre las componentes del pixel, dejando inalterada la componente de transparencia.
+
+\subsection{Pseudocódigo en C}
+
+El pseudocódigo para una iteración del ciclo de la implementación que recibimos por parte de la cátedra es:
+
+\begin{lstlisting}
+// sean A y B las dos imagenes pasadas por parametro y value un float recibido tambien como input.
+  for(ih=0;ih<(int)h;ih++) {		//itero sobre la altura de la imagen
+   for(iw=0;iw<(int)w;iw++) {		//itero sobre el ancho de la imagen
+    for(ii=1;ii<4;ii++) {			  //itero sobre los cuatro componentes RGBA del pixel
+     A[ih][iw][ii] = (value*(A[ih][iw][ii]) + (1.0-value)*(B[ih][iw][ii])); //proceso dicha componente de pixel.
+      }
+    }
+  }
+
+\end{lstlisting}
+
+De esta manera, lo que se hace es iterar por cada pixel de cada imagen y por cada una de sus componentes, realizando el cálculo correspondiente y guardando el resultado en una de las imágenes recibidas como input.
+
+\subsection{Implementación 1 en ASM}
+La primera implementación requiere realizar operaciones en punto flotante y procesar la mayor cantidad de pixeles posibles por iteración.\\
+Como cada pixel mide 4B (1B por cada componente), en un registro XMM es posible procesar de a 4 a la vez. De esta forma, en cada iteración del ciclo tomamos 4 pixeles de cada imagen.
+
+El procedimiento entonces será:
+
+\begin{enumerate}
+\item Tomar 4 pixeles de cada imagen.
+
+\begin{tabular}{| o | o | o | o |} %tabla color orange
+\hline
+$Pa_{3}$ & $Pa_{2}$ & $Pa_{1}$ & $Pa_{0}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| g | g | g | g |} %tabla color verde
+\hline
+$Pb_{3}$ & $Pb_{2}$ & $Pb_{1}$ & $Pb_{0}$ \\
+\hline
+\end{tabular}
+
+$Pa_{i}$ y $Pb_{i}$ son los pixeles íesimos de las imagenes A y B.
+\end{enumerate}
+2-Desempaquetar de byte a word y de word a dword.
+3-Convertir de dword int a double floating point.
+4-Multiplicar los componentes de pixeles correspondientes a m1 por value y los componentes de pixel correspondientes a m2 por 1-value.
+5-Sumar cada componente con su análogo.
+6-Convertir a int.
+7-Empaquetar de dword a word y de word a byte.
+8-Almacenar los 4 pixeles ya procesados en la imagen recibida por parámetro que será la devuelta como resultado.
+8-Repetir.
+
+\begin{lstlisting}
+//TODO: pseudocodigo :P
+\end{lstlisting}
+
+\hl{TODO: explicar el pseudocodigo}.
+
+
+\subsection{Implementación 2 en ASM}
+Esta implementación, diferenciándose de la anterior, requiere realizar operaciones en enteros.
+
+\begin{lstlisting}
+//TODO: pseudocodigo :P
+\end{lstlisting}
+
+\hl{TODO: explicar el pseudocodigo}.
+
+
+\subsection{Resultados}
+A continuación, detallamos los resultados obtenidos a través de la experimentación con las distintas implementaciones en C y Assembler para este filtro y las conclusiones a las que llegamos tras el estudio de los mismos.
+
+\hl{TODO: Experimentar, chamuyar y poner graficos.}
