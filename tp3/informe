@@ -1,0 +1,15 @@
+GDT: se decidio hacer el codigo Execute only (8), los datos Read/Write(2)
+IDT: el selector de segmento es el de codigo del SO (8)
+
+1-Se deshabilitan todas las interrupciones
+2-Imprime mensaje de bienvenida a modo real
+3-habilitar A20
+4-Cargar lgdt con la direccion de la gdt
+5-cargar el bit 0 de CR0, habilitando el modo protegido
+6-saltar a modo protegido jmp 0x40 (descriptor 8 de la idt 1000000)
+7-establecer los selectores de segmento, el ds y ss son el mismo (index 9)
+8-establecer esp y ebp en 0x27000
+9-mensaje bienvenida modo protegido
+10-cargo segmento de video (indice 12)
+10-inicializar la pantalla
+11-incializar idt

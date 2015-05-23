@@ -72,14 +72,14 @@ modo_protegido:
     mov eax, 0x27000
     mov esp, eax
     mov ebp, eax
-    ;0x27000
-    ;mov ax, 0x48
-    ;mov ss, ax
 
     ; Imprimir mensaje de bienvenida
     imprimir_texto_mp iniciando_mp_msg, iniciando_mp_len, 0x07, 0, 0
 
     ; Inicializar el juego
+
+
+    ; Inicializar pantalla
 
     ;pinto fondo de gris
     push 80
@@ -121,8 +121,6 @@ modo_protegido:
     call screen_pintar_rect
     add esp, 6*4
 
-    ; Inicializar pantalla
-
     ; Inicializar el manejador de memoria
 
     ; Inicializar el directorio de paginas
@@ -138,14 +136,17 @@ modo_protegido:
     ; Inicializar el scheduler
 
     ; Inicializar la IDT
+    call idt_inicializar
 
     ; Cargar IDT
+    lidt [IDT_DESC]
 
     ; Configurar controlador de interrupciones
 
     ; Cargar tarea inicial
 
     ; Habilitar interrupciones
+    sti
 
     ; Saltar a la primera tarea: Idle
 
@@ -161,5 +162,7 @@ modo_protegido:
 
 %include "a20.asm"
 extern GDT_DESC
+extern IDT_DESC
+extern idt_inicializar
 extern screen_pintar_rect
 extern screen_pintar_linea_h
