@@ -179,9 +179,9 @@ rgbTOhslASM:
 
 			;Guardo cada croma
 			mov r11b, 	[rdi + 0]   ;r11b = transparencia
-			mov r8b, 	[rdi + 1] 	;r8b  = r
+			mov r8b, 	[rdi + 3] 	;r8b  = r
 			mov r9b,	[rdi + 2]	;r9b  = g
-			mov r10b, 	[rdi + 3]	;r10b = b
+			mov r10b, 	[rdi + 1]	;r10b = b
 
 			cmp r8, r9
 			jg r8bMayor
@@ -651,21 +651,17 @@ hslTOrgbASM:
 			;		xmm13 -> contendrá a R
 			;		xmm14 -> contendrá a G
 			;		xmm15 -> contendrá a B
-			;		r: 0.000000  g: 0.555427  b: 0.121691
 
 				movdqu xmm12, xmm0 		;xmm12 -> (float) transparencia
 				addss xmm13, xmm9 		;xmm13 = xmm13 + xmm9.  r = (r+m)
 				addss xmm14, xmm9 		;xmm14 = xmm14 + xmm9.  g = (g+m)
 				addss xmm15, xmm9 		;xmm15 = xmm15 + xmm9.  b = (b+m)
 
-				;r+m: 0.439934  b+m: 0.561624  g+m: 0.995360
-
 				movss xmm10, [dosCincoCinco] 	;xmm10 = 255.00
 				mulps xmm13, xmm10 		;xmm13 = xmm13 * 255.00.  r = (r+m) * 255.00
 				mulps xmm14, xmm10 		;xmm14 = xmm14 * 255.00.  g = (g+m) * 255.00
 				mulps xmm15, xmm10 		;xmm15 = xmm15 * 255.00.  b = (b+m) * 255.00
 
-				;(r+m)*255.0f: 112.183121  (b+m)*255.0f: 143.214188  (g+m)*255.0f: 253.816895
 			;En este punto tenemos
 				;xmm12 = (float) transparencia
 				;xmm13 = (float) R
@@ -687,13 +683,10 @@ hslTOrgbASM:
 				;R14 = G
 				;R15 = B
 
-				;dst[0]: 255  dst[1]: 119  dst[2]: 147  dst[3]: 246
-				mov [rsi], r12b   ;transparencia
-				mov [rsi + 1], r13b   ;R
-				mov [rsi + 3], r14b   ;G
+				mov [rsi + 0], r12b   ;transparencia
+				mov [rsi + 1], r14b   ;G
 				mov [rsi + 2], r15b   ;B
-
-				;112.183121 143.214188 253.816895 0.000000
+				mov [rsi + 3], r13b   ;R
 
 	pop r15
 	pop r14
