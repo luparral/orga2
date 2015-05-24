@@ -6,6 +6,7 @@
 /* ************************************************************************* */
 
 #include "filters.h"
+#include <math.h>
 
 void C_merge(uint32_t w, uint32_t h, uint8_t* data1, uint8_t* data2, float value) {
   uint8_t (*m1)[w][4] = (uint8_t (*)[w][4]) data1;
@@ -19,5 +20,3 @@ void C_merge(uint32_t w, uint32_t h, uint8_t* data1, uint8_t* data2, float value
     }
   }
 }
-
-//MOV [R14], XMM5
