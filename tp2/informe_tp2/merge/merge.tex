@@ -48,33 +48,184 @@ $Pb_{3}$ & $Pb_{2}$ & $Pb_{1}$ & $Pb_{0}$ \\
 \hline
 \end{tabular}
 
-$Pa_{i}$ y $Pb_{i}$ son los pixeles íesimos de las imagenes A y B.
+$Pa_{i}$ y $Pb_{i}$ son los pixeles íesimos de las imagenes A y B.\\
+
+\item Desempaquetar de byte a word y de word a dword.
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $Pa_{3a}$ & $0$ & $Pa_{3b}$ & $0$ & $Pa_{3c}$ & $0$ & $Pa_{3d}$ & $0$ & $Pa_{2a}$ & $0$ & $Pa_{2b}$ & $0$ & $Pa_{2c}$ & $0$ & $Pa_{2d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $Pa_{1a}$ & $0$ & $Pa_{1b}$ & $0$ & $Pa_{1c}$ & $0$ & $Pa_{1d}$ & $0$ & $Pa_{0a}$ & $0$ & $Pa_{0b}$ & $0$ & $Pa_{0c}$ & $0$ & $Pa_{0d}$ \\ 
+\hline
+\end{tabular}
+
+En los dos registros anteriores quedan expresados las componentes de los 4 primeros píxeles tras ser desempaquetados de byte a word.
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $Pa_{3a}$ & $0$ & $0$ & $0$ & $Pa_{3b}$ & $0$ & $0$ & $0$ & $Pa_{3c}$ & $0$ & $0$ & $0$ & $Pa_{3d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $Pa_{2a}$ & $0$ & $0$ & $0$ & $Pa_{2b}$ & $0$ & $0$ & $0$ & $Pa_{2c}$ & $0$ & $0$ & $0$ & $Pa_{2d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $Pa_{1a}$ & $0$ & $0$ & $0$ & $Pa_{1b}$ & $0$ & $0$ & $0$ & $Pa_{1c}$ & $0$ & $0$ & $0$ & $Pa_{1d}$\\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $Pa_{0a}$ & $0$ & $0$ & $0$ & $Pa_{0b}$ & $0$ & $0$ & $0$ & $Pa_{0c}$ & $0$ & $0$ & $0$ & $Pa_{0d}$ \\ 
+\hline
+\end{tabular}
+
+En estos últimos cuatro registros, quedan expresados en words las componentes de los 4 píxeles, donde $Pa_{ij}$ representa al pixel iésimo de la imagen A en su componente j, y j puede ser R,G,B o A.
+
+Análogamente, se realiza el desempaquetado para los píxeles de la imagen B. 
+
+Primero de byte a word.
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |} %tabla color green
+\hline
+$0$ & $Pb_{3a}$ & $0$ & $Pb_{3b}$ & $0$ & $Pb_{3c}$ & $0$ & $Pb_{3d}$ & $0$ & $Pb_{2a}$ & $0$ & $Pb_{2b}$ & $0$ & $Pb_{2c}$ & $0$ & $Pb_{2d}$ \\ 
+\hline
+\end{tabular}
+
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $Pb_{1a}$ & $0$ & $Pb_{1b}$ & $0$ & $Pb_{1c}$ & $0$ & $Pb_{1d}$ & $0$ & $Pb_{0a}$ & $0$ & $Pb_{0b}$ & $0$ & $Pb_{0c}$ & $0$ & $Pb_{0d}$ \\ 
+\hline
+\end{tabular}
+
+Luego de word a dword
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $Pb_{3a}$ & $0$ & $0$ & $0$ & $Pb_{3b}$ & $0$ & $0$ & $0$ & $Pb_{3c}$ & $0$ & $0$ & $0$ & $Pb_{3d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $Pb_{2a}$ & $0$ & $0$ & $0$ & $Pb_{2b}$ & $0$ & $0$ & $0$ & $Pb_{2c}$ & $0$ & $0$ & $0$ & $Pb_{2d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $Pb_{1a}$ & $0$ & $0$ & $0$ & $Pb_{1b}$ & $0$ & $0$ & $0$ & $Pb_{1c}$ & $0$ & $0$ & $0$ & $Pb_{1d}$\\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $Pb_{0a}$ & $0$ & $0$ & $0$ & $Pb_{0b}$ & $0$ & $0$ & $0$ & $Pb_{0c}$ & $0$ & $0$ & $0$ & $Pb_{0d}$ \\ 
+\hline
+\end{tabular}
+
+\item Convertir de dword int a double floating point cada uno de los componentes desempaquetados anteriormente (instrucción \texttt{cvtdq2ps}).
+\item Multiplicar los componentes de pixeles correspondientes a A por value (v).
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{3a}$ & $0$ & $0$ & $0$ & $v * Pa_{3b}$ & $0$ & $0$ & $0$ & $v * Pa_{3c}$ & $0$ & $0$ & $0$ & $v * Pa_{3d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{2a}$ & $0$ & $0$ & $0$ & $v * Pa_{2b}$ & $0$ & $0$ & $0$ & $v * Pa_{2c}$ & $0$ & $0$ & $0$ & $v * Pa_{2d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{1a}$ & $0$ & $0$ & $0$ & $v * Pa_{1b}$ & $0$ & $0$ & $0$ & $v * Pa_{1c}$ & $0$ & $0$ & $0$ & $v * Pa_{1d}$\\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{0a}$ & $0$ & $0$ & $0$ & $v * Pa_{0b}$ & $0$ & $0$ & $0$ & $v * Pa_{0c}$ & $0$ & $0$ & $0$ & $v * Pa_{0d}$ \\ 
+\hline
+\end{tabular}
+
+Multiplicar los componentes de pixel correspondientes a B por 1-v.
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $(1-v) * Pb_{3a}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{3b}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{3c}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{3d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $(1-v) * Pb_{2a}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{2b}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{2c}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{2d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $(1-v) * Pb_{1a}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{1b}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{1c}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{1d}$\\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
+\hline
+$0$ & $0$ & $0$ & $(1-v) * Pb_{0a}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{0b}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{0c}$ & $0$ & $0$ & $0$ & $(1-v) * Pb_{0d}$ \\ 
+\hline
+\end{tabular}
+
+\item Sumar cada componente con su análogo. \\
+\footnotesize
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{3a} + (1-v) * Pb_{3a}$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $v * Pa_{3d} + (1-v) * Pb_{3d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{2a} + (1-v) * Pb_{2a}$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $v * Pa_{2d} + (1-v) * Pb_{2d}$ \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{1a} + (1-v) * Pb_{1a}$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $v * Pa_{1d} + (1-v) * Pb_{1d}$\\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
+\hline
+$0$ & $0$ & $0$ & $v * Pa_{0a} + (1-v) * Pb_{0a}$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $...$ & $0$ & $0$ & $0$ & $v * Pa_{0d} + (1-v) * Pb_{0d}$ \\ 
+\hline
+\end{tabular}
+\normalsize
+\item Convertir a enteros (instrucción \texttt{cvtps2dq}).
+\item Empaquetar de dword a word y de word a byte los registros en donde ahora se encuentra la suma entre los componentes de los píxeles de ambas imágenes.
+\item Almacenar los 4 pixeles ya procesados en la imagen recibida por parámetro que será la devuelta como resultado.
+\item Repetir.
+
 \end{enumerate}
-2-Desempaquetar de byte a word y de word a dword.
-3-Convertir de dword int a double floating point.
-4-Multiplicar los componentes de pixeles correspondientes a m1 por value y los componentes de pixel correspondientes a m2 por 1-value.
-5-Sumar cada componente con su análogo.
-6-Convertir a int.
-7-Empaquetar de dword a word y de word a byte.
-8-Almacenar los 4 pixeles ya procesados en la imagen recibida por parámetro que será la devuelta como resultado.
-8-Repetir.
-
-\begin{lstlisting}
-//TODO: pseudocodigo :P
-\end{lstlisting}
-
-\hl{TODO: explicar el pseudocodigo}.
-
 
 \subsection{Implementación 2 en ASM}
-Esta implementación, diferenciándose de la anterior, requiere realizar operaciones en enteros.
-
-\begin{lstlisting}
-//TODO: pseudocodigo :P
-\end{lstlisting}
-
-\hl{TODO: explicar el pseudocodigo}.
-
+Esta implementación, diferenciándose de la anterior, requiere realizar operaciones en enteros.\\
+Para esto, como \textit{value} es un valor en punto flotante y para multiplicar por este valor sería necesario convertir a punto flotante el componente a multiplicar, vamos a tener que multiplicarlo por un float "grande" (en este caso utilizamos el valor 32768.0). A continuación, convertimos este valor a entero. De esta forma, evitamos perder precision al pasar de un valor en punto flotante a entero.\\
+Con \textit{value} siendo ahora un entero, vamos a realizar las mismas operaciones que para la primera implementación, con la única diferencia siendo que, tras multiplicar \textit{value} por el componente de pixel, vamos a dividirlo por el mismo valor por el cual multiplicamos \textit{value} inicialmente (para lo cual realizamos un shift a derecha de 15, en nuestro caso, utilizando la instruccion \texttt{psrad}).\\
+Así, evitamos las conversiones que realizábamos en la implementación anterior, necesarias para operar en punto flotante.
 
 \subsection{Resultados}
 A continuación, detallamos los resultados obtenidos a través de la experimentación con las distintas implementaciones en C y Assembler para este filtro y las conclusiones a las que llegamos tras el estudio de los mismos.
