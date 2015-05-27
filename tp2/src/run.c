@@ -21,7 +21,7 @@ int run_blur(int c, char* src, char* dst){
   unsigned int cantidadDeMediciones = 1;
   unsigned long acumulador = 0;
   unsigned long diferencia;
-  for (unsigned int i = 0; i < cantidadDeMediciones; ++i)  {
+  for (unsigned int i = 1; i <= cantidadDeMediciones; ++i)  {
 
     BMP* bmp = bmp_read(src);
     if(bmp==0) { return -1;}  // open error
@@ -69,7 +69,7 @@ int run_merge(int c, char* src1, char* src2, char* dst, float value){
   unsigned int cantidadDeMediciones = 1;
   unsigned long acumulador = 0;
   unsigned long diferencia;
-  for (unsigned int i = 0; i < cantidadDeMediciones; ++i)  {
+  for (unsigned int i = 1; i <= cantidadDeMediciones; ++i)  {
 
     if(dst==0) { return -1;}  // non destine
     if(value>1) value=1; else if(value<0) value=0;
@@ -130,7 +130,7 @@ int run_hsl(int c, char* src, char* dst, float hh, float ss, float ll) {
   unsigned int cantidadDeMediciones = 1;
   unsigned long acumulador = 0;
   unsigned long diferencia;
-  for (unsigned int i = 1; i < cantidadDeMediciones; ++i){
+  for (unsigned int i = 1; i <= cantidadDeMediciones; ++i){
    
     BMP* bmp = bmp_read(src);
     if(bmp==0) { return -1;}  // open error
