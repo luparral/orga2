@@ -18,7 +18,7 @@ void printPartial(char* type, unsigned int iteracion, unsigned int cantidadDeMed
 }
 
 int run_blur(int c, char* src, char* dst){
-  unsigned int cantidadDeMediciones = 1;
+  unsigned int cantidadDeMediciones = 1000;
   unsigned long acumulador = 0;
   unsigned long diferencia;
   for (unsigned int i = 1; i <= cantidadDeMediciones; ++i)  {
@@ -57,7 +57,6 @@ int run_blur(int c, char* src, char* dst){
     bmp_save(dst,bmp);
     bmp_delete(bmp);
 
-    // printf("[blur] Iteracion %d de %d OK.. [Ciclos = %d]\n", i,cantidadDeMediciones, diferencia);
     printPartial("blur", i, cantidadDeMediciones, diferencia);
   }
 
@@ -66,7 +65,7 @@ int run_blur(int c, char* src, char* dst){
 }
 
 int run_merge(int c, char* src1, char* src2, char* dst, float value){
-  unsigned int cantidadDeMediciones = 1;
+  unsigned int cantidadDeMediciones = 1000;
   unsigned long acumulador = 0;
   unsigned long diferencia;
   for (unsigned int i = 1; i <= cantidadDeMediciones; ++i)  {
@@ -118,7 +117,6 @@ int run_merge(int c, char* src1, char* src2, char* dst, float value){
     bmp_delete(bmp1);
     bmp_delete(bmp2);
 
-    // printf("[merge] Iteracion %d de %d OK.. [Ciclos = %d]\n", i,cantidadDeMediciones, diferencia);
     printPartial("merge", i, cantidadDeMediciones, diferencia);
   }
 
@@ -127,7 +125,7 @@ int run_merge(int c, char* src1, char* src2, char* dst, float value){
 }
 
 int run_hsl(int c, char* src, char* dst, float hh, float ss, float ll) {
-  unsigned int cantidadDeMediciones = 1;
+  unsigned int cantidadDeMediciones = 1000;
   unsigned long acumulador = 0;
   unsigned long diferencia;
   for (unsigned int i = 1; i <= cantidadDeMediciones; ++i){
@@ -168,7 +166,6 @@ int run_hsl(int c, char* src, char* dst, float hh, float ss, float ll) {
     bmp_save(dst,bmp);
     bmp_delete(bmp);
 
-    // printf("[hsl] Iteracion %d de %d OK.. [Ciclos = %d]\n", i,cantidadDeMediciones, diferencia);
     printPartial("hsl", i, cantidadDeMediciones, diferencia);
   }
 
