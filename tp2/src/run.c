@@ -14,7 +14,7 @@ void printAverage(unsigned long acumulador, unsigned int cantidadDeMediciones){
 }
 
 void printPartial(char* type, unsigned int iteracion, unsigned int cantidadDeMediciones, unsigned long diferencia){
-  printf("[%s] Iteracion %d de %d OK.. [Ciclos = %d]\n", type, iteracion, cantidadDeMediciones, diferencia);
+  // printf("[%s] Iteracion %d de %d OK.. [Ciclos = %d]\n", type, iteracion, cantidadDeMediciones, diferencia);
 }
 
 int run_blur(int c, char* src, char* dst){
