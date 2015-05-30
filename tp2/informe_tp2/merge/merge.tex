@@ -136,7 +136,7 @@ $0$ & $0$ & $0$ & $Pb_{0a}$ & $0$ & $0$ & $0$ & $Pb_{0b}$ & $0$ & $0$ & $0$ & $P
 \end{tabular}
 
 \item Convertir de dword int a double floating point cada uno de los componentes desempaquetados anteriormente (instrucción \texttt{cvtdq2ps}).
-\item Multiplicar los componentes de pixeles correspondientes a A por value (v).
+\item Multiplicar los componentes de pixeles correspondientes a A por value (v). Para hacerlo, preparamos un registro que contiene cuatro dwords de valor v para poder realizar una multiplicación contra cada dword del registro.
 
 \begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
 \hline
@@ -162,7 +162,7 @@ $0$ & $0$ & $0$ & $v * Pa_{0a}$ & $0$ & $0$ & $0$ & $v * Pa_{0b}$ & $0$ & $0$ & 
 \hline
 \end{tabular}
 
-Multiplicar los componentes de pixel correspondientes a B por 1-v.
+Multiplicar los componentes de pixel correspondientes a B por 1-v. Preparamos un registro con cuatro dwords de valor 1-v (como hicimos previamente) para poder multiplicar ambos registros y obtener como resultado lo siguiente:
 
 \begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
 \hline
