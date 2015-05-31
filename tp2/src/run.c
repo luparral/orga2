@@ -18,7 +18,7 @@ void printPartial(char* type, unsigned int iteracion, unsigned int cantidadDeMed
 }
 
 int run_blur(int c, char* src, char* dst){
-  unsigned int cantidadDeMediciones = 1000;
+  unsigned int cantidadDeMediciones = 100;
   unsigned long acumulador = 0;
   unsigned long diferencia;
   for (unsigned int i = 1; i <= cantidadDeMediciones; ++i)  {
@@ -65,7 +65,7 @@ int run_blur(int c, char* src, char* dst){
 }
 
 int run_merge(int c, char* src1, char* src2, char* dst, float value){
-  unsigned int cantidadDeMediciones = 1000;
+  unsigned int cantidadDeMediciones = 100;
   unsigned long acumulador = 0;
   unsigned long diferencia;
   for (unsigned int i = 1; i <= cantidadDeMediciones; ++i)  {
@@ -125,7 +125,7 @@ int run_merge(int c, char* src1, char* src2, char* dst, float value){
 }
 
 int run_hsl(int c, char* src, char* dst, float hh, float ss, float ll) {
-  unsigned int cantidadDeMediciones = 1000;
+  unsigned int cantidadDeMediciones = 100;
   unsigned long acumulador = 0;
   unsigned long diferencia;
   for (unsigned int i = 1; i <= cantidadDeMediciones; ++i){
