@@ -6,8 +6,8 @@
 
 %include "imprimir.mac"
 
-interrupcion_reloj db     'Cargada interrupcion de reloj...'
-interrupcion_reloj_len equ    $ - interrupcion_reloj
+interrupcion db     'Cargada interrupcion...'
+interrupcion_len equ    $ - interrupcion
 
 BITS 32
 
@@ -30,8 +30,9 @@ extern sched_tarea_actual
 global _isr%1
 
 _isr%1:
+    xchg bx, bx
     mov eax, %1
-    imprimir_texto_mp interrupcion_reloj, interrupcion_reloj_len, 0x07, 0, 0
+    imprimir_texto_mp interrupcion, interrupcion_len, 0x07, 0, 0
     jmp $
 
 %endmacro
