@@ -1,4 +1,4 @@
-Organizacion del Computador 2
+Organización del Computador 2
 =========
 Mirar esto...
 Comandos para Git frecuentemente usados:
