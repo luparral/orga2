@@ -34,7 +34,7 @@ idt_descriptor IDT_DESC = {
     }
 */
 
-
+//attr = 1000 1110 000 000
 #define IDT_ENTRY(numero)                                                                                        \
     idt[numero].offset_0_15 = (unsigned short) ((unsigned int)(&_isr ## numero) & (unsigned int) 0xFFFF);        \
     idt[numero].segsel = (unsigned short) 0x40;                                                                  \

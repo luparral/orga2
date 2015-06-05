@@ -124,10 +124,16 @@ modo_protegido:
     ; Inicializar el manejador de memoria
 
     ; Inicializar el directorio de paginas
+    call mmu_inicializar
 
     ; Cargar directorio de paginas
+    mov cr3, eax
+
 
     ; Habilitar paginacion
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
 
     ; Inicializar tss
 
@@ -146,7 +152,7 @@ modo_protegido:
     ; Cargar tarea inicial
 
     ; Habilitar interrupciones
-    sti
+    ;sti
 
     ; Saltar a la primera tarea: Idle
 
@@ -166,3 +172,4 @@ extern IDT_DESC
 extern idt_inicializar
 extern screen_pintar_rect
 extern screen_pintar_linea_h
+extern mmu_inicializar
