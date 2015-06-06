@@ -78,6 +78,22 @@ La implementación ASM2 realiza casi lo mismo que la ASM1 pero con la variación
 
 \subsection{Resultados}
 A continuación, detallamos los resultados obtenidos a través de la experimentación con las distintas implementaciones en C y Assembler para este filtro y las conclusiones a las que llegamos tras el estudio de los mismos.\\
+Tener en cuenta que el porcentaje de desvío estándard para cada implementación de este filtro resultó ser de:
+\begin{tabular}{| l | l |}
+\hline
+Implementación & Porcentaje de Desvío Estándard \\
+Blur C  & $+/- 4.8\%$\\
+Blur ASM1 &   $+/- 13.8\%$\\
+Blur ASM2 & $+/- 12\%$\\
+\hline
+\end{tabular}
+
+Estos porcentajes representan que, para cada medición de cantidad de ciclos de clock de ejecución de una implementación dada de este filtro, tras descartar el 10\% de las peores mediciones, y tomar el promedio entre el 90\% de las mediciones restantes, el error varía entre +/- dicho porcentaje. Por ejemplo, dada la ejecución siguiente:\\
+
+\begin{verbatim}
+c blur image_1_40x40.bmp salida.bmp
+\end{verbatim}
+Sobre las 100 repeticiones realizadas, tras descartar el 10\% de las peores, quedan 90 mediciones sobre las cuales el promedio calculado fue 319538 con margen de error de +/-3\%.\\
 Las siguientes son las tablas resultantes de tomar el promedio de todos los tiempos medidos para imágenes tendientes a un mismo color, para los distintos tamaños evaluados, según se detalla en la introducción.\\
 
 \begin{tabular}{| l | l | l | l | l |}
