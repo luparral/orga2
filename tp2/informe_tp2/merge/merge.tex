@@ -228,8 +228,33 @@ Con \textit{value} siendo ahora un entero, vamos a realizar las mismas operacion
 Así, evitamos las conversiones que realizábamos en la implementación anterior, necesarias para operar en punto flotante.
 
 \subsection{Resultados}
-A continuación, detallamos los resultados obtenidos a través de la experimentación con las distintas implementaciones en C y Assembler para este filtro y las conclusiones a las que llegamos tras el estudio de los mismos.
+A continuación, detallamos los resultados obtenidos a través de la experimentación con las distintas implementaciones en C y Assembler para este filtro y las conclusiones a las que llegamos tras el estudio de los mismos.\\
 
+Las tablas a continuación fueron confeccionadas según se detalla en la introducción, sin embargo, en el caso de este filtro, como había que testear una imagen 'mergeandose' con otras, tomamos la decisión de ejecutar el filtro con cada imagen del conjunto de casos de prueba en combinación, primero con la imagen uniforme blanca y luego con la imagen uniforme negra.\\
+Un ejemplo de cómo sería el comando a ejecutar para correr los tests es el siguiente:\\
+\begin{verbatim}
+<ASM1/ASM2/C> merge image_1.bmp uniforme_blanca.bmp 0.5
+<ASM1/ASM2/C> merge image_1.bmp uniforme_negra.bmp 0.5 
+\end{verbatim}
+
+Por último, cabe destacar que el porcentaje de desvío estándard para cada implementación de este filtro resultó ser de:
+\begin{tabular}{| l | l |}
+\hline
+Implementación & Porcentaje de Desvío Estándard \\
+Merge C	& $+/- +/- 11\%$\\
+Merge ASM1 & 	$"+/- 17\%$\\
+Merge ASM2	& $+/- 17.5\%$\\
+\hline
+\end{tabular}
+
+Estos porcentajes representan que, para cada medición de cantidad de ciclos de clock de ejecución de una implementación dada de este filtro, tras descartar el 10\% de las peores mediciones, y tomar el promedio entre el 90\% de las mediciones restantes, el error varía entre +/- dicho porcentaje. Por ejemplo, dada la ejecución siguiente:
+
+\begin{verbatim}
+c merge image_1_40x40.bmp uniforme_blanca.bmp salida.bmp 0.5
+\end{verbatim}
+Sobre las 100 repeticiones realizadas, tras descartar el 10\% de las peores, quedan 90 mediciones sobre las cuales el promedio calculado fue 102116 con margen de error de +/-11\%.\\
+
+Las siguientes son las tablas correspondientes a las distintas implementaciones del filtro, ejecutándolo con las imágenes del conjunto de prueba junto con la imágen uniforme blanca.\\
 
 \begin{tabular}{| l | l | l | l | l |}
 \hline
@@ -303,6 +328,8 @@ Porcentaje de desviación  && 3.54\% &	1.88\% &	3.44\%\\
 \hline
 \end{tabular}
 
+A partir de las tablas anteriores, y tomando los promedios por tamaño, confeccionamos el siguiente gráfico que ilustra las diferencias en los tiempos de ejecución de cada implementación del filtro.
+
 \begin{tabular}{| l | l | l | l|}
 \hline
 Implementación  & 1600 píxeles & 90000 píxeles & 360000 píxeles\\
@@ -321,6 +348,8 @@ Merge ASM2 con Blanca y Value 0.5 & 6007.36 &	312670.85 &	1318934.89\\
 %\caption{A simple caption \label{overflow}}
 \end{figure}
 
+
+Las siguientes son las tablas correspondientes a la ejecución del filtro para cada una de todas las imágenes del conjunto de casos de prueba 'mergeadas' con la imagen uniforme negra.
 
 \begin{tabular}{| l | l | l | l | l |}
 \hline
@@ -396,15 +425,17 @@ Porcentaje de desviación  && 5.27\% &	2.09\% &	3.34\%\\
 \hline
 \end{tabular}
 
+Como en las secciones anteriores, tomando los promedios para cada tamaño, en cada implementación, podemos ilustrar la performance de las distints implementaciones en el gráfico que sigue.
+
 \begin{tabular}{| l | l | l | l|}
 \hline
 Implementación  & 1600 píxeles & 90000 píxeles & 360000 píxeles\\
 \hline
-Merge C con Negra y Value 0.5  & 110087.24	5759719.95	21359645.19\\
+Merge C con Negra y Value 0.5  & 110087.24	& 5759719.95	& 21359645.19\\
 \hline
-Merge ASM1 con Negra y Value 0.5  & 6812.33	340153.31	1375584.23\\
+Merge ASM1 con Negra y Value 0.5  & 6812.33 &	340153.31	& 1375584.23\\
 \hline
-Merge ASM2 con Negra y Value 0.5 & 6360.43	309911.11	1309491.23\\
+Merge ASM2 con Negra y Value 0.5 & 6360.43	& 309911.11	& 1309491.23\\
 \hline
 \end{tabular}
 
@@ -413,3 +444,12 @@ Merge ASM2 con Negra y Value 0.5 & 6360.43	309911.11	1309491.23\\
 \includegraphics[width=90mm]{merge/grafico_merge_conNegras.png}
 %\caption{A simple caption \label{overflow}}
 \end{figure}
+
+\subsubsection{Algunas conclusiones}
+Para este filtro, la implementación más rápida es ASM2.\\
+Como en los otros filtros, el tamaño de la imágen es un factor que incide en los ciclos de clock que demora la ejecución de una implementación, siendo la evolución creciente.\\
+No notamos que haya diferencias respecto de los tipos de imágenes utilizados, ya que para cada implementación, si miramos la fila que calcula los porcentajes de desvío estándard entre los distintos subgrupos de imágenes, veremos que los porcentajes son pequeños y de esta forma, ninguna implementación se desvía significativamente del promedio.\\
+Tampoco notamos diferencias notables entre los casos de pruebas en los que se 'mergeó' con la imagen uniforme blanca, respecto de los que se 'mergeó' con la imagen uniforme negra. De este modo, el tipo de imagen a ser 'mergeada' tampoco parece ser el factor de incidencia en la performance de este filtro.\\
+Si bien la diferencia de tiempo de ejecución de ASM1 y ASM2 no es marcada, como mencionamos anteriormente ASM2 resulta ser la implementación más performante. Lo que la diferencia de la otra implementación de Assembler es justamente que ASM2 realiza todas las operaciones en enteros y que no debe realizar las -costosas- operaciones de conversión a punto flotante y luego de punto flotante a enteros que realiza en cada iteración del ciclo ASM1. Dado que la cantidad de operaciones en ambas implementaciones es similar, creemos que las anteriores cuestiones son las determinantes para que ASM2 sea la implementación más rápida para este filtro.\\
+
+

@@ -127,7 +127,25 @@ Finalmente cargamos los resultados en el puntero a \textit{uint8\_t} pasado por 
 
 \subsection{Resultados}
 A continuación, mostraremos algunos de los resultados y conclusiones a los cuales llegamos a través de la experimentación de las distintas implementaciones según la estretegia ideada para este fin, detallada en la introducción.
-Las tablas a continuación representan, para cada implementación el promedio para las imágenes tendientes a un color determinado en cada uno de los distintos tamaños testeados. A su vez, en las últimas tres filas, se calcula el promedio general para dichos promedios, el desvío estandar entre ellos y el porcentaje de desvío.%poner una nota al pie que diga: para mas referencia, ver la introducción.
+
+Tener en cuenta que el porcentaje de desvío estándard para cada implementación de este filtro resultó ser de:
+\begin{tabular}{| l | l |}
+\hline
+Implementación & Porcentaje de Desvío Estándard \\
+HSL C	& $+/- +/- 3\%$\\
+HSL ASM1 & 	$"+/- 6\%$\\
+HSL ASM2	& $+/- 5\%$\\
+\hline
+\end{tabular}
+
+Estos porcentajes representan que, para cada medición de cantidad de ciclos de clock de ejecución de una implementación dada de este filtro, tras descartar el 10\% de las peores mediciones, y tomar el promedio entre el 90\% de las mediciones restantes, el error varía entre +/- dicho porcentaje. Por ejemplo, dada la ejecución siguiente:
+
+\begin{verbatim}
+c hsl image_1_40x40.bmp salida.bmp 0.5 0.5 0.5
+\end{verbatim}
+Sobre las 100 repeticiones realizadas, tras descartar el 10\% de las peores, quedan 90 mediciones sobre las cuales el promedio calculado fue 209670 con margen de error de +/-3\%.\\
+
+Las tablas a continuación representan, para cada implementación el promedio para las imágenes tendientes a un color determinado en cada uno de los distintos tamaños testeados. A su vez, en las últimas tres filas, se calcula el promedio general para dichos promedios, el desvío estandar entre ellos y el porcentaje de desvío.
 
 \begin{tabular}{| l | l | l | l | l |}
 \hline
