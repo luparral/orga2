@@ -60,12 +60,7 @@ Una vez con los 9 píxeles guardados en registros XMM, calculamos el promedio y 
 Finalmente, avanzamos un pixel y volvemos a iterar.\\
 
 \subsection{Implementación 2 en ASM}
-Esta implementación propone procesar de a cuatro pixeles.
-El siguiente es un pseudocódigo para una iteración del ciclo de esta implementación:
-
-\begin{lstlisting}
-//TODO: pseudocodigo :P
-\end{lstlisting}
+La implementación ASM2 realiza casi lo mismo que la ASM1 pero con la variación de que en vez de escribir en memoria 1 solo pixel, escribe 2, ya que el cálculo realizado es el mismo. Luego como escribió 2 píxeles, avanza dos en la fila y realiza el mismo procedimiento. Teoricamente esta implementación debería realizar la mitad de operaciones ya que puede calcular 2 pixeles al mismo tiempo en vez de a 1.
 
 
 \subsection{Resultados}
