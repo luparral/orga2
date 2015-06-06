@@ -17,8 +17,8 @@ El pseudocódigo para una iteración del ciclo de la implementación que recibim
 // sean A y B las dos imagenes pasadas por parametro y value un float recibido tambien como input.
   for(ih=0;ih<(int)h;ih++) {		//itero sobre la altura de la imagen
    for(iw=0;iw<(int)w;iw++) {		//itero sobre el ancho de la imagen
-    for(ii=1;ii<4;ii++) {			  //itero sobre los cuatro componentes RGBA del píxel
-     A[ih][iw][ii] = (value*(A[ih][iw][ii]) + (1.0-value)*(B[ih][iw][ii])); //proceso dicha componente de píxel.
+    for(ii=1;ii<4;ii++) {			  //itero sobre los cuatro componentes RGBA del pixel
+     A[ih][iw][ii] = (value*(A[ih][iw][ii]) + (1.0-value)*(B[ih][iw][ii])); //proceso dicha componente de pixel.
       }
     }
   }
