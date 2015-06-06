@@ -1,6 +1,6 @@
 \section{Blur}
 \subsection{Introducción}
-\textit{Blur} es un filtro que suaviza una imagen. Le asigna a cada pixel el promedio con sus pixeles vecinos.\\ Es decir:
+\textit{Blur} es un filtro que suaviza una imagen. Le asigna a cada píxel el promedio con sus píxeles vecinos.\\ Es decir:
 
 \begin{verbatim}
   m[j][i][k] = (m[j-1][i-1][k] + m[j-1][i][k] + m[j-1][i+1][k] + 
@@ -8,7 +8,7 @@
               m[j+1][i-1][k] + m[j+1][i][k] + m[j+1][i+1][k] ) / 9
 \end{verbatim}
 
-De esta forma, la salida es la imagen en donde para cada pixel, se realizó el "suavizado" según el cálculo anterior.
+De esta forma, la salida es la imagen en donde para cada píxel, se realizó el "suavizado" según el cálculo anterior.
 
 \subsection{Pseudocódigo en C}
 
@@ -45,10 +45,10 @@ for(iw=0;iw<(int)w;iw++) {
 \end{lstlisting}
 
 \subsection{Implementación 1 en ASM}
-La primera implementación consiste en procesar de a un pixel por iteración.\\
+La primera implementación consiste en procesar de a un píxel por iteración.\\
 
 La implementación comienza pidiendo memoria a través de \textit{malloc}, igual que C, para copiar dos filas de la imagen a procesar.\\
-Esto se hace debido a que de no hacerlo se presenta el siguiente problema: dado un pixel X que acaba de ser blureado, el pixel siguiente no puede tomar el valor de X para calcular el promedio de croma ya que este perdió su valor original. Notar que tampoco puede leer los de la fila anterior recién blureada, por el mismo problema; los únicos que puede leer son los de la fila 'siguiente', que aún no fue blureada. Entonces, necesitamos de 2 espacios de memoria para 'backupearlas', y poder leer de allí los valores originales.\\
+Esto se hace debido a que de no hacerlo se presenta el siguiente problema: dado un píxel X que acaba de ser blureado, el píxel siguiente no puede tomar el valor de X para calcular el promedio de croma ya que este perdió su valor original. Notar que tampoco puede leer los de la fila anterior recién blureada, por el mismo problema; los únicos que puede leer son los de la fila 'siguiente', que aún no fue blureada. Entonces, necesitamos de 2 espacios de memoria para 'backupearlas', y poder leer de allí los valores originales.\\
 
 Para la primera vez, se backupean las dos primeras filas y luego se van copiando en el ciclo de ejecución las 2 filas necesarias para cada fila que se bluree.Es por esta razón, que se comienza a blurear desde la segunda fila y no desde la primera.\\
 
@@ -60,20 +60,20 @@ En cuanto al ciclo en sí, levanta de a 4 píxeles de tres lugares distintos:
 \end{enumerate}
 A pesar de que se levantan de a cuatro píxeles, solo usamos 3 de ellos, ya que necesitamos 3 de cada uno para conseguir el promedio dado por el pseudocódigo provisto en el enunciado del TP.\\
 
-Una cuestión importante es que los 4 píxeles que levantamos de la imagen original (de la fila que aún no fue blureada) son tomados 'defasados' 1 píxel a la izquierda, con el fin de no 'salirnos' de la imagen en el cálculo del último pixel. Notar que levantar defasados a la izquierda un pixel no hace que no accedamos a memoria que no es nuestra, ya que el pixel 'fuera' de la imagen que estamos pidiendo en la primer iteración, en realidad no está fuera de la imagen, ya que la iteración comienza en la segunda fila, por ende, ese pixel mencionado, pertenece a la primer fila, que es memoria accesible.
+Una cuestión importante es que los 4 píxeles que levantamos de la imagen original (de la fila que aún no fue blureada) son tomados 'defasados' 1 píxel a la izquierda, con el fin de no 'salirnos' de la imagen en el cálculo del último píxel. Notar que levantar defasados a la izquierda un píxel no hace que no accedamos a memoria que no es nuestra, ya que el píxel 'fuera' de la imagen que estamos pidiendo en la primer iteración, en realidad no está fuera de la imagen, ya que la iteración comienza en la segunda fila, por ende, ese píxel mencionado, pertenece a la primer fila, que es memoria accesible.
 
-A continuación, shifteamos 1 pixel a derecha para subsanar lo recientemente explicado y tener los 3 píxeles que utilizaremos en la parte menos significativa de los xmm.
+A continuación, shifteamos 1 píxel a derecha para subsanar lo recientemente explicado y tener los 3 píxeles que utilizaremos en la parte menos significativa de los xmm.
 
 Eso hace que en este punto tengamos, en los 96 bits (3/4 de 128) menos significativos 3 xmms distintos, los 9 valores que necesitamos para blurear.
 
-Una vez con los 9 píxeles guardados en registros xmm, calculamos el promedio y lo aplicamos al pixel correspondiente. Para hacer esto tuvimos que 'unpackear' los píxeles obtenidos para poder trabajar con las cromas separadas, y para poder realizar sumas con confianza, ya que si bien cada croma ocupa 8 bits (1 byte), sumar las 9 cromas de los 9 píxeles podría necesitar un tamaño mayor al de 8 bits. Para lograr un rango seguro, debimos 'unpackear' hasta dwords.
+Una vez con los 9 píxeles guardados en registros xmm, calculamos el promedio y lo aplicamos al píxel correspondiente. Para hacer esto tuvimos que 'unpackear' los píxeles obtenidos para poder trabajar con las cromas separadas, y para poder realizar sumas con confianza, ya que si bien cada croma ocupa 8 bits (1 byte), sumar las 9 cromas de los 9 píxeles podría necesitar un tamaño mayor al de 8 bits. Para lograr un rango seguro, debimos 'unpackear' hasta dwords.
 
 Luego, pasamos a floats las sumas para poder dividir, realizamos la division por 9 y volvimos a pasarlos a enteros para así finalizar el 'blureo' del píxel actual.
 
 Finalmente, avanzamos un píxel y volvemos a iterar.\\
 
 \subsection{Implementación 2 en ASM}
-La implementación ASM2 realiza casi lo mismo que la ASM1 pero con la variación de que en vez de escribir en memoria 1 solo pixel, escribe 2, ya que el cálculo realizado es el mismo. Luego como escribió 2 píxeles, avanza dos en la fila y realiza el mismo procedimiento. Teoricamente esta implementación debería realizar la mitad de ciclos de iteración ya que puede calcular 2 pixeles al mismo tiempo en vez de a 1, es decir.
+La implementación ASM2 realiza casi lo mismo que la ASM1 pero con la variación de que en vez de escribir en memoria 1 solo píxel, escribe 2, ya que el cálculo realizado es el mismo. Luego como escribió 2 píxeles, avanza dos en la fila y realiza el mismo procedimiento. Teoricamente esta implementación debería realizar la mitad de ciclos de iteración ya que puede calcular 2 píxeles al mismo tiempo en vez de a 1, es decir.
 
 
 \subsection{Resultados}

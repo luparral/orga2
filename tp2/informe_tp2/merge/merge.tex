@@ -7,7 +7,7 @@ La fórmula a partir de la cual se procesan los píxeles de las imágenes a merg
          A[j][i][k] = value * A[j][i][k] + (1-value) * B[j][i][k];
 \end{verbatim}
 
-Donde \textit{k} itera sobre las componentes del pixel, dejando inalterada la componente de transparencia.
+Donde \textit{k} itera sobre las componentes del píxel, dejando inalterada la componente de transparencia.
 
 \subsection{Pseudocódigo en C}
 
@@ -17,24 +17,24 @@ El pseudocódigo para una iteración del ciclo de la implementación que recibim
 // sean A y B las dos imagenes pasadas por parametro y value un float recibido tambien como input.
   for(ih=0;ih<(int)h;ih++) {		//itero sobre la altura de la imagen
    for(iw=0;iw<(int)w;iw++) {		//itero sobre el ancho de la imagen
-    for(ii=1;ii<4;ii++) {			  //itero sobre los cuatro componentes RGBA del pixel
-     A[ih][iw][ii] = (value*(A[ih][iw][ii]) + (1.0-value)*(B[ih][iw][ii])); //proceso dicha componente de pixel.
+    for(ii=1;ii<4;ii++) {			  //itero sobre los cuatro componentes RGBA del píxel
+     A[ih][iw][ii] = (value*(A[ih][iw][ii]) + (1.0-value)*(B[ih][iw][ii])); //proceso dicha componente de píxel.
       }
     }
   }
 
 \end{lstlisting}
 
-De esta manera, lo que se hace es iterar por cada pixel de cada imagen y por cada una de sus componentes, realizando el cálculo correspondiente y guardando el resultado en una de las imágenes recibidas como input.
+De esta manera, lo que se hace es iterar por cada píxel de cada imagen y por cada una de sus componentes, realizando el cálculo correspondiente y guardando el resultado en una de las imágenes recibidas como input.
 
 \subsection{Implementación 1 en ASM}
-La primera implementación requiere realizar operaciones en punto flotante y procesar la mayor cantidad de pixeles posibles por iteración.\\
-Como cada pixel mide 4B (1B por cada componente), en un registro XMM es posible procesar de a 4 a la vez. De esta forma, en cada iteración del ciclo tomamos 4 pixeles de cada imagen.
+La primera implementación requiere realizar operaciones en punto flotante y procesar la mayor cantidad de píxeles posibles por iteración.\\
+Como cada píxel mide 4B (1B por cada componente), en un registro XMM es posible procesar de a 4 a la vez. De esta forma, en cada iteración del ciclo tomamos 4 píxeles de cada imagen.
 
 El procedimiento entonces será:
 
 \begin{enumerate}
-\item Tomar 4 pixeles de cada imagen.
+\item Tomar 4 píxeles de cada imagen.
 
 \begin{tabular}{| o | o | o | o |} %tabla color orange
 \hline
@@ -48,7 +48,7 @@ $Pb_{3}$ & $Pb_{2}$ & $Pb_{1}$ & $Pb_{0}$ \\
 \hline
 \end{tabular}
 
-$Pa_{i}$ y $Pb_{i}$ son los pixeles íesimos de las imagenes A y B.\\
+$Pa_{i}$ y $Pb_{i}$ son los píxeles íesimos de las imagenes A y B.\\
 
 \item Desempaquetar de byte a word y de word a dword.
 
@@ -90,7 +90,7 @@ $0$ & $0$ & $0$ & $Pa_{0a}$ & $0$ & $0$ & $0$ & $Pa_{0b}$ & $0$ & $0$ & $0$ & $P
 \hline
 \end{tabular}
 
-En estos últimos cuatro registros, quedan expresados en words las componentes de los 4 píxeles, donde $Pa_{ij}$ representa al pixel iésimo de la imagen A en su componente j, y j puede ser R,G,B o A.
+En estos últimos cuatro registros, quedan expresados en words las componentes de los 4 píxeles, donde $Pa_{ij}$ representa al píxel iésimo de la imagen A en su componente j, y j puede ser R,G,B o A.
 
 Análogamente, se realiza el desempaquetado para los píxeles de la imagen B. 
 
@@ -136,7 +136,7 @@ $0$ & $0$ & $0$ & $Pb_{0a}$ & $0$ & $0$ & $0$ & $Pb_{0b}$ & $0$ & $0$ & $0$ & $P
 \end{tabular}
 
 \item Convertir de dword int a double floating point cada uno de los componentes desempaquetados anteriormente (instrucción \texttt{cvtdq2ps}).
-\item Multiplicar los componentes de pixeles correspondientes a A por value (v). Para hacerlo, preparamos un registro que contiene cuatro dwords de valor v para poder realizar una multiplicación contra cada dword del registro.
+\item Multiplicar los componentes de píxeles correspondientes a A por value (v). Para hacerlo, preparamos un registro que contiene cuatro dwords de valor v para poder realizar una multiplicación contra cada dword del registro.
 
 \begin{tabular}{| o | o | o | o | o | o | o | o | o | o | o | o | o | o | o | o |} %tabla color orange
 \hline
@@ -162,7 +162,7 @@ $0$ & $0$ & $0$ & $v * Pa_{0a}$ & $0$ & $0$ & $0$ & $v * Pa_{0b}$ & $0$ & $0$ & 
 \hline
 \end{tabular}
 
-Multiplicar los componentes de pixel correspondientes a B por 1-v. Preparamos un registro con cuatro dwords de valor 1-v (como hicimos previamente) para poder multiplicar ambos registros y obtener como resultado lo siguiente:
+Multiplicar los componentes de píxel correspondientes a B por 1-v. Preparamos un registro con cuatro dwords de valor 1-v (como hicimos previamente) para poder multiplicar ambos registros y obtener como resultado lo siguiente:
 
 \begin{tabular}{| g | g | g | g | g | g | g | g | g | g | g | g | g | g | g | g |}
 \hline
@@ -216,7 +216,7 @@ $0$ & $0$ & $0$ & $v * Pa_{0a} + (1-v) * Pb_{0a}$ & $0$ & $0$ & $0$ & $...$ & $0
 \normalsize
 \item Convertir a enteros (instrucción \texttt{cvtps2dq}).
 \item Empaquetar de dword a word y de word a byte los registros en donde ahora se encuentra la suma entre los componentes de los píxeles de ambas imágenes.
-\item Almacenar los 4 pixeles ya procesados en la imagen recibida por parámetro que será la devuelta como resultado.
+\item Almacenar los 4 píxeles ya procesados en la imagen recibida por parámetro que será la devuelta como resultado.
 \item Repetir.
 
 \end{enumerate}
@@ -224,7 +224,7 @@ $0$ & $0$ & $0$ & $v * Pa_{0a} + (1-v) * Pb_{0a}$ & $0$ & $0$ & $0$ & $...$ & $0
 \subsection{Implementación 2 en ASM}
 Esta implementación, diferenciándose de la anterior, requiere realizar operaciones en enteros.\\
 Para esto, como \textit{value} es un valor en punto flotante y para multiplicar por este valor sería necesario convertir a punto flotante el componente a multiplicar, vamos a tener que multiplicarlo por un float "grande" (en este caso utilizamos el valor 32768.0). A continuación, convertimos este valor a entero. De esta forma, evitamos perder precision al pasar de un valor en punto flotante a entero.\\
-Con \textit{value} siendo ahora un entero, vamos a realizar las mismas operaciones que para la primera implementación, con la única diferencia siendo que, tras multiplicar \textit{value} por el componente de pixel, vamos a dividirlo por el mismo valor por el cual multiplicamos \textit{value} inicialmente (para lo cual realizamos un shift a derecha de 15, en nuestro caso, utilizando la instruccion \texttt{psrad}).\\
+Con \textit{value} siendo ahora un entero, vamos a realizar las mismas operaciones que para la primera implementación, con la única diferencia siendo que, tras multiplicar \textit{value} por el componente de píxel, vamos a dividirlo por el mismo valor por el cual multiplicamos \textit{value} inicialmente (para lo cual realizamos un shift a derecha de 15, en nuestro caso, utilizando la instruccion \texttt{psrad}).\\
 Así, evitamos las conversiones que realizábamos en la implementación anterior, necesarias para operar en punto flotante.
 
 \subsection{Resultados}

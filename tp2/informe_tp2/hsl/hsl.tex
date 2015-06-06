@@ -2,7 +2,7 @@
 \subsection{Introducción}
 \textit{HSL} es un filtro que consta de tres etapas:
 \begin{enumerate}
-\item \textbf{RGBtoHSL:} consiste en un cambio del espacio de color de los pixeles, desde RGB a HSL. 
+\item \textbf{RGBtoHSL:} consiste en un cambio del espacio de color de los píxeles, desde RGB a HSL. 
 \item \textbf{Suma:} se procesan los píxeles sumándole valores pasados por parámetro a cada una de las componentes.
 \item \textbf{RGBtoHSL:} se realiza la operación inversa a la de la primera etapa, es decir, el pasaje del espacio HSL a RGB.
 \end{enumerate}
@@ -11,15 +11,15 @@ El pseudocódigo de cada una de estas etapas es descripto en el enunciado del TP
 
 \subsection{Implementación 1}
 En esta sección se pide realizar una implementación de la etapa de \textit{Suma} en ASM y desde la misma llamar a las funciones en C para convertir entre RGB y HSL.\\
-Como las funciones \textit{RGBtoHSL} y \textit{hslTOrgb} procesan de a un pixel, es necesario iterar sobre cada pixel de la imagen para para ir procesándolos.\\
+Como las funciones \textit{RGBtoHSL} y \textit{hslTOrgb} procesan de a un píxel, es necesario iterar sobre cada píxel de la imagen para para ir procesándolos.\\
 
 De esta forma, los pasos que se realizan en una iteración del ciclo son los siguientes:
 
 \begin{enumerate}
 
-\item Tomar un pixel de la imagen.
+\item Tomar un píxel de la imagen.
 \item Llamar a la función \textit{RGBtoHSL} de C.
-\item Con el pixel ya transformado al espacio HSL, hay que realizar la operación de suma en sí. Esta se realiza de la siguiente manera:\\
+\item Con el píxel ya transformado al espacio HSL, hay que realizar la operación de suma en sí. Esta se realiza de la siguiente manera:\\
 
 \textbf{Pseudocódigo de Suma}
 \begin{verbatim}
@@ -44,7 +44,7 @@ $l+LL$ & $s+SS$ & $h+HH$ & $aa$ \\
 \hline
 \end{tabular}
 
-Donde \textit{h}, \textit{s} y \textit{l} son las componentes del pixel HSL y \textit{HH}, \textit{SS} y \textit{LL} los valores pasados como parámetros. El \textit{aa} es el dword correspondiente al alfa, que va a quedar sin modificaciones.
+Donde \textit{h}, \textit{s} y \textit{l} son las componentes del píxel HSL y \textit{HH}, \textit{SS} y \textit{LL} los valores pasados como parámetros. El \textit{aa} es el dword correspondiente al alfa, que va a quedar sin modificaciones.
 
 Para realizar el registro mostrado anteriormente realizamos las siguientes operaciones:
 
@@ -56,7 +56,7 @@ pslldq xmm2, 8			;xmm1 = |00|LL|SS|00| - shift a izquierda
 movss xmm3, [posicion_de_memoria_donde_esta_HH]	;xmm1 = |00|LL|SS|HH|
 pslldq xmm3, 4			;xmm1 = |LL|SS|HH|aa| - shift a izquierda
 \end{lstlisting}
-Y luego, sumamos este registro al registro en donde tenemos a los tres componentes HSL de pixel.\\ Llamaremos a este registro \textit{origen} para claridad.
+Y luego, sumamos este registro al registro en donde tenemos a los tres componentes HSL de píxel.\\ Llamaremos a este registro \textit{origen} para claridad.
 
 Estas operaciones debemos realizarlas en cada iteración del ciclo, porque tras el llamado a funciones de C, la convención no nos asegura que los registros XMM mantendrán sus valores.\\
 Por último en este paso, vamos a armar las máscaras que necesitamos para realizar las operaciones del pseudocódigo que mostramos al principio de este punto.\\
@@ -108,8 +108,8 @@ Como las componentes están enpaquetadas, debemos realizar las comparaciones sim
 	por xmm0, xmm1
 \end{lstlisting}
 En este punto tenemos en xmm0 el resultado para cada componente tras realizar las comparaciones indicadas por el pseudocódigo y asignar el valor indicado en cada caso. 
-\item Con el pixel ya modificado en todas sus componentes, ahora ya podemos pasarselo a la función \textbf{hslTOrgb} para volver a pasar al espacio RGB.
-\item Finalmente, avanzamos un pixel y volvemos a iterar.
+\item Con el píxel ya modificado en todas sus componentes, ahora ya podemos pasarselo a la función \textbf{hslTOrgb} para volver a pasar al espacio RGB.
+\item Finalmente, avanzamos un píxel y volvemos a iterar.
 
 \end{enumerate}
 
@@ -117,7 +117,7 @@ En este punto tenemos en xmm0 el resultado para cada componente tras realizar la
 La consigna en esta implementación es desarrollar todas las etapas del filtro en ASM.\\
 De esta manera, para la etapa de \textit{Suma} se aprovechó la implementación anterior y se desarrolló en Assembler las etapas restantes. Es decir, ahora tendremos la conversión RGB a HSL y HSL a RGB en dos rutinas separadas, programadas en Assembler.\\
 
-Al igual que en la primer implementación, se procesó de a un pixel por vez.\\
+Al igual que en la primer implementación, se procesó de a un píxel por vez.\\
 
 Para la primer conversión (\textit{RGB to HSL}) se busca el máximo y el mínimo de las componentes, y luego se comienza a definir $H$, $S$ y $L$.\\
 Para definir $H$ se evaluaron los casos para donde cada compoente era la máxima, y en cada uno se realizo el proceso correspondiente indicado en el enunciado del trabajo. Luego se procesó el valor de $S$ y de $L$, y se devolvió a la rutina principal via el puntero a float recibido por parametro.\\
@@ -332,6 +332,6 @@ Hsl C 0.5 0.5 0.5	& 298481.8	& 13931043	& 53567627.2\\
 Para HSL, la implementación más performante para los tres tamaños propuestos es ASM2, de la misma manera en que resultó ser para los otros filtros.\\
 Dentro de cada implementación, como en los casos anteriores, los tiempos de ejecución evolucionan de manera creciente a medida que aumenta la cantidad de píxeles en las imágenes, lo cuál era lo que nos indicaba el sentido común.\\
 
-Sin embargo, y tomando como estrategia de medición respecto de las diferencias entre los distintos tipos de imágenes la misma que la detallada en la introducción, los porcentajes de desvío estándar es mayor que en los otros filtros. Este resultado es en parte el esperado, ya que en esta implementación se toman acciones diferentes según el resultado que da sumar el color del pixel de la imagen al del parámetro recibido, entonces, es esperable que los tiempos de implementación divergieran en función de los distintos tipos de imágenes que tienden a distintos colores.\\
+Sin embargo, y tomando como estrategia de medición respecto de las diferencias entre los distintos tipos de imágenes la misma que la detallada en la introducción, los porcentajes de desvío estándar es mayor que en los otros filtros. Este resultado es en parte el esperado, ya que en esta implementación se toman acciones diferentes según el resultado que da sumar el color del píxel de la imagen al del parámetro recibido, entonces, es esperable que los tiempos de implementación divergieran en función de los distintos tipos de imágenes que tienden a distintos colores.\\
 
 Sin tener en cuenta que las diferencias de performance en las distintas implementaciones de este ciclo se ven relacionadas con el uso de C o Assembler (en los distintos filtros se usa, o bien todo C, o bien mixto -implementación ASM1- o bien todo Assembler -en ASM2-), el punto anterior referente a la diferencia entre los tipos de imágenes es el más llamativo a la hora de evaluar la performance de las distintas implementaciones, a diferencia tal vez de los otros filtros implementados, en donde la desviación estándar en función de los tipos de imágenes era significativamente menor. 
