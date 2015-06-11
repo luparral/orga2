@@ -280,10 +280,10 @@ Blur C & 301342.2 & 14617122 & 56362569.6\\
 \end{figure}
 
 \subsubsection{Algunas conclusiones}
-Dentro de cada implementación, vemos que el tiempo de ejecución aumenta a medida que aumenta el tamaño de las imágenes de prueba, lo cual era en cierto sentido lo que nos indicaba nuestro intuición que iba a suceder.\\
-Así mismo, la implementación más performante resultó ser ASM2.\\
+Dentro de cada implementación, vemos que el tiempo de ejecución aumenta a medida que aumenta el tamaño de las imágenes de prueba, lo cual era exacatamente lo esperado.\\
+Así mismo, la implementación más performante resultó ser ASM2. Esto también era esperado, ya que, procesó mas de 1 pixel por iteración, y, en definitiva, realizó menos accesos a memoria.\\
 Este resultado no pareciera depender de la cantidad de instrucciones, dado que ambas implementaciones de Assembler poseen una cantidad muy similar de las mismas. 
 %todo: me parece que tiene que ver con los accesos a memoria, chequear.
-También pudimos corroborar, que para este filtro, el tipo de imagen elegido no afectaba en la performance de la implementación, ya que los porcentajes de desvío son muy pequeños, lo que indica que los promedios de las mediciones de los distintos tipos no se alejan significativamente de la media.\\
+También pudimos corroborar, que para este filtro, el tipo de imagen elegido no afectabó significativamente la performance de la implementación, ya que los porcentajes de desvío son pequeños, lo que indica que los promedios de las mediciones de los distintos tipos no se alejan de la media.\\
 
 

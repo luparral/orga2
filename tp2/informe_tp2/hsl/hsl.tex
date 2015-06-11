@@ -330,7 +330,7 @@ Hsl C 0.5 0.5 0.5	& 298481.8	& 13931043	& 53567627.2\\
 
 \subsubsection{Algunas conclusiones}
 Para HSL, la implementación más performante para los tres tamaños propuestos es ASM2, de la misma manera en que resultó ser para los otros filtros.\\
-Dentro de cada implementación, como en los casos anteriores, los tiempos de ejecución evolucionan de manera creciente a medida que aumenta la cantidad de píxeles en las imágenes, lo cuál era lo que nos indicaba el sentido común.\\
+Dentro de cada implementación, como en los casos anteriores, los tiempos de ejecución evolucionan de manera creciente a medida que aumenta la cantidad de píxeles en las imágenes; totalmente esperable.\\
 
 Sin embargo, y tomando como estrategia de medición respecto de las diferencias entre los distintos tipos de imágenes la misma que la detallada en la introducción, los porcentajes de desvío estándar es mayor que en los otros filtros. Este resultado es en parte el esperado, ya que en esta implementación se toman acciones diferentes según el resultado que da sumar el color del píxel de la imagen al del parámetro recibido, entonces, es esperable que los tiempos de implementación divergieran en función de los distintos tipos de imágenes que tienden a distintos colores.\\
 
