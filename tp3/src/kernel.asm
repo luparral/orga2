@@ -21,6 +21,9 @@ iniciando_mr_len equ    $ - iniciando_mr_msg
 iniciando_mp_msg db     'Iniciando kernel (Modo Protegido)...'
 iniciando_mp_len equ    $ - iniciando_mp_msg
 
+nombre_grupo     db     'SnakeII/Nokia1100'
+nombre_grupo_len equ    $ - nombre_grupo
+
 ;;
 ;; Seccion de código.
 ;; -------------------------------------------------------------------------- ;;
@@ -124,16 +127,21 @@ modo_protegido:
     ; Inicializar el manejador de memoria
 
     ; Inicializar el directorio de paginas
-    call mmu_inicializar
-
     ; Cargar directorio de paginas
-    mov cr3, eax
-
 
     ; Habilitar paginacion
+    call mmu_inicializar_dir_kernel
+    mov cr3, eax
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
+
+    ;Imprimir nombre de grupo en borde derecho
+    imprimir_texto_mp nombre_grupo, nombre_grupo_len, 0x07, 0, 63
+
+
+    ;Inicializar mmu
+    call mmu_inicializar
 
     ; Inicializar tss
 
@@ -148,11 +156,14 @@ modo_protegido:
     lidt [IDT_DESC]
 
     ; Configurar controlador de interrupciones
+    call resetear_pic
+    call habilitar_pic
 
     ; Cargar tarea inicial
+    ;call mmu_inicializar_dir_pirata
 
     ; Habilitar interrupciones
-    ;sti
+    sti
 
     ; Saltar a la primera tarea: Idle
 
@@ -172,4 +183,9 @@ extern IDT_DESC
 extern idt_inicializar
 extern screen_pintar_rect
 extern screen_pintar_linea_h
+extern mmu_inicializar_dir_kernel
 extern mmu_inicializar
+extern mmu_inicializar_dir_pirata
+
+extern resetear_pic
+extern habilitar_pic

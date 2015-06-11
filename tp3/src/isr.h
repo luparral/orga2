@@ -29,4 +29,8 @@ void _isr17();
 void _isr18();
 void _isr19();
 
+void _isr32();      //clock
+void _isr33();      //keyboard
+void _isr46();      //algo
+
 #endif  /* !__ISR_H__ */

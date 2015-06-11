@@ -13,3 +13,8 @@ IDT: el selector de segmento es el de codigo del SO (8)
 10-cargo segmento de video (indice 12)
 10-inicializar la pantalla
 11-incializar idt
+12-pintar mapa de pantalla
+13-cargar page directory table
+14-cargar la primer tabla de paginas
+15-inicializar paginacion
+16-escribir nombre de grupo

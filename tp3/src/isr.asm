@@ -9,6 +9,12 @@
 interrupcion db     'Cargada interrupcion...'
 interrupcion_len equ    $ - interrupcion
 
+int_clock db        'Interrupcion reloj...'
+int_clock_len equ   $ - int_clock
+
+int_keyboard db        'Interrupcion teclado...'
+int_keyboard_len equ   $ - int_keyboard
+
 BITS 32
 
 sched_tarea_offset:     dd 0x00
@@ -21,6 +27,11 @@ extern fin_intr_pic1
 extern sched_tick
 extern sched_tarea_actual
 
+; Text print
+extern print_hex
+
+; Clock tick
+extern screen_actualizar_reloj_global
 
 ;;
 ;; Definición de MACROS
@@ -30,10 +41,9 @@ extern sched_tarea_actual
 global _isr%1
 
 _isr%1:
-    xchg bx, bx
     mov eax, %1
     imprimir_texto_mp interrupcion, interrupcion_len, 0x07, 0, 0
-    jmp $
+    iret
 
 %endmacro
 
@@ -45,20 +55,51 @@ _isr%1:
 ;;
 ;; Rutina de atención de las EXCEPCIONES
 ;; -------------------------------------------------------------------------- ;;
-ISR 0
 
-;;
-;; Rutina de atención del RELOJ
-;; -------------------------------------------------------------------------- ;;
-ISR 9
-;;
-;; Rutina de atención del TECLADO
-;; -------------------------------------------------------------------------- ;;
+; Rutina de atención del RELOJ
+global _isr32
+
+_isr32:
+    pusha
+    call screen_actualizar_reloj_global
+    call fin_intr_pic1
+    popa
+    iret
+
+
+; Rutina de atención del TECLADO
+global _isr33
+
+_isr33:
+    pusha
+    in al, 0x60
+
+    push 0x07   ;color
+    push 0x00
+    push 0x00
+    push 3      ;size
+    push eax
+    call print_hex
+    add esp, 5*4
+    call fin_intr_pic1
+
+    popa
+    iret
+
+; Rutina de atención de COSA
+global _isr46
+
+_isr46:
+    pusha
+    mov eax, 0x42
+    popa
+    iret
 
 ;;
 ;; Rutinas de atención de las SYSCALLS
 ;; -------------------------------------------------------------------------- ;;
 
+ISR 0
 ISR 1
 ISR 2
 ISR 3
@@ -67,6 +108,7 @@ ISR 5
 ISR 6
 ISR 7
 ISR 8
+ISR 9
 ISR 10
 ISR 11
 ISR 12
