@@ -70,8 +70,11 @@ Luego, pasamos a floats las sumas para poder dividir, realizamos la division por
 Finalmente, avanzamos un píxel y volvemos a iterar.\\
 
 \subsection{Implementación 2 en ASM}
-La implementación ASM2 realiza casi lo mismo que la ASM1 pero con la variación de que en vez de escribir en memoria 1 solo píxel, escribe 2, ya que el cálculo realizado es el mismo. Luego como escribió 2 píxeles, avanza dos en la fila y realiza el mismo procedimiento. Teoricamente esta implementación debería realizar la mitad de ciclos de iteración ya que puede calcular 2 píxeles al mismo tiempo en vez de a 1, es decir.
+La implementación ASM2 realiza casi lo mismo que la ASM1 pero con la variación de que en vez de escribir en memoria 1 solo píxel por vez, escribe 2. Luego, como escribió 2 píxeles, avanza dos en la fila y realiza el mismo procedimiento. Teoricamente esta implementación debería realizar la mitad de ciclos de iteración ya que puede calcular 2 píxeles al mismo tiempo en vez de a 1.
 
+Nota importante: A diferencia de como indica el enunciado del trabajo práctico, se decidió (previa consulta a docente) realizar esta metodología para la segunda implementación en assembler de Blur: 
+Al igual que en ASM1, tomaremos 4 píxeles de cada línea, pero en lugar de deshechar el cuarto, si lo pensamos, con ese cuarto píxel podemos procesar el blureado de 2 píxeles en lugar de 1. Así que para ASM2 de Blur, realizaremos lo recién mencionado, y luego avanzaremos 2 píxeles para volver a blurear.\\
+Esto ocurre y funciona bien ya que 2 píxeles cualesquiera adyacentes en la imagen comparten 4 píxeles entre sus matrices de vecinos, entonces, si ya gastamos el tiempo de traer esos 4 píxeles cuando trajimos la matriz de vecinos de un píxel dado, aprovechamos ese trabajo para blurear también el píxel adyacente siguiente. Nuevamente, para blurear dicho píxel adyacente siguiente, nos harán falta una columna de píxeles, la cual formamos con los píxeles extra que levantamos de memoria (y que la implementación ASM1 deshecha por completo) cuando bajamos la matriz de vecinos a registros xmm. 
 
 \subsection{Resultados}
 A continuación, detallamos los resultados obtenidos a través de la experimentación con las distintas implementaciones en C y Assembler para este filtro y las conclusiones a las que llegamos tras el estudio de los mismos.\\
