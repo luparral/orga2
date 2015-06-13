@@ -119,8 +119,22 @@ De esta manera, para la etapa de \textit{Suma} se aprovechó la implementación 
 
 Al igual que en la primer implementación, se procesó de a un píxel por vez. Esto es debido a que como la etapa de suma es la misma que en la primer implementación, dicha etapa va convirtiendo de a un píxel así que se respetó esa forma de trabajo.\\
 
+\underline{\textbf{Nota 1:}} Para realizar todas las comparaciónes, (los \textbf{ifs}) se uso la instrucción \textbf{cmpps}, la cual, dado un modo de comparación, aplica en el operando destino, una máscara con los valores resultantes de la comparación, grabando todas Fs si el resultado es \textit{true} y todos 0s si el resultado es \textit{false}
+
+\underline{\textbf{Nota 2:}} Para el cálculo de \textbf{fabs} lo que se hizo fue simplemente cambiar el valor del bit más significativo a 0, ya que en la representación de floats, ese es el bit que indica el signo del float; para realizar esto, se hizo AND bit a bit con una mascara que contenía todos 1s, excepto en el bit más significativo que tenía un 0.
+
+\underline{\textbf{Nota 3:}} Para el cálculo de \textbf{fmod} lo que se hizo fue aplicar el calculo de fmod, el cual es:
+\begin{verbatim}
+	fmod = numerador - tquot * denominador
+	donde tquot es el resultado (truncado a 0) de numerador/denominador
+\end{verbatim}
+Para realizar ese cálculo de hizo uso de las instrucciones \textbf{divss} y \textbf{roundss}.\\
+Fuente: http://www.cplusplus.com/reference/cmath/fmod/ \\\\
+
 Para la \textbf{primer conversión} (\textit{RGB to HSL}) se busca a mano el máximo y mínimo de las componentes. Una vez con dichos valores calculados, ya podemos comenzar a definir los valores de $H$, $S$ y $L$.\\
-También se obtuvo el valor de $d$ via la resta del máximo menos el mínimo, necesario para el cálculo de $H$ y $S$.
+También se obtuvo el valor de $d$ via la resta del máximo menos el mínimo, necesario para el cálculo de $H$ y $S$.\\
+
+
 
 \textbf{Cálculo de H}\\
 Para definir $H$ se evaluaron los distintos casos posibles:
@@ -153,21 +167,10 @@ Y por último, para el valor de $S$, se realizó el siguiente chequeo y la asign
 	else
 	    s = d / ( 1 - fabs( 2*l - 1 ) ) / 255.0001f;
 
-
 \end{verbatim}
 
-\underline{Nota 1:} Para el cálculo de fabs lo que se hizo fue simplemente cambiar el valor del bit más significativo a 0, ya que en la representación de floats, ese es el bit que indica el signo del float; para realizar esto, se hizo AND bit a bit con una mascara que contenía todos 1s, excepto en el bit más significativo que tenía un 0.\\
 
-\underline{Nota 2:} Para el cálculo de fmod lo que se hizo fue aplicar el calculo de fmod, el cual es:
-\begin{verbatim}
-	fmod = numerador - tquot * denominador
-	donde tquot es el resultado (truncado a 0) de numerador/denominador
-\end{verbatim}
-Fuente: http://www.cplusplus.com/reference/cmath/fmod/ \\
-
-
-
-Para la segunda conversión (\textit{HSL to RGB}), primero se calculó el valor de $c$, $x$ y $m$, y luego se procedió a realizar el cálculo de $R$, $G$ y $B$. Para esto se uso la instrucciòn cmpss y algo de logica para hacer los distintos "ifs" necesarios.\\
+Para la \textbf{segunda conversión} (\textit{HSL to RGB}), primero se calculó el valor de $c$, $x$ y $m$, y luego se procedió a realizar el cálculo de $R$, $G$ y $B$. Para esto se uso la instrucciòn cmpss y algo de logica para hacer los distintos "ifs" necesarios.\\
 Finalmente cargamos los resultados en el puntero a \textit{uint8\_t} pasado por parámetro y se retorna a la rutina principal.\\
 
 \subsection{Resultados}
