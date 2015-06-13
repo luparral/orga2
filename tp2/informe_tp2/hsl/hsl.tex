@@ -114,13 +114,58 @@ En este punto tenemos en xmm0 el resultado para cada componente tras realizar la
 \end{enumerate}
 
 \subsection{Implementación 2}
-La consigna en esta implementación es desarrollar todas las etapas del filtro en ASM.\\
-De esta manera, para la etapa de \textit{Suma} se aprovechó la implementación anterior y se desarrolló en Assembler las etapas restantes. Es decir, ahora tendremos la conversión RGB a HSL y HSL a RGB en dos rutinas separadas, programadas en Assembler.\\
+La consigna en esta implementación es desarrollar todas las etapas del filtro en lenguaje ensamblador.\\
+De esta manera, para la etapa de \textit{Suma} se aprovechó la implementación anterior y se desarrollaron las dos etapas restantes. Es decir, ahora tendremos la conversión de RGB a HSL y de HSL a RGB en dos rutinas separadas, programadas en Assembler.\\
 
-Al igual que en la primer implementación, se procesó de a un píxel por vez.\\
+Al igual que en la primer implementación, se procesó de a un píxel por vez. Esto es debido a que como la etapa de suma es la misma que en la primer implementación, dicha etapa va convirtiendo de a un píxel así que se respetó esa forma de trabajo.\\
 
-Para la primer conversión (\textit{RGB to HSL}) se busca el máximo y el mínimo de las componentes, y luego se comienza a definir $H$, $S$ y $L$.\\
-Para definir $H$ se evaluaron los casos para donde cada compoente era la máxima, y en cada uno se realizo el proceso correspondiente indicado en el enunciado del trabajo. Luego se procesó el valor de $S$ y de $L$, y se devolvió a la rutina principal via el puntero a float recibido por parametro.\\
+Para la \textbf{primer conversión} (\textit{RGB to HSL}) se busca a mano el máximo y mínimo de las componentes. Una vez con dichos valores calculados, ya podemos comenzar a definir los valores de $H$, $S$ y $L$.\\
+También se obtuvo el valor de $d$ via la resta del máximo menos el mínimo, necesario para el cálculo de $H$ y $S$.
+
+\textbf{Cálculo de H}\\
+Para definir $H$ se evaluaron los distintos casos posibles:
+donde la componente mínima era igual a la máxima, y donde la máxima era o bien igual a R, o bien igual a G o bien igual a B. En cada uno se realizo el proceso correspondiente indicado en el enunciado del trabajo, el cual dicta:
+
+\begin{verbatim}
+	if( cmax == cmin ) h = 0
+	else if( cmax == r ) h = 60 * ((g-b)/d + 6)
+	else if( cmax == g ) h = 60 * ((b-r)/d + 2)
+	else if( cmax == b ) h = 60 * ((r-g)/d + 4)
+	    
+	if( h >= 360 ) h = h - 360
+
+\end{verbatim}
+
+\textbf{Cálculo de L}\\
+Luego para el calculo de $L$, se realizó la cuenta especificada en el enunciado:
+
+\begin{verbatim}
+	l = ( cmax + cmin ) / 510
+
+\end{verbatim}
+
+\textbf{Cálculo de S}\\
+Y por último, para el valor de $S$, se realizó el siguiente chequeo y la asignación correspondiente, tal como dicta el enunciado:
+
+\begin{verbatim}
+	if ( cmax == cmin )
+	    s = 0
+	else
+	    s = d / ( 1 - fabs( 2*l - 1 ) ) / 255.0001f;
+
+
+\end{verbatim}
+
+\underline{Nota 1:} Para el cálculo de fabs lo que se hizo fue simplemente cambiar el valor del bit más significativo a 0, ya que en la representación de floats, ese es el bit que indica el signo del float; para realizar esto, se hizo AND bit a bit con una mascara que contenía todos 1s, excepto en el bit más significativo que tenía un 0.\\
+
+\underline{Nota 2:} Para el cálculo de fmod lo que se hizo fue aplicar el calculo de fmod, el cual es:
+\begin{verbatim}
+	fmod = numerador - tquot * denominador
+	donde tquot es el resultado (truncado a 0) de numerador/denominador
+\end{verbatim}
+Fuente: http://www.cplusplus.com/reference/cmath/fmod/ \\
+
+
 
 Para la segunda conversión (\textit{HSL to RGB}), primero se calculó el valor de $c$, $x$ y $m$, y luego se procedió a realizar el cálculo de $R$, $G$ y $B$. Para esto se uso la instrucciòn cmpss y algo de logica para hacer los distintos "ifs" necesarios.\\
 Finalmente cargamos los resultados en el puntero a \textit{uint8\_t} pasado por parámetro y se retorna a la rutina principal.\\

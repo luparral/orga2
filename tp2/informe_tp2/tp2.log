@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.9.7)  12 JUN 2015 15:43
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.9.7)  13 JUN 2015 19:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -999,22 +999,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 120--121
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 122--124
+Underfull \hbox (badness 10000) in paragraph at lines 159--160
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 125--127
+Underfull \hbox (badness 10000) in paragraph at lines 166--167
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 146--147
+Underfull \hbox (badness 10000) in paragraph at lines 170--172
 
  []
 
 [16]
-Underfull \hbox (badness 10000) in paragraph at lines 222--223
+Underfull \hbox (badness 10000) in paragraph at lines 191--192
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 267--268
 
  []
 
@@ -1022,15 +1027,15 @@ Underfull \hbox (badness 10000) in paragraph at lines 222--223
 File: hsl/graficoHsl.png Graphic file (type png)
 
 <use hsl/graficoHsl.png>
-Package pdftex.def Info: hsl/graficoHsl.png used on input line 238.
+Package pdftex.def Info: hsl/graficoHsl.png used on input line 283.
 (pdftex.def)             Requested size: 256.0748pt x 144.57475pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 242--243
+Underfull \hbox (badness 10000) in paragraph at lines 287--288
 
  []
 
-[17 <./hsl/graficoHsl.png (PNG copy)>]
-Underfull \hbox (badness 10000) in paragraph at lines 310--311
+[17]
+Underfull \hbox (badness 10000) in paragraph at lines 355--356
 
  []
 
@@ -1038,19 +1043,19 @@ Underfull \hbox (badness 10000) in paragraph at lines 310--311
 File: hsl/graficoHsl_cte.png Graphic file (type png)
 
 <use hsl/graficoHsl_cte.png>
-Package pdftex.def Info: hsl/graficoHsl_cte.png used on input line 327.
+Package pdftex.def Info: hsl/graficoHsl_cte.png used on input line 372.
 (pdftex.def)             Requested size: 256.0748pt x 143.91254pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 332--334
+Underfull \hbox (badness 10000) in paragraph at lines 377--379
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 335--336
+[18 <./hsl/graficoHsl.png (PNG copy)>]
+Underfull \hbox (badness 10000) in paragraph at lines 380--381
 
  []
 
-) [18 <./hsl/graficoHsl_cte.png (PNG copy)>] (./tp2.aux
+) [19 <./hsl/graficoHsl_cte.png (PNG copy)>] (./tp2.aux
 LaTeX Info: Redefining \. on input line 6.
 LaTeX Info: Redefining \% on input line 6.
 ) ) 
@@ -1078,10 +1083,10 @@ amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on tp2.pdf (19 pages, 896701 bytes).
+Output written on tp2.pdf (20 pages, 898514 bytes).
 PDF statistics:
- 143 PDF objects out of 1000 (max. 8388607)
- 95 compressed objects within 1 object stream
+ 146 PDF objects out of 1000 (max. 8388607)
+ 97 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  46 words of extra memory for PDF output out of 10000 (max. 10000000)
 
