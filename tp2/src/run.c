@@ -9,8 +9,8 @@
 #include <string.h>
 
 void printAverage(unsigned long acumulador, unsigned int cantidadDeMediciones){
-  float promedio = acumulador/cantidadDeMediciones;
-  printf("Promedio final: %f\n\n",promedio);
+  // float promedio = acumulador/cantidadDeMediciones;
+  // printf("Promedio final: %f\n\n",promedio);
 }
 
 void printPartial(char* type, unsigned int iteracion, unsigned int cantidadDeMediciones, unsigned long diferencia){
