@@ -143,6 +143,20 @@ modo_protegido:
     ;Inicializar mmu
     call mmu_inicializar
 
+    push 0x10000
+    call mmu_inicializar_dir_pirata
+    add esp, 4
+    mov cr3, eax
+
+    ;TODO: BORRAR
+    push 1
+    push 1
+    push 0
+    push 0
+    push 0xAA
+    push 0x00
+    call screen_pintar_rect
+    add esp, 6*4
     ; Inicializar tss
 
     ; Inicializar tss de la tarea Idle
