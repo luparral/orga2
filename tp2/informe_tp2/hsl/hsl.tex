@@ -114,16 +114,97 @@ En este punto tenemos en xmm0 el resultado para cada componente tras realizar la
 \end{enumerate}
 
 \subsection{Implementación 2}
-La consigna en esta implementación es desarrollar todas las etapas del filtro en ASM.\\
-De esta manera, para la etapa de \textit{Suma} se aprovechó la implementación anterior y se desarrolló en Assembler las etapas restantes. Es decir, ahora tendremos la conversión RGB a HSL y HSL a RGB en dos rutinas separadas, programadas en Assembler.\\
+La consigna en esta implementación es desarrollar todas las etapas del filtro en lenguaje ensamblador.\\
+De esta manera, para la etapa de \textit{Suma} se aprovechó la implementación anterior y se desarrollaron las dos etapas restantes. Es decir, ahora tendremos la conversión de RGB a HSL y de HSL a RGB en dos rutinas separadas, programadas en Assembler.\\
 
-Al igual que en la primer implementación, se procesó de a un píxel por vez.\\
+Al igual que en la primer implementación, se procesó de a un píxel por vez. Esto es debido a que como la etapa de suma es la misma que en la primer implementación, dicha etapa va convirtiendo de a un píxel así que se respetó esa forma de trabajo.\\
 
-Para la primer conversión (\textit{RGB to HSL}) se busca el máximo y el mínimo de las componentes, y luego se comienza a definir $H$, $S$ y $L$.\\
-Para definir $H$ se evaluaron los casos para donde cada compoente era la máxima, y en cada uno se realizo el proceso correspondiente indicado en el enunciado del trabajo. Luego se procesó el valor de $S$ y de $L$, y se devolvió a la rutina principal via el puntero a float recibido por parametro.\\
+\underline{\textbf{Nota 1:}} Para realizar todas las comparaciónes, (los \textbf{ifs}) se uso la instrucción \textbf{cmpps}, la cual, dado un modo de comparación, aplica en el operando destino, una máscara con los valores resultantes de la comparación, grabando todas Fs si el resultado es \textit{true} y todos 0s si el resultado es \textit{false}
 
-Para la segunda conversión (\textit{HSL to RGB}), primero se calculó el valor de $c$, $x$ y $m$, y luego se procedió a realizar el cálculo de $R$, $G$ y $B$. Para esto se uso la instrucciòn cmpss y algo de logica para hacer los distintos "ifs" necesarios.\\
-Finalmente cargamos los resultados en el puntero a \textit{uint8\_t} pasado por parámetro y se retorna a la rutina principal.\\
+\underline{\textbf{Nota 2:}} Para el cálculo de \textbf{fabs} lo que se hizo fue simplemente cambiar el valor del bit más significativo a 0, ya que en la representación de floats, ese es el bit que indica el signo del float; para realizar esto, se hizo AND bit a bit con una mascara que contenía todos 1s, excepto en el bit más significativo que tenía un 0.
+
+\underline{\textbf{Nota 3:}} Para el cálculo de \textbf{fmod} lo que se hizo fue aplicar el calculo de fmod, el cual es:
+\begin{verbatim}
+	fmod = numerador - tquot * denominador
+	donde tquot es el resultado (truncado a 0) de numerador/denominador
+\end{verbatim}
+Para realizar ese cálculo de hizo uso de las instrucciones \textbf{divss} y \textbf{roundss}.\\
+Fuente: http://www.cplusplus.com/reference/cmath/fmod/ \\\\
+
+Para la \textbf{primer conversión} (\textit{RGB to HSL}) se busca a mano el máximo y mínimo de las componentes. Una vez con dichos valores calculados, ya podemos comenzar a definir los valores de $H$, $S$ y $L$.\\
+También se obtuvo el valor de $d$ via la resta del máximo menos el mínimo, necesario para el cálculo de $H$ y $S$.\\
+
+
+
+\textbf{Cálculo de H}\\
+Para definir $H$ se evaluaron los distintos casos posibles:
+donde la componente mínima era igual a la máxima, y donde la máxima era o bien igual a R, o bien igual a G o bien igual a B. En cada uno se realizo el proceso correspondiente indicado en el enunciado del trabajo, el cual dicta:
+
+\begin{verbatim}
+	if( cmax == cmin ) h = 0
+	else if( cmax == r ) h = 60 * ((g-b)/d + 6)
+	else if( cmax == g ) h = 60 * ((b-r)/d + 2)
+	else if( cmax == b ) h = 60 * ((r-g)/d + 4)
+	    
+	if( h >= 360 ) h = h - 360
+
+\end{verbatim}
+
+\textbf{Cálculo de L}\\
+Luego para el calculo de $L$, se realizó la cuenta especificada en el enunciado:
+
+\begin{verbatim}
+	l = ( cmax + cmin ) / 510
+
+\end{verbatim}
+
+\textbf{Cálculo de S}\\
+Y por último, para el valor de $S$, se realizó el siguiente chequeo y la asignación correspondiente, tal como dicta el enunciado:
+
+\begin{verbatim}
+	if ( cmax == cmin )
+	    s = 0
+	else
+	    s = d / ( 1 - fabs( 2*l - 1 ) ) / 255.0001f;
+
+\end{verbatim}
+
+\newpage
+Para la \textbf{segunda conversión} (\textit{HSL to RGB}), primero se computó el valor de $c$, $x$ y $m$. Para conseguir esas 3 variables, se realizaron los siguientes calculos dados en el enunciado del TP:
+
+\begin{verbatim}
+	c = ( 1 - fabs( 2*l - 1 )) * s;
+	x = c * ( 1 - fabs( fmod( h/60, 2 ) - 1 ) )
+	m = l - c / 2
+\end{verbatim}
+El cálculo de \textbf{fabs} y \textbf{fmod} fueorn calculados como se describió en las notas 2 y 3 anteriores.\\
+
+Luego, se procedió a realizar el cálculo de $R$, $G$ y $B$, evaluando los siguientes 6 casos en donde h puede oscilar:
+
+\begin{verbatim}
+	if(   0<=h && h<60  ) r=c b=x g=0
+	if(  60<=h && h<120 ) r=x b=c g=0
+	if( 120<=h && h<180 ) r=0 b=c g=x
+	if( 180<=h && h<240 ) r=0 b=x g=c
+	if( 240<=h && h<300 ) r=x b=0 g=c
+	if( 300<=h && h<360 ) r=c b=0 g=x
+\end{verbatim}
+Para esto se uso la instrucción cmpss y algo de logica para hacer los distintos "ifs" necesarios tal como se declara en la \textbf{nota 1}.\\
+
+
+Casi terminando, se hace el calculo de la escala, mediante las siguientes sumas y multiplicaciones:
+\begin{verbatim}
+r = (r+m) * 255
+g = (g+m) * 255
+b = (b+m) * 255
+\end{verbatim}
+Para las mismas, se hizo uso de la instrucciones \textbf{addss} y \textbf{mulps}.\\
+
+
+Finalmente, hacemos uso de la instrucción \textbf{cvtss2si} para convertir los valores de R, G y B a enteros.
+
+Este último paso nos da finalmente los valores de RGB para devolver. (La componente de transparencia, no se tiene en cuenta para la explicación ya que no tiene lógica de procesado, simplemente se la transforma de float a entero y se devuelve.)\\
+Estos mismos los cargamos en el puntero a \textit{uint8\_t} pasado por parámetro y se retorna a la rutina principal.\\
 
 \subsection{Resultados}
 A continuación, mostraremos algunos de los resultados y conclusiones a los cuales llegamos a través de la experimentación de las distintas implementaciones según la estretegia ideada para este fin, detallada en la introducción.
