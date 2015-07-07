@@ -1,5 +1,6 @@
 GDT: se decidio hacer el codigo Execute only (8), los datos Read/Write(2)
 IDT: el selector de segmento es el de codigo del SO (8)
+codigo de tarea inicial: 0x14000
 
 1-Se deshabilitan todas las interrupciones
 2-Imprime mensaje de bienvenida a modo real

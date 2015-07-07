@@ -24,6 +24,8 @@ iniciando_mp_len equ    $ - iniciando_mp_msg
 nombre_grupo     db     'SnakeII/Nokia1100'
 nombre_grupo_len equ    $ - nombre_grupo
 
+offset: dd 0
+selector: dw 0
 ;;
 ;; Seccion de código.
 ;; -------------------------------------------------------------------------- ;;
@@ -61,13 +63,15 @@ modo_protegido:
 
     ; Establecer selectores de segmentos
     xor eax, eax
-    mov ax, 0x48                ;index 9, gdt/ldt 0, rpl 00
+    mov ax, 9                ;index 9, gdt/ldt 0, rpl 00
+    shl ax, 3
     mov ds, ax
     mov ss, ax                  ; stack segment same as data segment
 
     ; Cargo video
     xor eax, eax
-    mov ax, 01100000b           ;index 12, video
+    mov ax, 12           ;index 12, video
+    shl ax, 3
     mov fs, ax
 
     ; Establecer la base de la pila
@@ -85,44 +89,13 @@ modo_protegido:
     ; Inicializar pantalla
 
     ;pinto fondo de gris
-    push 80
-    push 50
-    push 0
-    push 0
-    push 0x77
-    push 0x00
-    call screen_pintar_rect
-    add esp, 6*4
-
+    pintar_rect 0x00, 0x77, 0, 0, 50, 80
     ;pinto lineas con comandos abajo en negro
-    push 80
-    push 50
-    push 0
-    push 45
-    push 0x00
-    push 0x00
-    call screen_pintar_rect
-    add esp, 6*4
-
+    pintar_rect 0x00, 0x00, 45, 0, 50, 80
     ;pinto panel primer jugador
-    push 10                 ;ancho
-    push 5                  ;alto
-    push 30                 ;columna
-    push 45                 ;fila
-    push 0x99
-    push 0x00
-    call screen_pintar_rect
-    add esp, 6*4
-
+    pintar_rect 0x00, 0x99, 45, 30, 5, 10
     ;pinto panel segundo jugador
-    push 10                 ;ancho
-    push 5                  ;alto
-    push 40                 ;columna
-    push 45                 ;fila
-    push 0xCC
-    push 0x00
-    call screen_pintar_rect
-    add esp, 6*4
+    pintar_rect 0x00, 0xCC, 45, 40, 5, 10
 
     ; Inicializar el manejador de memoria
 
@@ -148,16 +121,9 @@ modo_protegido:
     add esp, 4
     mov cr3, eax
 
-    ;TODO: BORRAR
-    push 1
-    push 1
-    push 0
-    push 0
-    push 0xAA
-    push 0x00
-    call screen_pintar_rect
-    add esp, 6*4
     ; Inicializar tss
+    call gdt_inicializar_tareas
+    call tss_inicializar
 
     ; Inicializar tss de la tarea Idle
 
@@ -174,12 +140,15 @@ modo_protegido:
     call habilitar_pic
 
     ; Cargar tarea inicial
-    ;call mmu_inicializar_dir_pirata
 
     ; Habilitar interrupciones
     sti
 
     ; Saltar a la primera tarea: Idle
+    mov ax, 14
+    shl ax, 3
+    mov [selector], ax
+    jmp far [offset]
 
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF
@@ -193,6 +162,7 @@ modo_protegido:
 
 %include "a20.asm"
 extern GDT_DESC
+extern gdt_inicializar_tareas
 extern IDT_DESC
 extern idt_inicializar
 extern screen_pintar_rect
@@ -200,6 +170,7 @@ extern screen_pintar_linea_h
 extern mmu_inicializar_dir_kernel
 extern mmu_inicializar
 extern mmu_inicializar_dir_pirata
+extern tss_inicializar
 
 extern resetear_pic
 extern habilitar_pic

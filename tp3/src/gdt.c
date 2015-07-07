@@ -12,7 +12,6 @@
 
 /* Definicion de la GDT */
 /* -------------------------------------------------------------------------- */
-
 gdt_entry gdt[GDT_COUNT] = {
     /* Descriptor nulo*/
     /* Offset = 0x00 */
@@ -100,7 +99,7 @@ gdt_entry gdt[GDT_COUNT] = {
         (unsigned char)     0x00,           /* base[31:24]  */
     },
     /* Descriptor Datos video*/
-    /* Offset = 0x0B */
+    /* Offset = 0x0C */
     [GDT_IDX_VIDEO_DESC] = (gdt_entry) {
         (unsigned short)    0x0000,         /* limit[0:15]  */
         (unsigned short)    0x0000,         /* base[0:15]   */
@@ -115,8 +114,47 @@ gdt_entry gdt[GDT_COUNT] = {
         (unsigned char)     0x01,           /* db           */
         (unsigned char)     0x01,           /* g            */
         (unsigned char)     0xB8,           /* base[31:24]  */
-    }
+    },
+
 };
+void gdt_inicializar_tareas(){
+    /* Descriptor TSS tarea_inicial */
+    /* Offset = 0x0D */
+    gdt[GDT_IDX_TSS_INICIAL_DESC] = (gdt_entry) {
+        (unsigned short)    0x67,         /* limit[0:15]  */
+        (unsigned short)    (int)(&tss_inicial),         /* base[0:15]   */
+        (unsigned char)     (int)(&tss_inicial) >> 16,           /* base[23:16]  */
+        (unsigned char)     0x09,           /* type         */
+        (unsigned char)     0x0,           /* s            */
+        (unsigned char)     0x0,           /* dpl          */
+        (unsigned char)     0x01,           /* p            */
+        (unsigned char)     0x0,           /* limit[16:19] */
+        (unsigned char)     0x0,           /* avl          */
+        (unsigned char)     0x0,           /* l            */
+        (unsigned char)     0x0,           /* db           */
+        (unsigned char)     0x0,           /* g            */
+        (unsigned char)     (int)(&tss_inicial) >> 24,           /* base[31:24]  */
+    };
+    /* Descriptor TSS tarea_idle */
+    /* Offset = 0x0E */
+    gdt[GDT_IDX_TSS_IDLE_DESC] = (gdt_entry) {
+        (unsigned short)    0x67,         /* limit[0:15]  */
+        (unsigned short)    (int)(&tss_idle),         /* base[0:15]   */
+        (unsigned char)     (int)(&tss_idle) >> 16,           /* base[23:16]  */
+        (unsigned char)     0x09,           /* type         */
+        (unsigned char)     0x0,           /* s            */
+        (unsigned char)     0x0,           /* dpl          */
+        (unsigned char)     0x01,           /* p            */
+        (unsigned char)     0x0,           /* limit[16:19] */
+        (unsigned char)     0x0,           /* avl          */
+        (unsigned char)     0x0,           /* l            */
+        (unsigned char)     0x0,           /* db           */
+        (unsigned char)     0x0,           /* g            */
+        (unsigned char)     (int)(&tss_idle) >> 24,           /* base[31:24]  */
+    };
+
+    return;
+}
 
 gdt_descriptor GDT_DESC = {
     sizeof(gdt) - 1,

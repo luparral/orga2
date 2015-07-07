@@ -39,10 +39,14 @@ typedef unsigned int   uint;
 #define GDT_IDX_CS_USR_DESC         10
 #define GDT_IDX_DS_USR_DESC         11
 #define GDT_IDX_VIDEO_DESC          12
+#define GDT_IDX_TSS_INICIAL_DESC    13
+#define GDT_IDX_TSS_IDLE_DESC       14
 
 /* Offsets en la gdt */
 /* -------------------------------------------------------------------------- */
 #define GDT_OFF_NULL_DESC           (GDT_IDX_NULL_DESC      << 3)
+#define GDT_OFF_TSS_INICIAL_DESC    (GDT_IDX_TSS_INICIAL_DESC << 3)
+#define GDT_OFF_TSS_IDLE_DESC    (GDT_IDX_TSS_IDLE_DESC << 3)
 
 /* Selectores de segmentos */
 /* -------------------------------------------------------------------------- */

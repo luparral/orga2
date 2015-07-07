@@ -9,6 +9,7 @@
 #define __GDT_H__
 
 #include "defines.h"
+#include "tss.h"
 
 
 
@@ -37,5 +38,6 @@ typedef struct str_gdt_entry {
 extern gdt_entry gdt[];
 extern gdt_descriptor GDT_DESC;
 
+extern void gdt_inicializar_tareas();
 
 #endif  /* !__GDT_H__ */

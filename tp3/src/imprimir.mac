@@ -140,4 +140,16 @@
     popa
 %endmacro
 
+%macro pintar_rect 6
+    push %6     ;ancho
+    push %5     ;alto
+    push %4     ;columna
+    push %3     ;fila
+    push %2     ;color
+    push %1     ;texto
+
+    call screen_pintar_rect
+    add esp, 6*4
+%endmacro
+
 %endif  ;; !__IMPRIMIR_MAC__ ;;
