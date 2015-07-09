@@ -26,14 +26,20 @@ typedef struct str_page_entry{
 #define PAGE_KERNEL     0x28000
 #define AREA_LIBRE      0x100000
 
+//devuelve la posicion de la siguiente pagina libre
 uint* mmu_inicializar();
-page_entry* mmu_inicializar_dir_pirata(uint* dir_tarea);
+//devuelve un cr3 con el puntero a la pdt
+uint mmu_inicializar_dir_pirata(jugador_t* jugador, pirata_t* pirata);
 page_entry* mmu_inicializar_dir_kernel();
+void mmu_mapear_y_copiar_pagina(uint* destino_virtual, uint* pdt_tarea, uint* destino_fisico, uint* fuente);
+void mmu_copiar_pagina(uint* fuente, uint* destino);
 void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica);
 void mmu_unmapear_pagina(uint virtual, uint cr3);
 
 /*Auxiliar functions*/
+//devuelve la posicion de la siguiente pagina libre
 uint* new_page();
+
 page_entry* empty_mapping(page_entry* pdt);
 page_entry* identity_mapping(page_entry* pet);
 

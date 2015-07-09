@@ -116,11 +116,6 @@ modo_protegido:
     ;Inicializar mmu
     call mmu_inicializar
 
-    push 0x10000
-    call mmu_inicializar_dir_pirata
-    add esp, 4
-    mov cr3, eax
-
     ; Inicializar tss
     call gdt_inicializar_tareas
     call tss_inicializar

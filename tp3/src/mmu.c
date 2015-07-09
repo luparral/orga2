@@ -33,7 +33,7 @@ uint* mmu_inicializar(){
 }
 
 
-page_entry* mmu_inicializar_dir_pirata(uint* dir_tarea){
+uint mmu_inicializar_dir_pirata(jugador_t* jugador, pirata_t* pirata){
 	page_entry* pdt_tarea = (page_entry*)new_page();
 	empty_mapping(pdt_tarea);
 
@@ -45,27 +45,55 @@ page_entry* mmu_inicializar_dir_pirata(uint* dir_tarea){
 	pdt_tarea->available = 0x00;
 	pdt_tarea->attr = 0x03;
 
-	mmu_mapear_pagina(CODIGO_BASE, (uint)pdt_tarea, MAPA_BASE_FISICA);
+	uint* destino = (uint*)CODIGO_BASE;
+	//TODO: hay que copiarlo a la direccion del puerto
+	uint* destino_fisico;
+	uint* codigo;
 
-	//Copio el codigo de la tarea
-	int* codigo_base = (int*)CODIGO_BASE;
+	//TODO: mover funcionalidad hacia init jugador que tenga el codigo de cada uno de los piratas, o que cada pirata tenga su propio codigo?
+	if(jugador->index == JUGADOR_A){
+		destino_fisico = (uint*)(game_xy2lineal(POS_INIT_A_X, POS_INIT_A_Y) + MAPA_BASE_FISICA);
+		if(pirata->tipo == PIRATA_E){
+			codigo = (uint*)CODIGO_TAREA_A_E;
+		} else {
+			codigo = (uint*)CODIGO_TAREA_A_M;
+		}
+	} else{
+		destino_fisico = (uint*)(game_xy2lineal(POS_INIT_B_X, POS_INIT_B_Y) + MAPA_BASE_FISICA);
+		if(pirata->tipo == PIRATA_E){
+			codigo = (uint*)CODIGO_TAREA_B_E;
+		} else {
+			codigo = (uint*)CODIGO_TAREA_B_M;
+		}
+	}
 
+	mmu_mapear_y_copiar_pagina(destino, (uint*)pdt_tarea, destino_fisico, codigo);
+
+	return (uint)pdt_tarea;
+}
+
+void mmu_mapear_y_copiar_pagina(uint* destino_virtual, uint* pdt_tarea, uint* destino_fisico, uint* fuente){
+	mmu_mapear_pagina((uint)destino_virtual, (uint)pdt_tarea, (uint)destino_fisico);
 	//tengo que cambiar de cr3 para mapearlo, copiarlo y luego desmapearlo
 	uint cr3 = rcr3();
 	lcr3((uint)pdt_tarea);
-
-	int i;
-	for (i = 0; i < 1024; i++) {
-		*codigo_base = *dir_tarea;
-		codigo_base++;
-		dir_tarea++;
-	}
-
+	mmu_copiar_pagina(fuente, destino_virtual);
 	//desmapeo y vuelvo al viejo cr3
-	mmu_unmapear_pagina(CODIGO_BASE, (uint)pdt_tarea);
+	mmu_unmapear_pagina((uint)destino_virtual, (uint)pdt_tarea);
 	lcr3(cr3);
 
-	return pdt_tarea;
+	return;
+}
+
+void mmu_copiar_pagina(uint* fuente, uint* destino){
+	int i;
+	for (i = 0; i < 1024; i++) {
+		*destino = *fuente;
+		destino++;
+		fuente++;
+	}
+
+	return;
 }
 
 void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){

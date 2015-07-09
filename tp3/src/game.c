@@ -12,16 +12,6 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 #include <stdarg.h>
 
 
-#define POS_INIT_A_X                      1
-#define POS_INIT_A_Y                      1
-#define POS_INIT_B_X         MAPA_ANCHO - 2
-#define POS_INIT_B_Y          MAPA_ALTO - 2
-
-#define CANT_POSICIONES_VISTAS            9
-#define MAX_SIN_CAMBIOS                 999
-
-#define BOTINES_CANTIDAD 8
-
 uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {30,  3, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {49, 38, 50}, {64, 21, 100}, {34, 21, 100}

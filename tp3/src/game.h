@@ -16,8 +16,27 @@ typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion
 #define JUGADOR_A                         0
 #define JUGADOR_B                         1
 
+#define PIRATA_E            0
+#define PIRATA_M            1
+
+#define CODIGO_TAREA_A_E    0x10000
+#define CODIGO_TAREA_A_M    0x11000
+#define CODIGO_TAREA_B_E    0x12000
+#define CODIGO_TAREA_B_M    0x13000
+
 #define MAPA_ANCHO                       80
 #define MAPA_ALTO                        44
+
+
+#define POS_INIT_A_X                      1
+#define POS_INIT_A_Y                      1
+#define POS_INIT_B_X         MAPA_ANCHO - 2
+#define POS_INIT_B_Y          MAPA_ALTO - 2
+
+#define CANT_POSICIONES_VISTAS            9
+#define MAX_SIN_CAMBIOS                 999
+
+#define BOTINES_CANTIDAD 8
 
 
 struct jugador_t;
@@ -26,7 +45,9 @@ typedef struct pirata_t
 {
     uint index;
     struct jugador_t *jugador;
-
+    uint posicion;
+    uint tipo;
+    uint ticks;
     // id unica, posicion, tipo, reloj
 } pirata_t;
 
