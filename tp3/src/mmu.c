@@ -46,11 +46,9 @@ uint mmu_inicializar_dir_pirata(jugador_t* jugador, pirata_t* pirata){
 	pdt_tarea->attr = 0x03;
 
 	uint* destino = (uint*)CODIGO_BASE;
-	//TODO: hay que copiarlo a la direccion del puerto
 	uint* destino_fisico;
 	uint* codigo;
 
-	//TODO: mover funcionalidad hacia init jugador que tenga el codigo de cada uno de los piratas, o que cada pirata tenga su propio codigo?
 	if(jugador->index == JUGADOR_A){
 		destino_fisico = (uint*)(game_xy2lineal(POS_INIT_A_X, POS_INIT_A_Y) + MAPA_BASE_FISICA);
 		if(pirata->tipo == PIRATA_E){
