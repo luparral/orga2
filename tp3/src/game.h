@@ -9,57 +9,6 @@
 
 #include "defines.h"
 
-typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion;
-
-#define MAX_CANT_PIRATAS_VIVOS           8
-
-#define JUGADOR_A                         0
-#define JUGADOR_B                         1
-
-#define PIRATA_E            0
-#define PIRATA_M            1
-
-#define CODIGO_TAREA_A_E    0x10000
-#define CODIGO_TAREA_A_M    0x11000
-#define CODIGO_TAREA_B_E    0x12000
-#define CODIGO_TAREA_B_M    0x13000
-
-#define MAPA_ANCHO                       80
-#define MAPA_ALTO                        44
-
-
-#define POS_INIT_A_X                      1
-#define POS_INIT_A_Y                      1
-#define POS_INIT_B_X         MAPA_ANCHO - 2
-#define POS_INIT_B_Y          MAPA_ALTO - 2
-
-#define CANT_POSICIONES_VISTAS            9
-#define MAX_SIN_CAMBIOS                 999
-
-#define BOTINES_CANTIDAD 8
-
-
-struct jugador_t;
-
-typedef struct pirata_t
-{
-    uint index;
-    struct jugador_t *jugador;
-    uint posicion;
-    uint tipo;
-    uint ticks;
-    // id unica, posicion, tipo, reloj
-} pirata_t;
-
-
-typedef struct jugador_t
-{
-    uint index;
-    pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
-    // coordenadas puerto, posiciones exploradas, mineros pendientes, etc
-} jugador_t;
-
-
 extern jugador_t jugadorA, jugadorB;
 
 // ~ auxiliares dadas ~
@@ -67,13 +16,13 @@ uint game_xy2lineal();
 pirata_t* id_pirata2pirata(uint id);
 
 // ~ auxiliares sugeridas o requeridas (segun disponga enunciado) ~
-void game_pirata_inicializar(pirata_t *pirata, jugador_t *jugador, uint index, uint id);
-void game_pirata_erigir(pirata_t *pirata, jugador_t *j, uint tipo);
+pirata_t* game_pirata_inicializar(jugador_t *jugador, uint tipo);
+void game_pirata_erigir(jugador_t *j, pirata_t *pirata, uint tipo);
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y);
 void game_pirata_exploto(uint id);
 
-void game_jugador_inicializar(jugador_t *j);
-void game_jugador_lanzar_pirata(jugador_t *j, uint tipo, int x, int y);
+void game_jugador_inicializar(jugador_t* j);
+void game_jugador_lanzar_pirata(jugador_t *j, uint tipo);
 pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo);
 void game_jugador_anotar_punto(jugador_t *j);
 void game_explorar_posicion(jugador_t *jugador, int x, int y);

@@ -135,6 +135,9 @@ modo_protegido:
     call habilitar_pic
 
     ; Cargar tarea inicial
+    mov ax, 13
+    shl ax, 3
+	ltr ax
 
     ; Habilitar interrupciones
     sti

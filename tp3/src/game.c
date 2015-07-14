@@ -83,25 +83,66 @@ void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
 }
 
 
-void game_inicializar()
-{
+void game_inicializar(){
+    game_jugador_inicializar(&jugadorA);
+    game_jugador_inicializar(&jugadorB);
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug)
 {
 }
 
-void game_jugador_inicializar(jugador_t *j)
-{
-	static int index = 0;
+//TODO:inicializar jugador detectando que codigo usar
+void game_jugador_inicializar(jugador_t* j){
+    static int id = 0;
+    j->id = id++;
 
-	j->index = index++;
-    // ~ completar ~
+    int i;
+    for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
+        j->piratas[i].vivo = FALSE;
+    }
+    j->cant_piratas = 0;
+    j->cant_exploradores = 0;
+    j->cant_mineros = 0;
 
+    if(id == JUGADOR_A){
+        j->coord_puerto = (coord_t){
+            .x = POS_INIT_A_X,
+            .y = POS_INIT_A_Y
+        };
+        j->codigo_explorador = (uint*)CODIGO_TAREA_A_E;
+        j->codigo_minero = (uint*)CODIGO_TAREA_A_M;
+    } else {
+        j->coord_puerto = (coord_t){
+            .x = POS_INIT_B_X,
+            .y = POS_INIT_B_Y
+        };
+        j->codigo_explorador = (uint*)CODIGO_TAREA_B_E;
+        j->codigo_minero = (uint*)CODIGO_TAREA_B_M;
+    }
+
+    return;
 }
 
-void game_pirata_inicializar(pirata_t *pirata, jugador_t *j, uint index, uint id)
-{
+pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
+    //busco que pirata esta libre
+    int i;
+    for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
+        if(j->piratas[i].vivo == FALSE)
+            break;
+    }
+
+    //TODO: que onda con devolver referencias a variables locales?
+    pirata_t* p = &(pirata_t){
+        .id = i,
+        .coord = j->coord_puerto,
+        .tipo = tipo,
+        .ticks = 0,
+        .vivo = TRUE,
+        .codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero
+    };
+
+    return p;
 }
 
 void game_tick(uint id_pirata)
@@ -109,20 +150,49 @@ void game_tick(uint id_pirata)
 }
 
 
-void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint tipo)
+void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo)
 {
 }
 
-pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo)
-{
-    // ~ completar ~
+pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo){
+    pirata_t* p = game_pirata_inicializar(j, tipo);
 
-	return NULL;
+    int gdt_offset;
+    if(j->id == JUGADOR_A){
+        gdt_offset = 15;
+    } else {
+        gdt_offset = 23;
+    }
+
+    //Busco tss libre para el pirata
+    int i;
+    for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
+        if(gdt[gdt_offset+i].p == 0) break;
+    }
+
+    uint* dir_tss = tss_inicializar_pirata(j, p);
+    gdt_incializar_pirata(gdt_offset+i, dir_tss);
+
+	return p;
 }
 
 
-void game_jugador_lanzar_pirata(jugador_t *j, uint tipo, int x, int y)
-{
+void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
+    if(j->cant_piratas <= MAX_CANT_PIRATAS_VIVOS){
+        j->cant_piratas++;
+        if(tipo == PIRATA_E){
+            j->cant_exploradores++;
+        }else{
+            j->cant_mineros++;
+        }
+        pirata_t* p = game_jugador_erigir_pirata(j, tipo);
+        //TODO: esto pierde memoria? conviene que piratas sea un array de pirata_t*?
+        j->piratas[p->id] = *p;
+    }
+
+    return;
+
+
 }
 
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y)

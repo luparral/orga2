@@ -39,5 +39,6 @@ extern gdt_entry gdt[];
 extern gdt_descriptor GDT_DESC;
 
 extern void gdt_inicializar_tareas();
+void gdt_incializar_pirata(uint indice, uint* dir_tss);
 
 #endif  /* !__GDT_H__ */

@@ -33,7 +33,7 @@ uint* mmu_inicializar(){
 }
 
 
-uint mmu_inicializar_dir_pirata(jugador_t* jugador, pirata_t* pirata){
+uint mmu_inicializar_dir_pirata(jugador_t* j, pirata_t* p){
 	page_entry* pdt_tarea = (page_entry*)new_page();
 	empty_mapping(pdt_tarea);
 
@@ -46,24 +46,8 @@ uint mmu_inicializar_dir_pirata(jugador_t* jugador, pirata_t* pirata){
 	pdt_tarea->attr = 0x03;
 
 	uint* destino = (uint*)CODIGO_BASE;
-	uint* destino_fisico;
-	uint* codigo;
-
-	if(jugador->index == JUGADOR_A){
-		destino_fisico = (uint*)(game_xy2lineal(POS_INIT_A_X, POS_INIT_A_Y) + MAPA_BASE_FISICA);
-		if(pirata->tipo == PIRATA_E){
-			codigo = (uint*)CODIGO_TAREA_A_E;
-		} else {
-			codigo = (uint*)CODIGO_TAREA_A_M;
-		}
-	} else{
-		destino_fisico = (uint*)(game_xy2lineal(POS_INIT_B_X, POS_INIT_B_Y) + MAPA_BASE_FISICA);
-		if(pirata->tipo == PIRATA_E){
-			codigo = (uint*)CODIGO_TAREA_B_E;
-		} else {
-			codigo = (uint*)CODIGO_TAREA_B_M;
-		}
-	}
+	uint* destino_fisico = (uint*)(game_xy2lineal(p->coord.x, p->coord.y) + MAPA_BASE_FISICA);
+	uint* codigo = p->codigo;
 
 	mmu_mapear_y_copiar_pagina(destino, (uint*)pdt_tarea, destino_fisico, codigo);
 

@@ -20,6 +20,64 @@ typedef unsigned char  uchar;
 typedef unsigned short ushort;
 typedef unsigned int   uint;
 
+typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion;
+
+#define MAX_CANT_PIRATAS_VIVOS           8
+
+#define JUGADOR_A                         0
+#define JUGADOR_B                         1
+
+#define PIRATA_E            0
+#define PIRATA_M            1
+
+#define CODIGO_TAREA_A_E    0x10000
+#define CODIGO_TAREA_A_M    0x11000
+#define CODIGO_TAREA_B_E    0x12000
+#define CODIGO_TAREA_B_M    0x13000
+
+#define MAPA_ANCHO                       80
+#define MAPA_ALTO                        44
+
+
+#define POS_INIT_A_X                      1
+#define POS_INIT_A_Y                      1
+#define POS_INIT_B_X         MAPA_ANCHO - 2
+#define POS_INIT_B_Y          MAPA_ALTO - 2
+
+#define CANT_POSICIONES_VISTAS            9
+#define MAX_SIN_CAMBIOS                 999
+
+#define BOTINES_CANTIDAD 8
+
+typedef struct coord_t{
+    uint x;
+    uint y;
+} coord_t;
+
+struct jugador_t;
+
+typedef struct pirata_t{
+    uint id;
+    coord_t coord;
+    uint tipo;
+    uint ticks;
+    uint vivo;
+    uint* codigo;
+} pirata_t;
+
+typedef struct jugador_t{
+    uint id;
+    pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
+    uint cant_piratas;
+    uint cant_exploradores;
+    uint cant_mineros;
+    coord_t coord_puerto;
+    coord_t coord_exploradas[MAPA_ALTO*MAPA_ANCHO];
+    uint* codigo_explorador;
+    uint* codigo_minero;
+    // coordenadas puerto, posiciones exploradas, mineros pendientes, etc
+} jugador_t;
+
 /* Constantes basicas */
 /* -------------------------------------------------------------------------- */
 #define PAGE_SIZE               0x00001000
