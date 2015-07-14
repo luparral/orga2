@@ -16,6 +16,8 @@ uint game_xy2lineal();
 pirata_t* id_pirata2pirata(uint id);
 
 // ~ auxiliares sugeridas o requeridas (segun disponga enunciado) ~
+void game_inicializar();
+
 pirata_t* game_pirata_inicializar(jugador_t *jugador, uint tipo);
 void game_pirata_erigir(jugador_t *j, pirata_t *pirata, uint tipo);
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y);

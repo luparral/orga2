@@ -11,8 +11,6 @@
 #include "defines.h"
 #include "tss.h"
 
-
-
 typedef struct str_gdt_descriptor {
     unsigned short  gdt_length;
     unsigned int    gdt_addr;

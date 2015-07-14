@@ -92,7 +92,6 @@ void game_jugador_inicializar_mapa(jugador_t *jug)
 {
 }
 
-//TODO:inicializar jugador detectando que codigo usar
 void game_jugador_inicializar(jugador_t* j){
     static int id = 0;
     j->id = id++;
@@ -101,6 +100,7 @@ void game_jugador_inicializar(jugador_t* j){
     for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
         j->piratas[i].vivo = FALSE;
     }
+    j->monedas = 0;
     j->cant_piratas = 0;
     j->cant_exploradores = 0;
     j->cant_mineros = 0;
