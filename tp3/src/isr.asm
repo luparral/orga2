@@ -63,6 +63,7 @@ _isr32:
     pusha
     call screen_actualizar_reloj_global
     call fin_intr_pic1
+    call proximo_reloj
     popa
     iret
 
@@ -119,3 +120,21 @@ ISR 16
 ISR 17
 ISR 18
 ISR 19
+;--------------------------------------------------------------------------------;;
+
+proximo_reloj:
+    pushad
+    call sched_proxima_a_ejecutar   
+    cmp ax, 0
+    je .fin
+    cmp ax, 13
+    je .fin
+    
+    shl ax, 3
+    mov [sched_tarea_selector], ax 
+    jmp far [sched_tarea_offset]
+
+    ;fin scheduler
+    .fin:      
+        popad
+    ret
