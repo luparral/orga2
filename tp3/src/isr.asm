@@ -33,6 +33,10 @@ extern print_hex
 ; Clock tick
 extern screen_actualizar_reloj_global
 
+; Lanzar Pirata
+;void game_jugador_lanzar_pirata(jugador_t *j, uint tipo)
+extern game_jugador_lanzar_pirata
+
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
@@ -70,6 +74,7 @@ _isr32:
 
 ; Rutina de atención del TECLADO
 global _isr33
+;TODO: Test
 
 _isr33:
     pusha
@@ -84,8 +89,38 @@ _isr33:
     add esp, 5*4
     call fin_intr_pic1
 
-    popa
-    iret
+    cmp al, 0xF36
+    je .shiftRight
+    cmp al, 0xF2A
+    je .shiftLeft
+    jmp .fin
+
+    .fin 
+        popa
+        iret
+
+    .shiftRight
+    ;lanzar pirata explorador jugador B
+        mov bl, 1
+        mov cl, 0
+        push bl
+        push cl
+        call game_jugador_lanzar_pirata
+        pop cl
+        pop bl
+        jmp .fin
+
+    .shiftLeft
+    ;lanzar pirata explorador jugador A
+        mov bl, 0
+        mov cl, 0
+        push bl
+        push cl
+        call game_jugador_lanzar_pirata
+        pop cl
+        pop bl
+        jmp .fin
+
 
 ; Rutina de atención de COSA
 global _isr46
