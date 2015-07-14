@@ -17,9 +17,8 @@ int_keyboard_len equ   $ - int_keyboard
 
 BITS 32
 
-sched_tarea_offset:     dd 0x00
-sched_tarea_selector:   dw 0x00
-
+offset: dd 0
+selector: dw 0
 ;; PIC
 extern fin_intr_pic1
 
@@ -158,21 +157,18 @@ ISR 19
 ;--------------------------------------------------------------------------------;;
 
 proximo_reloj:
-    pushad
-    call sched_proxima_a_ejecutar   
+    call sched_proxima_a_ejecutar
     cmp ax, 0
     je .fin
-    cmp ax, 13
+    cmp ax, 14
     je .fin
-    
+
     shl ax, 3
-    mov [sched_tarea_selector], ax 
-    jmp far [sched_tarea_offset]
+    mov [selector], ax
+    jmp far [offset]
 
     ;fin scheduler
-    .fin:      
-        popad
+    .fin:
     ret
-
 
 extern sched_proxima_a_ejecutar
