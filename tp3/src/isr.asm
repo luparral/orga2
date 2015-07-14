@@ -100,24 +100,28 @@ _isr33:
 
     .shiftRight
     ;lanzar pirata explorador jugador B
-        mov bl, 1
-        mov cl, 0
-        push bl
-        push cl
+        xor ebx, ebx
+        xor ecx, ecx
+        mov byte bl, 1
+        mov byte cl, 0
+        push ebx
+        push ecx
         call game_jugador_lanzar_pirata
-        pop cl
-        pop bl
+        pop ecx
+        pop ebx
         jmp .fin
 
     .shiftLeft
     ;lanzar pirata explorador jugador A
-        mov bl, 0
-        mov cl, 0
-        push bl
-        push cl
+        xor ebx, ebx
+        xor ecx, ecx
+        mov byte bl, 0
+        mov byte cl, 0
+        push ebx
+        push ecx
         call game_jugador_lanzar_pirata
-        pop cl
-        pop bl
+        pop ecx
+        pop ebx
         jmp .fin
 
 
