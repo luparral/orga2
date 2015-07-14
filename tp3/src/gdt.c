@@ -156,6 +156,25 @@ void gdt_inicializar_tareas(){
     return;
 }
 
+void gdt_incializar_pirata(uint indice, uint* dir_tss){
+
+    gdt[indice].base_0_15 = (int)(dir_tss);
+	gdt[indice].base_23_16 = (int)(dir_tss) >> 16;
+	gdt[indice].base_31_24 = (int)(dir_tss) >> 24;
+	gdt[indice].dpl = 0x3;
+	gdt[indice].type = 0x9;
+	gdt[indice].l = 0;
+	gdt[indice].g = 0;
+	gdt[indice].s = 0;
+	gdt[indice].db = 1;
+	gdt[indice].limit_0_15 = 0x67;
+	gdt[indice].limit_16_19 = 0;
+	gdt[indice].p = 1;
+	gdt[indice].avl = 0x0;
+
+    return;
+}
+
 gdt_descriptor GDT_DESC = {
     sizeof(gdt) - 1,
     (unsigned int) &gdt
