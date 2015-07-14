@@ -23,7 +23,6 @@ uint sched_proxima_a_ejecutar(){
 		return 14; //tarea inicial?
 
 	int gdt_offset = (jugador_actual == JUGADOR_A) ? GDT_OFFSET_TSS_JUG_A: GDT_OFFSET_TSS_JUG_B;
-	int gdt_task_index;
 
 	//Tiene que ejecutar a partir de la siguiente de la tarea actual
 	int i;
@@ -32,10 +31,9 @@ uint sched_proxima_a_ejecutar(){
 
 		if(gdt[siguiente + gdt_offset].p == 1) {
 			pirata_actual = siguiente;
-			gdt_task_index = pirata_actual + gdt_offset;
-			break;
+			return pirata_actual + gdt_offset;
 		}
 	}
 
-	return gdt_task_index;
+	return 0;
 }
