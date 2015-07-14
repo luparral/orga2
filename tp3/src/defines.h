@@ -100,6 +100,9 @@ typedef struct jugador_t{
 #define GDT_IDX_VIDEO_DESC          12
 #define GDT_IDX_TSS_INICIAL_DESC    13
 #define GDT_IDX_TSS_IDLE_DESC       14
+#define GDT_OFFSET_TSS_JUG_A        15
+#define GDT_OFFSET_TSS_JUG_B        23
+
 
 /* Offsets en la gdt */
 /* -------------------------------------------------------------------------- */

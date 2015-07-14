@@ -12,55 +12,30 @@ void sched_inicializar(){
 	jugador_actual = 1; //0: A - 1:B
 
 	game_inicializar();
-
-	proximoA = 15; //primer pirata de A
-	proximoB = 23; //primer pirata de B
-
 }
 
 uint sched_proxima_a_ejecutar(){
 	//cambio de jugador
 	jugador_actual = (jugador_actual+1) % 2;
 
+
 	if ((jugadorA.cant_piratas == 0) && (jugadorB.cant_piratas == 0)) //estoy en el primer tick, voy a ir a la tarea inicial
-		return 13;
+		return 14; //tarea inicial?
 
+	int gdt_offset = (jugador_actual == JUGADOR_A) ? GDT_OFFSET_TSS_JUG_A: GDT_OFFSET_TSS_JUG_B;
+	int gdt_task_index;
+
+	//Tiene que ejecutar a partir de la siguiente de la tarea actual
 	int i;
-	if (jugador_actual == 0){
-		i = proximoA;
+	for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
+		int siguiente = (pirata_actual + i +1) % MAX_CANT_PIRATAS_VIVOS;
 
-		do{
-			i++;
-
-			if (i > 22)
-				i = 15;
-
-			if (gdt[i].p == 1){
-				proximoA = i;
-				pirata_actual = i - 15;
-				return proximoA;
-			}
-
-		}while(i != proximoA);
-
-	} else{
-		i = proximoB;
-
-		do{
-			i++;
-
-			if (i > 30)
-				i = 23;
-
-			if (gdt[i].p == 1){
-				proximoB = i;
-				pirata_actual = i - 23;
-				return proximoB;
-			}
-
-		} while(i != proximoB);
+		if(gdt[siguiente + gdt_offset].p == 1) {
+			pirata_actual = siguiente;
+			gdt_task_index = pirata_actual + gdt_offset;
+			break;
+		}
 	}
 
-	return 0;
-
+	return gdt_task_index;
 }

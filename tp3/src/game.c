@@ -159,9 +159,9 @@ pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo){
 
     int gdt_offset;
     if(j->id == JUGADOR_A){
-        gdt_offset = 15;
+        gdt_offset = GDT_OFFSET_TSS_JUG_A;
     } else {
-        gdt_offset = 23;
+        gdt_offset = GDT_OFFSET_TSS_JUG_B;
     }
 
     //Busco tss libre para el pirata

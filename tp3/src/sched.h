@@ -9,12 +9,10 @@
 #define __SCHED_H__
 
 #include "game.h"
+#include "tss.h"
 
-uint proximoA;
-uint proximoB;
-
-unsigned char jugador_actual;
-unsigned char pirata_actual;
+uint jugador_actual;
+uint pirata_actual;
 
 void sched_inicializar();
 uint sched_proxima_a_ejecutar();

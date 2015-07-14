@@ -138,3 +138,6 @@ proximo_reloj:
     .fin:      
         popad
     ret
+
+
+extern sched_proxima_a_ejecutar
