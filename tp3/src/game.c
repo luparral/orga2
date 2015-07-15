@@ -44,6 +44,13 @@ jugador_t* game_get_jugador_actual(){
 }
 
 
+jugador_t* game_id_jugador2jugador(uint id){
+    if(id == JUGADOR_A)
+        return &jugadorA;
+    else
+        return &jugadorB;
+}
+
 uint game_dir2xy(direccion dir, int *x, int *y){
 	switch (dir)
 	{
@@ -193,6 +200,7 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
 }
 
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y){
+
 }
 
 
@@ -201,7 +209,7 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f){
 
 
 uint game_syscall_pirata_mover(uint id, direccion dir){
-    //TO DO
+    
     // ~ completar
     return 0;
 }
@@ -240,8 +248,16 @@ uint game_syscall_cavar(uint id) {
 }
 
 uint game_syscall_pirata_posicion(uint id, int idx){
-    // ~ completar ~
-    return 0;
+    //para que es la variable id?
+    //TODO: test
+    pirata_t* pirataABuscar = id_pirata2pirata(idx);
+
+    uint x = pirataABuscar->coord.x;
+    uint y = pirataABuscar->coord.y;
+
+    uint res = y << 8 | x;
+
+    return res;
 }
 
 uint game_syscall_manejar(uint syscall, uint param1){
@@ -281,4 +297,15 @@ void game_terminar_si_es_hora(){
 
 
 void game_atender_teclado(unsigned char tecla){
+    if(tecla == KB_shiftA){
+        jugador_t* j_a = game_id_jugador2jugador(0);
+        game_jugador_lanzar_pirata(j_a,0);
+    }
+
+    if(tecla == KB_shiftB){
+        jugador_t* j_b = game_id_jugador2jugador(1);
+        game_jugador_lanzar_pirata(j_b,0);
+    }
+
+    return;
 }

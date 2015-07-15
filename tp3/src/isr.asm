@@ -32,10 +32,9 @@ extern print_hex
 ; Clock tick
 extern screen_actualizar_reloj_global
 
-; Lanzar Pirata
-;void game_jugador_lanzar_pirata(jugador_t *j, uint tipo)
-extern game_jugador_lanzar_pirata
 
+; Atender interrupcion de teclado
+extern game_atender_teclado
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
@@ -88,41 +87,13 @@ _isr33:
     add esp, 5*4
     call fin_intr_pic1
 
-    cmp al, 0xF36
-    je .shiftRight
-    cmp al, 0xF2A
-    je .shiftLeft
-    jmp .fin
+    push eax
+    call game_atender_teclado
+    pop eax
 
-    .fin 
-        popa
-        iret
+    popa
+    iret
 
-    .shiftRight
-    ;lanzar pirata explorador jugador B
-        xor ebx, ebx
-        xor ecx, ecx
-        mov byte bl, 1
-        mov byte cl, 0
-        push ebx
-        push ecx
-        call game_jugador_lanzar_pirata
-        pop ecx
-        pop ebx
-        jmp .fin
-
-    .shiftLeft
-    ;lanzar pirata explorador jugador A
-        xor ebx, ebx
-        xor ecx, ecx
-        mov byte bl, 0
-        mov byte cl, 0
-        push ebx
-        push ecx
-        call game_jugador_lanzar_pirata
-        pop ecx
-        pop ebx
-        jmp .fin
 
 
 ; Rutina de atención de COSA
