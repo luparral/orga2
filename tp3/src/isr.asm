@@ -6,14 +6,62 @@
 
 %include "imprimir.mac"
 
-interrupcion db     'Cargada interrupcion...'
-interrupcion_len equ    $ - interrupcion
+interrupcion_0 db       'Divide error'
+interrupcion_0_len equ  $ - interrupcion_0
 
-int_clock db        'Interrupcion reloj...'
-int_clock_len equ   $ - int_clock
+interrupcion_2 db       'Not Maskable Int'
+interrupcion_2_len equ  $ - interrupcion_2
 
-int_keyboard db        'Interrupcion teclado...'
-int_keyboard_len equ   $ - int_keyboard
+interrupcion_3 db       'Breakpoint'
+interrupcion_3_len equ  $ - interrupcion_3
+
+interrupcion_4 db       'Overflow'
+interrupcion_4_len equ  $ - interrupcion_4
+
+interrupcion_5 db       'BOUND Range Exceeded'
+interrupcion_5_len equ  $ - interrupcion_5
+
+interrupcion_6 db       'Invalid Opcode (Undefined Opcode)'
+interrupcion_6_len equ  $ - interrupcion_6
+
+interrupcion_7 db       'Device Not Avaible'
+interrupcion_7_len equ  $ - interrupcion_7
+
+interrupcion_8 db       'Double fault'
+interrupcion_8_len equ  $ - interrupcion_8
+
+interrupcion_9 db       'Coprocessor segment Overrun'
+interrupcion_9_len equ  $ - interrupcion_9
+
+interrupcion_10 db      'Invalid TSS'
+interrupcion_10_len equ $ - interrupcion_10
+
+interrupcion_11 db      'Segment Not Present'
+interrupcion_11_len equ $ - interrupcion_11
+
+interrupcion_12 db     'Stack-segmet Fault'
+interrupcion_12_len equ    $ - interrupcion_12
+
+interrupcion_13 db     'General Protection'
+interrupcion_13_len equ    $ - interrupcion_13
+
+interrupcion_14 db     'Page fault'
+interrupcion_14_len equ    $ - interrupcion_14
+
+interrupcion_15 db     'Intel reserved'
+interrupcion_15_len equ    $ - interrupcion_15
+
+interrupcion_16 db     'FPU Error (Math fault)'
+interrupcion_16_len equ    $ - interrupcion_16
+
+interrupcion_17 db     'Alignement Check'
+interrupcion_17_len equ    $ - interrupcion_17
+
+interrupcion_18 db     'Machine Check'
+interrupcion_18_len equ    $ - interrupcion_18
+
+interrupcion_19 db     'SIMD FP exception'
+interrupcion_19_len equ    $ - interrupcion_19
 
 BITS 32
 
@@ -50,7 +98,7 @@ global _isr%1
 
 _isr%1:
     mov eax, %1
-    imprimir_texto_mp interrupcion, interrupcion_len, 0x07, 0, 0
+    imprimir_texto_mp interrupcion_%1, interrupcion_%1_len, 0x07, 4, 25
     iret
 
 %endmacro
@@ -138,7 +186,6 @@ _isr46:
 ;; -------------------------------------------------------------------------- ;;
 
 ISR 0
-ISR 1
 ISR 2
 ISR 3
 ISR 4

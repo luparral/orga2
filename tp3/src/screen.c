@@ -101,3 +101,7 @@ void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int c
     }
 
 }
+
+void screen_inicializar(){
+
+}
