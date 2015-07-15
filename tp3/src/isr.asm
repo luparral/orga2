@@ -35,6 +35,12 @@ extern screen_actualizar_reloj_global
 
 ; Atender interrupcion de teclado
 extern game_atender_teclado
+
+;Llamados a rutinas de syscalls
+extern game_syscall_cavar
+extern game_syscall_pirata_mover
+extern game_syscall_pirata_posicion
+
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
@@ -101,9 +107,34 @@ global _isr46
 
 _isr46:
     pusha
-    mov eax, 0x42
-    popa
-    iret
+    ;en eax tiene el tipo de syscall recibida
+    ;en ecx esta la direccion?
+    cmp eax, 0x1
+    je .sysCallMoverse
+    cmp eax, 0x2
+    je .sysCallCavar
+    cmp eax, 0x3
+    je .sysCallPosicion
+    jmp .fin
+
+    .fin
+        popa
+        iret
+
+    .sysCallMoverse
+        push ecx
+        call game_syscall_pirata_mover
+        pop ecx
+        jmp .fin
+
+    .sysCallCavar
+        call game_syscall_cavar
+        jmp .fin
+
+    .sysCallPosicion
+        ;TODO: Chequear cual es el parametro que hay que pasar y donde esta
+        call game_syscall_pirata_posicion
+        jmp .fin
 
 ;;
 ;; Rutinas de atención de las SYSCALLS
