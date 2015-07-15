@@ -128,7 +128,10 @@ _isr46:
         jmp .fin
 
     .sysCallCavar
+        mov ecx, [jugador_actual]
+        push ecx
         call game_syscall_cavar
+        pop ecx
         jmp .fin
 
     .sysCallPosicion
