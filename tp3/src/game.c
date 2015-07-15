@@ -3,12 +3,9 @@
 TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 ================================================================================
 */
-
-#include "game.h"
+#include "sched.h"
 #include "mmu.h"
-#include "tss.h"
 #include "screen.h"
-
 #include <stdarg.h>
 
 
@@ -21,8 +18,7 @@ jugador_t jugadorA;
 jugador_t jugadorB;
 
 
-void* error()
-{
+void* error(){
 	__asm__ ("int3");
 	return 0;
 }
@@ -35,14 +31,20 @@ uint game_posicion_valida(int x, int y) {
 	return (x >= 0 && y >= 0 && x < MAPA_ANCHO && y < MAPA_ALTO);
 }
 
-pirata_t* id_pirata2pirata(uint id_pirata)
-{
+pirata_t* id_pirata2pirata(uint id_pirata){
     // ~ completar ~
 	return NULL;
 }
 
-uint game_dir2xy(direccion dir, int *x, int *y)
-{
+jugador_t* game_get_jugador_actual(){
+    if(jugador_actual == JUGADOR_A)
+        return &jugadorA;
+    else
+        return &jugadorB;
+}
+
+
+uint game_dir2xy(direccion dir, int *x, int *y){
 	switch (dir)
 	{
 		case IZQ: *x = -1; *y =  0; break;
@@ -55,8 +57,7 @@ uint game_dir2xy(direccion dir, int *x, int *y)
 	return 0;
 }
 
-uint game_valor_tesoro(uint x, uint y)
-{
+uint game_valor_tesoro(uint x, uint y){
 	int i;
 	for (i = 0; i < BOTINES_CANTIDAD; i++)
 	{
@@ -67,8 +68,7 @@ uint game_valor_tesoro(uint x, uint y)
 }
 
 // dada una posicion (x,y) guarda las posiciones de alrededor en dos arreglos, uno para las x y otro para las y
-void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
-{
+void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y){
 	int next = 0;
 	int i, j;
 	for (i = -1; i <= 1; i++)
@@ -88,8 +88,7 @@ void game_inicializar(){
     game_jugador_inicializar(&jugadorB);
 }
 
-void game_jugador_inicializar_mapa(jugador_t *jug)
-{
+void game_jugador_inicializar_mapa(jugador_t *jug){
 }
 
 void game_jugador_inicializar(jugador_t* j){
@@ -145,13 +144,11 @@ pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
     return p;
 }
 
-void game_tick(uint id_pirata)
-{
+void game_tick(uint id_pirata){
 }
 
 
-void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo)
-{
+void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
 
 pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo){
@@ -195,59 +192,77 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
 
 }
 
-void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y)
-{
+void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y){
 }
 
 
-void game_explorar_posicion(jugador_t *jugador, int c, int f)
-{
+void game_explorar_posicion(jugador_t *jugador, int c, int f){
 }
 
 
-uint game_syscall_pirata_mover(uint id, direccion dir)
-{
+uint game_syscall_pirata_mover(uint id, direccion dir){
+    //TO DO
     // ~ completar
     return 0;
 }
 
-uint game_syscall_cavar(uint id)
-{
-    // ~ completar ~
+uint* game_buscarBotin(uint id){
+    pirata_t* pirata = id_pirata2pirata(id);
+    
+    int i;
+    for(i = 0; i < BOTINES_CANTIDAD; i++)
+        if(pirata->coord.x == botines[i][0] && pirata->coord.y == botines[i][1])
+            return botines[i];
 
-	return 0;
+    return NULL;
 }
 
-uint game_syscall_pirata_posicion(uint id, int idx)
-{
+
+uint game_syscall_cavar(uint id) {
+    pirata_t* pirata = id_pirata2pirata(id);
+
+    if (pirata->tipo != PIRATA_M){
+        return 0;
+    }
+    //es explorador
+    uint* botin = game_buscarBotin(id);
+    if (botin != NULL){
+        //Recorrer las coordenadas con botines hardocdeadas y ver si una matchea
+        if(game_valor_tesoro(pirata->coord.x, pirata->coord.y) == 0){
+            //liberarMinero()
+        }else{
+            game_get_jugador_actual()->monedas++;
+            botin[2]--; 
+        }
+    }
+
+    return 0;
+}
+
+uint game_syscall_pirata_posicion(uint id, int idx){
     // ~ completar ~
     return 0;
 }
 
-uint game_syscall_manejar(uint syscall, uint param1)
-{
+uint game_syscall_manejar(uint syscall, uint param1){
     // ~ completar ~
     return 0;
 }
 
-void game_pirata_exploto(uint id)
-{
+void game_pirata_exploto(uint id){
 }
 
-pirata_t* game_pirata_en_posicion(uint x, uint y)
-{
+pirata_t* game_pirata_en_posicion(uint x, uint y){
 	return NULL;
 }
 
 
-void game_jugador_anotar_punto(jugador_t *j)
-{
+void game_jugador_anotar_punto(jugador_t *j){
 }
 
 
 
-void game_terminar_si_es_hora()
-{
+void game_terminar_si_es_hora(){
 }
 
 
@@ -265,6 +280,5 @@ void game_terminar_si_es_hora()
 #define KB_shiftB   0x36 // 0xb6
 
 
-void game_atender_teclado(unsigned char tecla)
-{
+void game_atender_teclado(unsigned char tecla){
 }
