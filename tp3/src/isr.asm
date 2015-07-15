@@ -32,9 +32,14 @@ extern print_hex
 ; Clock tick
 extern screen_actualizar_reloj_global
 
-; Lanzar Pirata
-;void game_jugador_lanzar_pirata(jugador_t *j, uint tipo)
-extern game_jugador_lanzar_pirata
+
+; Atender interrupcion de teclado
+extern game_atender_teclado
+
+;Llamados a rutinas de syscalls
+extern game_syscall_cavar
+extern game_syscall_pirata_mover
+extern game_syscall_pirata_posicion
 
 ;;
 ;; Definición de MACROS
@@ -73,8 +78,6 @@ _isr32:
 
 ; Rutina de atención del TECLADO
 global _isr33
-;TODO: Test
-
 _isr33:
     pusha
     in al, 0x60
@@ -88,51 +91,47 @@ _isr33:
     add esp, 5*4
     call fin_intr_pic1
 
-    cmp al, 0xF36
-    je .shiftRight
-    cmp al, 0xF2A
-    je .shiftLeft
+    push eax
+    call game_atender_teclado
+    pop eax
+
+    popa
+    iret
+
+
+;TODO: hay que desaoljar la tarea mediante el scheduler para dar paso a la prox tarea
+; Rutina de atención de 0x46
+global _isr46
+_isr46:
+    pusha
+    ;en eax tiene el tipo de syscall recibida
+    ;en ecx esta la direccion?
+    cmp eax, 0x1
+    je .sysCallMoverse
+    cmp eax, 0x2
+    je .sysCallCavar
+    cmp eax, 0x3
+    je .sysCallPosicion
     jmp .fin
 
-    .fin 
+    .fin
         popa
         iret
 
-    .shiftRight
-    ;lanzar pirata explorador jugador B
-        xor ebx, ebx
-        xor ecx, ecx
-        mov byte bl, 1
-        mov byte cl, 0
-        push ebx
+    .sysCallMoverse
         push ecx
-        call game_jugador_lanzar_pirata
+        call game_syscall_pirata_mover
         pop ecx
-        pop ebx
         jmp .fin
 
-    .shiftLeft
-    ;lanzar pirata explorador jugador A
-        xor ebx, ebx
-        xor ecx, ecx
-        mov byte bl, 0
-        mov byte cl, 0
-        push ebx
-        push ecx
-        call game_jugador_lanzar_pirata
-        pop ecx
-        pop ebx
+    .sysCallCavar
+        call game_syscall_cavar
         jmp .fin
 
-
-; Rutina de atención de COSA
-global _isr46
-
-_isr46:
-    pusha
-    mov eax, 0x42
-    popa
-    iret
+    .sysCallPosicion
+        ;TODO: Chequear cual es el parametro que hay que pasar y donde esta
+        call game_syscall_pirata_posicion
+        jmp .fin
 
 ;;
 ;; Rutinas de atención de las SYSCALLS
