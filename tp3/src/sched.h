@@ -17,4 +17,7 @@ uint pirata_actual;
 void sched_inicializar();
 uint sched_proxima_a_ejecutar();
 
+extern uint jugador_actual;
+extern uint pirata_actual;
+
 #endif	/* !__SCHED_H__ */

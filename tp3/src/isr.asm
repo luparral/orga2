@@ -178,3 +178,4 @@ proximo_reloj:
     ret
 
 extern sched_proxima_a_ejecutar
+extern jugador_actual
