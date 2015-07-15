@@ -32,7 +32,11 @@ uint game_posicion_valida(int x, int y) {
 }
 
 pirata_t* id_pirata2pirata(uint id_pirata){
-    // ~ completar ~
+    if(jugador_actual == JUGADOR_A){
+        return &jugadorA.piratas[id_pirata];
+    } else {
+        return &jugadorB.piratas[id_pirata];
+    }
 	return NULL;
 }
 
@@ -209,14 +213,14 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f){
 
 
 uint game_syscall_pirata_mover(uint id, direccion dir){
-    
+
     // ~ completar
     return 0;
 }
 
 uint* game_buscarBotin(uint id){
     pirata_t* pirata = id_pirata2pirata(id);
-    
+
     int i;
     for(i = 0; i < BOTINES_CANTIDAD; i++)
         if(pirata->coord.x == botines[i][0] && pirata->coord.y == botines[i][1])
@@ -225,7 +229,8 @@ uint* game_buscarBotin(uint id){
     return NULL;
 }
 
-
+//TODO: si no hay mas botin se debe liberar al pirata
+//el parametro id por donde lo recibe?
 uint game_syscall_cavar(uint id) {
     pirata_t* pirata = id_pirata2pirata(id);
 
@@ -240,7 +245,7 @@ uint game_syscall_cavar(uint id) {
             //liberarMinero()
         }else{
             game_get_jugador_actual()->monedas++;
-            botin[2]--; 
+            botin[2]--;
         }
     }
 
@@ -265,7 +270,18 @@ uint game_syscall_manejar(uint syscall, uint param1){
     return 0;
 }
 
+//TODO: terminar esta funcion
 void game_pirata_exploto(uint id){
+    jugador_t* j= game_get_jugador_actual();
+    j->cant_piratas--;
+
+    if(j->piratas[id].tipo == PIRATA_E){
+        j->cant_exploradores--;
+    } else {
+        j->cant_mineros--;
+    }
+
+    gdt[pirata_actual + jugador_actual*8 + 15].p = 0;
 }
 
 pirata_t* game_pirata_en_posicion(uint x, uint y){
@@ -297,14 +313,14 @@ void game_terminar_si_es_hora(){
 
 
 void game_atender_teclado(unsigned char tecla){
+    jugador_t* j;
     if(tecla == KB_shiftA){
-        jugador_t* j_a = game_id_jugador2jugador(0);
-        game_jugador_lanzar_pirata(j_a,0);
+        j = game_id_jugador2jugador(JUGADOR_A);
+        game_jugador_lanzar_pirata(j,0);
     }
-
     if(tecla == KB_shiftB){
-        jugador_t* j_b = game_id_jugador2jugador(1);
-        game_jugador_lanzar_pirata(j_b,0);
+        j = game_id_jugador2jugador(JUGADOR_B);
+        game_jugador_lanzar_pirata(j,0);
     }
 
     return;

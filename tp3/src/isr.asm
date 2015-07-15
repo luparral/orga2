@@ -78,8 +78,6 @@ _isr32:
 
 ; Rutina de atención del TECLADO
 global _isr33
-;TODO: Test
-
 _isr33:
     pusha
     in al, 0x60
@@ -101,10 +99,9 @@ _isr33:
     iret
 
 
-
-; Rutina de atención de COSA
+;TODO: hay que desaoljar la tarea mediante el scheduler para dar paso a la prox tarea
+; Rutina de atención de 0x46
 global _isr46
-
 _isr46:
     pusha
     ;en eax tiene el tipo de syscall recibida
