@@ -199,8 +199,6 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
     }
 
     return;
-
-
 }
 
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y){
@@ -322,6 +320,8 @@ void game_atender_teclado(unsigned char tecla){
         j = game_id_jugador2jugador(JUGADOR_B);
         game_jugador_lanzar_pirata(j,0);
     }
+
+    //TODO: hay que crear piratas aca?
 
     return;
 }

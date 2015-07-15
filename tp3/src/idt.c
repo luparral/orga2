@@ -45,7 +45,6 @@ void idt_inicializar() {
     // Excepciones
 
     IDT_ENTRY(0);
-    IDT_ENTRY(1);
     IDT_ENTRY(2);
     IDT_ENTRY(3);
     IDT_ENTRY(4);
