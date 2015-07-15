@@ -63,6 +63,7 @@ typedef struct pirata_t{
     uint ticks;
     uint vivo;
     uint* codigo;
+    jugador_t* jugador;
 } pirata_t;
 
 typedef struct jugador_t{

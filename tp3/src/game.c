@@ -37,7 +37,12 @@ uint game_posicion_valida(int x, int y) {
 
 pirata_t* id_pirata2pirata(uint id_pirata)
 {
-    // ~ completar ~
+    if(jugador_actual == JUGADOR_A){
+        return &jugadorA.piratas[id_pirata];
+    } else {
+        return &jugadorB.piratas[id_pirata];
+    }
+
 	return NULL;
 }
 
@@ -230,8 +235,18 @@ uint game_syscall_manejar(uint syscall, uint param1)
     return 0;
 }
 
-void game_pirata_exploto(uint id)
-{
+void game_pirata_exploto(uint id){
+    jugador_t* j= game_get_jugador_actual();
+    j->cant_piratas--;
+
+    if(j->piratas[id].tipo == PIRATA_E){
+        j->cant_exploradores--;
+    } else {
+        j->cant_mineros--;
+    }
+
+    gdt[pirata_actual + jugador_actual*8 + 15].p = 0;
+
 }
 
 pirata_t* game_pirata_en_posicion(uint x, uint y)

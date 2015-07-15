@@ -14,6 +14,7 @@ void sched_inicializar(){
 	game_inicializar();
 }
 
+//0 significa que no tiene que cambiar de tarea
 uint sched_proxima_a_ejecutar(){
 	//cambio de jugador
 	jugador_actual = (jugador_actual+1) % 2;
