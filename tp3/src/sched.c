@@ -18,9 +18,9 @@ uint sched_proxima_a_ejecutar(){
 	//cambio de jugador
 	jugador_actual = (jugador_actual+1) % 2;
 
-
+	//TODO: hay que ir a la tarea inicial?
 	if ((jugadorA.cant_piratas == 0) && (jugadorB.cant_piratas == 0)) //estoy en el primer tick, voy a ir a la tarea inicial
-		return 14; //tarea inicial?
+		return 14;
 
 	int gdt_offset = (jugador_actual == JUGADOR_A) ? GDT_OFFSET_TSS_JUG_A: GDT_OFFSET_TSS_JUG_B;
 
