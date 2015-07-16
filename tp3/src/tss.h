@@ -13,7 +13,6 @@
 #include "gdt.h"
 #include "game.h"
 
-
 typedef struct str_tss {
     unsigned short  ptl;
     unsigned short  unused0;
@@ -60,5 +59,8 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata);
 
 extern tss tss_inicial;
 extern tss tss_idle;
+
+extern tss tss_jugadorA[MAX_CANT_PIRATAS_VIVOS];
+extern tss tss_jugadorB[MAX_CANT_PIRATAS_VIVOS];
 
 #endif  /* !__TSS_H__ */

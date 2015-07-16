@@ -108,6 +108,7 @@ void game_jugador_inicializar(jugador_t* j){
 
     int i;
     for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
+        j->piratas[i]->id = i;
         j->piratas[i]->vivo = FALSE;
     }
     j->monedas = 0;
@@ -115,7 +116,7 @@ void game_jugador_inicializar(jugador_t* j){
     j->cant_exploradores = 0;
     j->cant_mineros = 0;
 
-    if(id == JUGADOR_A){
+    if(j->id == JUGADOR_A){
         j->coord_puerto = (coord_t){
             .x = POS_INIT_A_X,
             .y = POS_INIT_A_Y
@@ -143,16 +144,12 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
             break;
     }
 
-    //TODO: que onda con devolver referencias a variables locales?
-    pirata_t* p = &(pirata_t){
-        .id = i,
-        .coord = j->coord_puerto,
-        .tipo = tipo,
-        .ticks = 0,
-        .vivo = TRUE,
-        .codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero
-    };
-    j->piratas[i] = p;
+    j->piratas[i]->id = i;
+    j->piratas[i]->coord = j->coord_puerto;
+    j->piratas[i]->tipo = tipo;
+    j->piratas[i]->ticks = 0;
+    j->piratas[i]->vivo = TRUE;
+    j->piratas[i]->codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero;
 
     return i;
 }
@@ -160,6 +157,9 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
 void game_tick(uint id_pirata){
 }
 
+//TODO: ELIMINAR DEBUG
+// print_hex((uint)destino_virtual, 10, 10, 10, (0x7 << 4) | 0x4);
+// __asm__ ("xchg %bx, %bx");
 
 void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
@@ -196,7 +196,6 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
             j->cant_mineros++;
         }
         game_jugador_erigir_pirata(j, tipo);
-        //TODO: esto pierde memoria? conviene que piratas sea un array de pirata_t*?
     }
 
     return;

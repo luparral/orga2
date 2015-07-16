@@ -74,9 +74,6 @@ extern fin_intr_pic1
 extern sched_tick
 extern sched_tarea_actual
 
-; Text print
-extern print_hex
-
 ; Clock tick
 extern screen_actualizar_reloj_global
 
@@ -117,8 +114,8 @@ global _isr32
 
 _isr32:
     pusha
-    call screen_actualizar_reloj_global
     call fin_intr_pic1
+    call screen_actualizar_reloj_global
     call screen_actualizar
     call proximo_reloj
     popa

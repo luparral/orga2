@@ -8,7 +8,6 @@
 #include "tss.h"
 #include "mmu.h"
 
-
 tss tss_inicial;
 tss tss_idle;
 
@@ -33,9 +32,10 @@ void tss_inicializar() {
 uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     jugador_t* j = game_id_jugador2jugador(id_jugador);
     pirata_t* p = id_pirata2pirata(id_pirata);
+
     if(id_jugador == JUGADOR_A){
-        tss_jugadorA[id_pirata].cr3 = mmu_inicializar_dir_pirata(j, p);
         tss_jugadorA[id_pirata].eflags = 0x202;
+        tss_jugadorA[id_pirata].cr3 = mmu_inicializar_dir_pirata(j, p);
         tss_jugadorA[id_pirata].iomap = 0xFFFF;
         tss_jugadorA[id_pirata].eip = 0x800000;
         tss_jugadorA[id_pirata].esp = 0x801000;
@@ -55,7 +55,6 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
         tss_jugadorA[id_pirata].edi = 0;
         tss_jugadorA[id_pirata].esp0 = (uint)new_page() + 4096;
         tss_jugadorA[id_pirata].ss0 = GDT_IDX_DS_OS_DESC << 3;
-
         return (uint*)&tss_jugadorA[id_pirata];
     } else {
         tss_jugadorB[id_pirata].cr3 = mmu_inicializar_dir_pirata(j, p);

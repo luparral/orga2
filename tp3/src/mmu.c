@@ -101,7 +101,6 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){
 		pdt_entry->attr = 0x03;
 	}
 
-	// __asm__ ("xchg %bx, %bx");
 	page_entry* pet_base = (page_entry*)(pdt_entry->dir_base << 12);
 
 	//asignar la entrada a la direccion fisica
