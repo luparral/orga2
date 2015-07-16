@@ -88,7 +88,7 @@ extern game_atender_teclado
 extern game_syscall_cavar
 extern game_syscall_pirata_mover
 extern game_syscall_pirata_posicion
-
+extern screen_actualizar
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
@@ -119,6 +119,7 @@ _isr32:
     pusha
     call screen_actualizar_reloj_global
     call fin_intr_pic1
+    call screen_actualizar
     call proximo_reloj
     popa
     iret
