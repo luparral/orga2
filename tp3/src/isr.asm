@@ -80,6 +80,10 @@ extern print_hex
 ; Clock tick
 extern screen_actualizar_reloj_global
 
+;Metodos de modo_debug
+extern screen_pantalla_debug
+extern load_screen
+extern modo_debug
 
 ; Atender interrupcion de teclado
 extern game_atender_teclado
@@ -90,10 +94,6 @@ extern game_syscall_pirata_mover
 extern game_syscall_pirata_posicion
 extern screen_actualizar
 
-;Metodos de modo_debug
-extern screen_pantalla_debug
-extern load_screen
-extern modo_debug
 
 ;;
 ;; Definición de MACROS
@@ -105,7 +105,7 @@ global _isr%1
 _isr%1:
     mov eax, %1
     imprimir_texto_mp interrupcion_%1, interrupcion_%1_len, 0x07, 4, 25
-    
+
     cmp byte [modo_debug], 0
     je .fin
 
@@ -119,14 +119,14 @@ _isr%1:
         in al, 0x60
         cmp al, 0x15
         jne .ciclar               ; Espero
-        
+
         ; cuando presiona y, se devuelve
         call load_screen
 
-    .fin
+    .fin:
         popad
         iret
-    
+
 
 %endmacro
 
