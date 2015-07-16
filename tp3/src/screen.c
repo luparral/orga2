@@ -222,8 +222,6 @@ void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp,
         pirata = tss_jugadorB[pirata_actual];
     }
 
-////////////////////////
-
     uint num;
     num = eax;
     print("eax", 27, 9, C_BG_LIGHT_GREY | C_FG_BLACK);
