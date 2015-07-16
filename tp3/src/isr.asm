@@ -73,9 +73,7 @@ extern fin_intr_pic1
 ;; Sched
 extern sched_tick
 extern sched_tarea_actual
-
-; Clock tick
-extern screen_actualizar_reloj_global
+extern sched_proxima_a_ejecutar
 
 ;Metodos de modo_debug
 extern screen_pantalla_debug
@@ -89,8 +87,6 @@ extern game_atender_teclado
 extern game_syscall_cavar
 extern game_syscall_pirata_mover
 extern game_syscall_pirata_posicion
-extern screen_actualizar
-
 
 ;;
 ;; Definición de MACROS
@@ -121,14 +117,14 @@ _isr%1:
         call load_screen
 
     .fin:
-        ;TODO: test
+        ;TODO: destruir pirata
         ;despues de llamar a pantalla debug hay que desalojar la tarea actual, por lo que saltamos a idle
         mov ax, 14
 
         shl ax, 3
         mov [selector], ax
         jmp far [offset]
-        
+
         popad
         iret
 
@@ -146,16 +142,25 @@ _isr%1:
 
 ; Rutina de atención del RELOJ
 global _isr32
-
 _isr32:
     pusha
     call fin_intr_pic1
     call screen_actualizar_reloj_global
     call screen_actualizar
-    call proximo_reloj
+    call sched_proxima_a_ejecutar
+    cmp ax, 0
+    je .fin
+    cmp ax, 14
+    je .fin
+
+    shl ax, 3
+    mov [selector], ax
+    jmp far [offset]
+
+    ;fin scheduler
+    .fin:
     popa
     iret
-
 
 ; Rutina de atención del TECLADO
 global _isr33
@@ -166,6 +171,7 @@ _isr33:
     call game_atender_teclado
     pop eax
     call fin_intr_pic1
+
     popa
     iret
 
@@ -232,20 +238,6 @@ ISR 18
 ISR 19
 ;--------------------------------------------------------------------------------;;
 
-proximo_reloj:
-    call sched_proxima_a_ejecutar
-    cmp ax, 0
-    je .fin
-    cmp ax, 14
-    je .fin
-
-    shl ax, 3
-    mov [selector], ax
-    jmp far [offset]
-
-    ;fin scheduler
-    .fin:
-    ret
-
-extern sched_proxima_a_ejecutar
+extern screen_actualizar_reloj_global
+extern screen_actualizar
 extern jugador_actual

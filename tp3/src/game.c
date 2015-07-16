@@ -197,7 +197,6 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
         }
         game_jugador_erigir_pirata(j, tipo);
     }
-
     return;
 }
 
@@ -211,7 +210,6 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f){
 
 
 uint game_syscall_pirata_mover(uint id, direccion dir){
-
     // ~ completar
     return 0;
 }
@@ -308,7 +306,7 @@ void game_terminar_si_es_hora(){
 #define KB_l_Br     0x26 // 0xa6
 #define KB_shiftA   0x2a // 0xaa
 #define KB_shiftB   0x36 // 0xb6
-#define KB_y   0x15 
+#define KB_y   0x15
 
 void game_atender_teclado(unsigned char tecla){
     jugador_t* j;
@@ -323,11 +321,7 @@ void game_atender_teclado(unsigned char tecla){
         game_jugador_lanzar_pirata(j,0);
     }
     if(tecla == KB_y){
-        if(modo_debug == 1){
-            modo_debug = 0;
-        }else{
-            modo_debug = 1;
-        }
+        modo_debug = !modo_debug;
     }
 
     return;
