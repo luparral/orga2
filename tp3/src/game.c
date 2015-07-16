@@ -33,9 +33,9 @@ uint game_posicion_valida(int x, int y) {
 
 pirata_t* id_pirata2pirata(uint id_pirata){
     if(jugador_actual == JUGADOR_A){
-        return &jugadorA.piratas[id_pirata];
+        return jugadorA.piratas[id_pirata];
     } else {
-        return &jugadorB.piratas[id_pirata];
+        return jugadorB.piratas[id_pirata];
     }
 	return NULL;
 }
@@ -108,7 +108,7 @@ void game_jugador_inicializar(jugador_t* j){
 
     int i;
     for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
-        j->piratas[i].vivo = FALSE;
+        j->piratas[i]->vivo = FALSE;
     }
     j->monedas = 0;
     j->cant_piratas = 0;
@@ -134,11 +134,12 @@ void game_jugador_inicializar(jugador_t* j){
     return;
 }
 
-pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
+//devuelve el indice del pirata
+uint game_pirata_inicializar(jugador_t *j, uint tipo){
     //busco que pirata esta libre
     int i;
     for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
-        if(j->piratas[i].vivo == FALSE)
+        if(j->piratas[i]->vivo == FALSE)
             break;
     }
 
@@ -151,8 +152,9 @@ pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
         .vivo = TRUE,
         .codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero
     };
+    j->piratas[i] = p;
 
-    return p;
+    return i;
 }
 
 void game_tick(uint id_pirata){
@@ -162,8 +164,8 @@ void game_tick(uint id_pirata){
 void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
 
-pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo){
-    pirata_t* p = game_pirata_inicializar(j, tipo);
+uint game_jugador_erigir_pirata(jugador_t *j, uint tipo){
+    uint id_pirata = game_pirata_inicializar(j, tipo);
 
     int gdt_offset;
     if(j->id == JUGADOR_A){
@@ -178,10 +180,10 @@ pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo){
         if(gdt[gdt_offset+i].p == 0) break;
     }
 
-    uint* dir_tss = tss_inicializar_pirata(j, p);
+    uint* dir_tss = tss_inicializar_pirata(j->id, id_pirata);
     gdt_incializar_pirata(gdt_offset+i, dir_tss);
 
-	return p;
+	return id_pirata;
 }
 
 
@@ -193,9 +195,8 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
         }else{
             j->cant_mineros++;
         }
-        pirata_t* p = game_jugador_erigir_pirata(j, tipo);
+        game_jugador_erigir_pirata(j, tipo);
         //TODO: esto pierde memoria? conviene que piratas sea un array de pirata_t*?
-        j->piratas[p->id] = *p;
     }
 
     return;
@@ -273,7 +274,7 @@ void game_pirata_exploto(uint id){
     jugador_t* j= game_get_jugador_actual();
     j->cant_piratas--;
 
-    if(j->piratas[id].tipo == PIRATA_E){
+    if(j->piratas[id]->tipo == PIRATA_E){
         j->cant_exploradores--;
     } else {
         j->cant_mineros--;
@@ -312,6 +313,8 @@ void game_terminar_si_es_hora(){
 
 void game_atender_teclado(unsigned char tecla){
     jugador_t* j;
+    //debug de teclado
+    print_hex(tecla, 3, 30, 30, C_BG_LIGHT_GREY | C_FG_RED);
     if(tecla == KB_shiftA){
         j = game_id_jugador2jugador(JUGADOR_A);
         game_jugador_lanzar_pirata(j,0);
@@ -327,8 +330,6 @@ void game_atender_teclado(unsigned char tecla){
             modo_debug = 1;
         }
     }
-
-    //TODO: hay que crear piratas aca?
 
     return;
 }

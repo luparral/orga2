@@ -56,7 +56,7 @@ typedef struct str_tss {
 } __attribute__((__packed__, aligned (8))) tss;
 
 void tss_inicializar();
-uint* tss_inicializar_pirata(jugador_t* jugador, pirata_t* p);
+uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata);
 
 tss tss_jugadorA[MAX_CANT_PIRATAS_VIVOS];
 tss tss_jugadorB[MAX_CANT_PIRATAS_VIVOS];

@@ -157,20 +157,10 @@ global _isr33
 _isr33:
     pusha
     in al, 0x60
-
-    push 0x07   ;color
-    push 0x00
-    push 0x00
-    push 3      ;size
-    push eax
-    call print_hex
-    add esp, 5*4
-    call fin_intr_pic1
-
     push eax
     call game_atender_teclado
     pop eax
-
+    call fin_intr_pic1
     popa
     iret
 
