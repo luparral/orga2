@@ -124,6 +124,14 @@ _isr%1:
         call load_screen
 
     .fin:
+        ;TODO: test
+        ;despues de llamar a pantalla debug hay que desalojar la tarea actual, por lo que saltamos a idle
+        mov ax, 14
+
+        shl ax, 3
+        mov [selector], ax
+        jmp far [offset]
+        
         popad
         iret
 
