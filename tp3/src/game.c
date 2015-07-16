@@ -308,7 +308,7 @@ void game_terminar_si_es_hora(){
 #define KB_l_Br     0x26 // 0xa6
 #define KB_shiftA   0x2a // 0xaa
 #define KB_shiftB   0x36 // 0xb6
-
+#define KB_y   0x15 
 
 void game_atender_teclado(unsigned char tecla){
     jugador_t* j;
@@ -319,6 +319,13 @@ void game_atender_teclado(unsigned char tecla){
     if(tecla == KB_shiftB){
         j = game_id_jugador2jugador(JUGADOR_B);
         game_jugador_lanzar_pirata(j,0);
+    }
+    if(tecla == KB_y){
+        if(modo_debug == 1){
+            modo_debug = 0;
+        }else{
+            modo_debug = 1;
+        }
     }
 
     //TODO: hay que crear piratas aca?

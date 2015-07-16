@@ -17,12 +17,16 @@
 
 #include "colors.h"
 #include "defines.h"
+#include "tss.h"
+#include "sched.h"
+
 /* Estructura de para acceder a memoria de video */
 typedef struct ca_s {
     unsigned char c;
     unsigned char a;
 } ca;
 
+ca temp[VIDEO_FILS][VIDEO_COLS];
 
 struct pirata_t;
 typedef struct pirata_t pirata_t;
@@ -52,9 +56,11 @@ void screen_borrar_pirata(jugador_t *j, pirata_t *pirata);
 void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata);
 void screen_pintar_reloj_piratas(jugador_t *j);
 void screen_pintar_relojes();
-
+void screen_pantalla_debug();
 void screen_actualizar_posicion_mapa(uint x, uint y);
 void screen_stop_game_show_winner(jugador_t *j);
+void load_screen();
+void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp, unsigned int falsoesp, unsigned int ebx, unsigned int edx, unsigned int ecx, unsigned int eax, unsigned int errorCode, unsigned int eip, unsigned int cs, unsigned int eflags, unsigned int esp, unsigned int ss);
 
 void screen_actualizar();
 
