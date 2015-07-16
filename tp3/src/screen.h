@@ -42,8 +42,9 @@ void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int c
 void screen_inicializar();
 void screen_pintar_puntajes();
 
+coord_t getStatusCoords(uint id);
 void screen_actualizar_reloj_global();
-void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata);
+void screen_actualizar_reloj_pirata (uint, uint);
 unsigned char screen_color_jugador(jugador_t *j);
 unsigned char screen_caracter_pirata(unsigned int tipo);
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata);
@@ -54,6 +55,8 @@ void screen_pintar_relojes();
 
 void screen_actualizar_posicion_mapa(uint x, uint y);
 void screen_stop_game_show_winner(jugador_t *j);
+
+void screen_actualizar();
 
 
 #endif  /* !__SCREEN_H__ */
