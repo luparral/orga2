@@ -15,11 +15,12 @@ extern jugador_t jugadorA, jugadorB;
 // ~ auxiliares dadas ~
 uint game_xy2lineal();
 pirata_t* id_pirata2pirata(uint id);
+jugador_t* game_id_jugador2jugador(uint id);
 
 // ~ auxiliares sugeridas o requeridas (segun disponga enunciado) ~
 void game_inicializar();
 
-pirata_t* game_pirata_inicializar(jugador_t *jugador, uint tipo);
+uint game_pirata_inicializar(jugador_t *jugador, uint tipo);
 void game_pirata_erigir(jugador_t *j, pirata_t *pirata, uint tipo);
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y);
 void game_pirata_exploto(uint id);
@@ -27,7 +28,7 @@ jugador_t* game_get_jugador_actual();
 
 void game_jugador_inicializar(jugador_t* j);
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo);
-pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo);
+uint game_jugador_erigir_pirata(jugador_t *j, uint tipo);
 void game_jugador_anotar_punto(jugador_t *j);
 void game_explorar_posicion(jugador_t *jugador, int x, int y);
 

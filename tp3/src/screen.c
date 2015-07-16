@@ -149,40 +149,15 @@ void screen_inicializar(){
 }
 
 coord_t getStatusCoords(uint id){
-    coord_t res;
-
-    if(id == 0){
-        res.x = 4;
-        res.y = 48;
-    }else if(id==1){
-        res.x = 6;
-        res.y = 48;
-    }else if(id==2){
-        res.x = 8;
-        res.y = 48;
-    }else if(id==3){
-        res.x = 10;
-        res.y = 48;
-    }else if(id==4){
-        res.x = 12;
-        res.y = 48;
-    }else if(id==5){
-        res.x = 14;
-        res.y = 48;
-    }else if(id==6){
-        res.x = 16;
-        res.y = 48;
-    }else if(id==7){
-        res.x = 18;
-        res.y = 48;
-    }
-
-    return res;
+    return (coord_t){
+        .x = 4+id*2,
+        .y = 48
+    };
 }
 
 void screen_actualizar(){
     print_hex(jugadorA.monedas, 1, 36, 47, C_BG_RED + C_FG_WHITE);
-    print_hex(jugadorB.monedas, 1, 41, 47, C_BG_BLUE + C_FG_WHITE);
+    print_hex(jugadorB.monedas, 1, 46, 47, C_BG_BLUE + C_FG_WHITE);
 
     int suma=0;
     if(jugador_actual == jugadorB.id)
@@ -190,7 +165,7 @@ void screen_actualizar(){
 
     coord_t coord = getStatusCoords(pirata_actual);
     if(id_pirata2pirata(pirata_actual)->vivo){
-        screen_actualizar_reloj_pirata(coord.x, coord.y);
+        screen_actualizar_reloj_pirata(coord.y, coord.x);
     } else {
         screen_pintar(0x78, C_FG_RED, 48, suma + (4+pirata_actual*2));
     }

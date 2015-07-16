@@ -68,7 +68,7 @@ typedef struct pirata_t{
 typedef struct jugador_t{
     uint id;
     uint monedas;
-    pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
+    pirata_t* piratas[MAX_CANT_PIRATAS_VIVOS];
     uint cant_piratas;
     uint cant_exploradores;
     uint cant_mineros;
