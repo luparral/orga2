@@ -110,7 +110,42 @@ void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int c
 }
 
 void screen_inicializar(){
+    int i;
+    int j;
+    //pintar fondo
+    for (i = 0; i < VIDEO_FILS; i++) {
+        for (j = 0; j < VIDEO_COLS; j++) {
+            p[i][j].c = 0;
+            p[i][j].a = C_BG_LIGHT_GREY;
+        }
+    }
+    print("SnakeII/Nokia1100", 63, 0, C_BG_LIGHT_GREY | C_FG_RED );
+    //pintar panel de jugador
+    for (i = 45; i < VIDEO_FILS ; i++) {
+        for (j = 0; j < VIDEO_COLS; j++) {
+            p[i][j].c = 0;
+            p[i][j].a = C_BG_BLACK;
+        }
+        for(j = 30; j < 40; j++){
+            p[i][j].c = 0;
+            p[i][j].a = C_BG_RED;
+        }
+        for(j = 40; j < 50; j++){
+            p[i][j].c = 0;
+            p[i][j].a = C_BG_BLUE;
+        }
+    }
 
+    //pinto el numero de jugadores
+    for (i = 0; i < 8; i++) {
+        screen_pintar(0x31+i, C_FG_WHITE, 46, 4+i*2);
+        screen_pintar(0x78, C_FG_RED, 48, 4+i*2);
+        //-4 for the margin, -16 for the text start
+        screen_pintar(0x31+i, C_FG_WHITE, 46, VIDEO_COLS-20+i*2);
+        screen_pintar(0x78, C_FG_RED, 48, VIDEO_COLS-20+i*2);
+    }
+
+    return;
 }
 
 coord_t getStatusCoords(uint id){

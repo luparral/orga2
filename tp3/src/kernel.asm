@@ -87,15 +87,7 @@ modo_protegido:
 
 
     ; Inicializar pantalla
-
-    ;pinto fondo de gris
-    pintar_rect 0x00, 0x77, 0, 0, 50, 80
-    ;pinto lineas con comandos abajo en negro
-    pintar_rect 0x00, 0x00, 45, 0, 50, 80
-    ;pinto panel primer jugador
-    pintar_rect 0x00, 0x99, 45, 30, 5, 10
-    ;pinto panel segundo jugador
-    pintar_rect 0x00, 0xCC, 45, 40, 5, 10
+    call screen_inicializar
 
     ; Inicializar el manejador de memoria
 
@@ -108,10 +100,6 @@ modo_protegido:
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
-
-    ;Imprimir nombre de grupo en borde derecho
-    imprimir_texto_mp nombre_grupo, nombre_grupo_len, 0x07, 0, 63
-
 
     ;Inicializar mmu
     call mmu_inicializar
@@ -164,8 +152,8 @@ extern GDT_DESC
 extern gdt_inicializar_tareas
 extern IDT_DESC
 extern idt_inicializar
+extern screen_inicializar
 extern screen_pintar_rect
-extern screen_pintar_linea_h
 extern mmu_inicializar_dir_kernel
 extern mmu_inicializar
 extern mmu_inicializar_dir_pirata
