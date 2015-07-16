@@ -11,9 +11,6 @@
 tss tss_inicial;
 tss tss_idle;
 
-tss tss_jugadorA[MAX_CANT_PIRATAS_VIVOS];
-tss tss_jugadorB[MAX_CANT_PIRATAS_VIVOS];
-
 void tss_inicializar() {
     tss_idle.cr3 = rcr3();
     tss_idle.eflags = 0x202;

@@ -170,3 +170,156 @@ void screen_actualizar(){
         screen_pintar(0x78, C_FG_RED, 48, suma + (4+pirata_actual*2));
     }
 }
+
+
+
+void save_screen(){
+    ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
+    int i = 0, j = 0;
+
+    for (j = 0; j < VIDEO_FILS; j++){
+        for (i = 0; i < VIDEO_COLS; i++){
+            temp[j][i] = p[j][i];
+        }
+    }
+}
+
+void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp, unsigned int falsoesp, unsigned int ebx, unsigned int edx, unsigned int ecx, unsigned int eax, unsigned int errorCode, unsigned int eip, unsigned int cs, unsigned int eflags, unsigned int esp, unsigned int ss){
+
+    ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
+    int i = 0, j = 0;
+
+    save_screen();
+
+    //Recuadro
+    for (i = 25; i< 55; i++){
+        p[6][i].c = ' ';
+        p[6][i].a = C_BG_BLACK;
+        p[41][i].c = ' ';
+        p[41][i].a = C_BG_BLACK;
+    }
+
+    for (j = 7; j<42; j++){
+        p[j][25].c = ' ';
+        p[j][25].a = C_BG_BLACK;
+        p[j][54].c = ' ';
+        p[j][54].a = C_BG_BLACK;
+    }
+
+    //Fondo gris
+    for (j = 8; j<41; j++){
+        for (i = 26; i<54; i++){
+            p[j][i].c = ' ';
+            p[j][i].a = C_BG_LIGHT_GREY;
+        }
+    }
+
+
+    tss pirata;
+    if (jugador_actual == JUGADOR_A){
+        pirata = tss_jugadorA[pirata_actual];
+    }else{
+        pirata = tss_jugadorB[pirata_actual];
+    }
+
+    uint num;
+    num = eax;
+    print("eax", 27, 9, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(eax, 8, 31, 9, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("ebx", 27, 11, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(ebx, 8, 31, 11, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("ecx", 27, 13, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(ecx, 8, 31, 13, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("edx", 27, 15, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(edx, 8, 31, 15, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("esi", 27, 17, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(esi, 8, 31, 17, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("edi", 27, 19, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(edi, 8, 31, 19, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("ebp", 27, 21, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(ebp, 8, 31, 21, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("esp", 27, 23, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(esp, 8, 31, 23, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("eip", 27, 25, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(eip, 8, 31, 25, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("cs", 28, 27, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(cs, 8, 31, 27, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    num = pirata.ds;
+    print("ds", 28, 29, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 31, 29, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    num = pirata.es;
+    print("es", 28, 31, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 31, 31, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    num = pirata.fs;
+    print("fs", 28, 33, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 31, 33, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    num = pirata.gs;
+    print("gs", 28, 35, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 31, 35, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("ss", 28, 37, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(ss, 8, 31, 37, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    print("eflags", 28, 39, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(eflags, 8, 34, 39, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+
+    num = rcr0();
+    print("cr0", 41, 9, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 45, 9, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    num = rcr2();
+    print("cr2", 41, 11, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 45, 11, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    num = pirata.cr3;
+    print("cr3", 41, 13, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 45, 13, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    num = rcr4();
+    print("cr4", 41, 15, C_BG_LIGHT_GREY | C_FG_BLACK);
+    print_hex(num, 8, 45, 15, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    uint* stack = (uint*) esp;
+
+    print("stack", 41, 26, C_BG_LIGHT_GREY | C_FG_BLACK);
+
+    num = *stack;
+    print_hex(num, 8, 41, 29, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    stack++;
+    num = *stack;
+    print_hex(num, 8, 41, 30, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    stack++;
+    num = *stack;
+    print_hex(num, 8, 41, 31, C_BG_LIGHT_GREY | C_FG_WHITE);
+
+    stack++;
+    num = *stack;
+    print_hex(num, 8, 41, 32, C_BG_LIGHT_GREY | C_FG_WHITE);
+}
+
+void load_screen(){
+    ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
+    int i = 0, j = 0;
+
+    for (j = 0; j < VIDEO_FILS; j++){
+        for (i = 0; i < VIDEO_COLS; i++){
+            p[j][i] = temp[j][i];
+        }
+    }
+}

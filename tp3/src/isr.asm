@@ -77,6 +77,10 @@ extern sched_tarea_actual
 ; Clock tick
 extern screen_actualizar_reloj_global
 
+;Metodos de modo_debug
+extern screen_pantalla_debug
+extern load_screen
+extern modo_debug
 
 ; Atender interrupcion de teclado
 extern game_atender_teclado
@@ -86,6 +90,8 @@ extern game_syscall_cavar
 extern game_syscall_pirata_mover
 extern game_syscall_pirata_posicion
 extern screen_actualizar
+
+
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
@@ -96,7 +102,36 @@ global _isr%1
 _isr%1:
     mov eax, %1
     imprimir_texto_mp interrupcion_%1, interrupcion_%1_len, 0x07, 4, 25
-    iret
+
+    cmp byte [modo_debug], 0
+    je .fin
+
+    ;parametros para screen_pantalla_debug
+    pushad
+    call screen_pantalla_debug
+
+    .ciclar:
+        ; presiono y?
+        xor eax, eax
+        in al, 0x60
+        cmp al, 0x15
+        jne .ciclar               ; Espero
+
+        ; cuando presiona y, se devuelve
+        call load_screen
+
+    .fin:
+        ;TODO: test
+        ;despues de llamar a pantalla debug hay que desalojar la tarea actual, por lo que saltamos a idle
+        mov ax, 14
+
+        shl ax, 3
+        mov [selector], ax
+        jmp far [offset]
+        
+        popad
+        iret
+
 
 %endmacro
 
@@ -150,24 +185,24 @@ _isr46:
     je .sysCallPosicion
     jmp .fin
 
-    .fin
+    .fin:
         popa
         iret
 
-    .sysCallMoverse
+    .sysCallMoverse:
         push ecx
         call game_syscall_pirata_mover
         pop ecx
         jmp .fin
 
-    .sysCallCavar
+    .sysCallCavar:
         mov ecx, [jugador_actual]
         push ecx
         call game_syscall_cavar
         pop ecx
         jmp .fin
 
-    .sysCallPosicion
+    .sysCallPosicion:
         ;TODO: Chequear cual es el parametro que hay que pasar y donde esta
         call game_syscall_pirata_posicion
         jmp .fin
