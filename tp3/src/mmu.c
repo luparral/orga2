@@ -9,40 +9,39 @@
 #include "i386.h"
 /* Atributos paginas */
 /* -------------------------------------------------------------------------- */
-page_entry* pdt_kernel = (page_entry*)PDT_KERNEL;
-uint* next_page = (uint*)AREA_LIBRE;
+page_entry* pdt_kernel;
+page_entry* pet_kernel;
+uint* next_page;
 
-page_entry* mmu_inicializar_dir_kernel(){
+void mmu_inicializar_dir_kernel(){
+	pdt_kernel = (page_entry*)PDT_KERNEL;
+	pet_kernel = (page_entry*)PAGE_KERNEL;
 
-	pdt_kernel = empty_mapping(pdt_kernel);
+	mmu_empty_mapping(pdt_kernel);
+	mmu_identity_mapping(pet_kernel);
 
-	//link to the dir of PAGE_KERNEL
-	pdt_kernel->dir_base = 0x28;
-	pdt_kernel->available = 0x0;
+	pdt_kernel->dir_base = (uint)pet_kernel >> 12;
+	pdt_kernel->available = 0x00;
 	pdt_kernel->attr = 0x03;
 
-	page_entry* pet_kernel = (page_entry*)PAGE_KERNEL;
-
-	identity_mapping(pet_kernel);
-
-	return pdt_kernel;
+	return;
 }
 
-uint* mmu_inicializar(){
-	return next_page;
+void mmu_inicializar(){
+	next_page = (uint*)AREA_LIBRE;
 }
 
 
 uint mmu_inicializar_dir_pirata(jugador_t* j, pirata_t* p){
-	page_entry* pdt_tarea = (page_entry*)new_page();
-	empty_mapping(pdt_tarea);
+	page_entry* pdt_tarea = (page_entry*)mmu_new_page();
+	mmu_empty_mapping(pdt_tarea);
 
-	page_entry* pet = (page_entry*)new_page();
-	identity_mapping(pet);
+	page_entry* pet = (page_entry*)mmu_new_page();
+	mmu_identity_mapping(pet);
 
 	//pierdo los primeros 3 hexa
 	pdt_tarea->dir_base = (uint)pet >> 12;
-	pdt_tarea->available = 0x00;
+	pdt_kernel->available = 0x00;
 	pdt_tarea->attr = 0x03;
 
 	uint* destino = (uint*)CODIGO_BASE;
@@ -70,11 +69,8 @@ void mmu_mapear_y_copiar_pagina(uint* destino_virtual, uint* pdt_tarea, uint* de
 void mmu_copiar_pagina(uint* fuente, uint* destino){
 	int i;
 	for (i = 0; i < 1024; i++) {
-		*destino = *fuente;
-		destino++;
-		fuente++;
+		destino[i] = fuente[i];
 	}
-
 	return;
 }
 
@@ -93,9 +89,9 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){
 	//si no hay una entrada presente, pedir 4k y crear una nueva pagina
 	if(pdt_entry->attr == 0x00){
 		//pido pagina nueva
-		page_entry* page = (page_entry*)new_page();
+		page_entry* page = (page_entry*)mmu_new_page();
 		//vacio pagina
-		empty_mapping(page);
+		mmu_empty_mapping(page);
 		pdt_entry->dir_base = (uint)page >> 12;
 		pdt_entry->available = 0x00;
 		pdt_entry->attr = 0x03;
@@ -144,36 +140,29 @@ void mmu_unmapear_pagina(uint virtual, uint cr3){
 
 /*Auxiliar functions*/
 
-uint* new_page(){
+uint* mmu_new_page(){
 	uint* aux = next_page;
 	next_page += PAGE_SIZE/sizeof(int);
 	return aux;
 }
-page_entry* empty_mapping(page_entry* entry){
-	page_entry* aux = entry;
+void mmu_empty_mapping(page_entry* entry){
 	int i;
-
 	for (i = 1; i < 1024; i++) {
-		entry->dir_base = 0x00000;
-		entry->available = 0x00;
-		entry->attr = 0x00;
-		entry++;
+		entry[i].dir_base = 0x00000;
+		entry[i].available = 0x00;
+		entry[i].attr = 0x00;
 	}
-	return aux;
 }
 
-page_entry* identity_mapping(page_entry* pet){
-	page_entry* aux = pet;
+void mmu_identity_mapping(page_entry* pet){
 	int i;
-
 	for (i = 0; i < 1024; i++) {
-		pet->dir_base = i;
-		pet->available = 0x00;
-		pet->attr = 0x03;
-		pet++;
+		pet[i].dir_base = i;
+		pet[i].available = 0x00;
+		pet[i].attr = 0x03;
 	}
 
-	return aux;
+	return;
 }
 /* Direcciones fisicas de codigos */
 /* -------------------------------------------------------------------------- */

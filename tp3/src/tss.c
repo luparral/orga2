@@ -56,7 +56,7 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     pointerTss->ebx = 0;
     pointerTss->esi = 0;
     pointerTss->edi = 0;
-    pointerTss->esp0 = (uint)new_page() + 0x1000;
+    pointerTss->esp0 = (uint)mmu_new_page() + 0x1000;
     pointerTss->ss0 = GDT_IDX_DS_OS_DESC << 3;
     return (uint*)pointerTss;
 }

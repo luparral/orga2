@@ -84,19 +84,22 @@ modo_protegido:
     imprimir_texto_mp iniciando_mp_msg, iniciando_mp_len, 0x07, 0, 0
 
     ; Inicializar el juego
-
+    call game_inicializar
 
     ; Inicializar pantalla
     call screen_inicializar
 
     ; Inicializar el manejador de memoria
+    call mmu_inicializar_dir_kernel
 
     ; Inicializar el directorio de paginas
+    call mmu_inicializar
+
     ; Cargar directorio de paginas
+    mov eax, [pdt_kernel]
+    mov cr3, eax
 
     ; Habilitar paginacion
-    call mmu_inicializar_dir_kernel
-    mov cr3, eax
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
@@ -107,8 +110,6 @@ modo_protegido:
     ; Inicializar tss
     call gdt_inicializar_tareas
     call tss_inicializar
-
-    ; Inicializar tss de la tarea Idle
 
     ; Inicializar el scheduler
     call sched_inicializar
@@ -149,8 +150,8 @@ modo_protegido:
 
 %include "a20.asm"
 extern GDT_DESC
-extern gdt_inicializar_tareas
 extern IDT_DESC
+extern gdt_inicializar_tareas
 extern idt_inicializar
 extern screen_inicializar
 extern screen_pintar_rect
@@ -159,6 +160,8 @@ extern mmu_inicializar
 extern mmu_inicializar_dir_pirata
 extern tss_inicializar
 extern sched_inicializar
+extern game_inicializar
+extern pdt_kernel
 
 extern resetear_pic
 extern habilitar_pic

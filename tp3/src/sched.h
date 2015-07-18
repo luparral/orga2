@@ -19,6 +19,7 @@ uint jugadorB_pirata_actual;
 uint modo_debug;
 
 void sched_inicializar();
+uint sched_tick();
 uint sched_proxima_a_ejecutar();
 
 extern uint jugador_actual;

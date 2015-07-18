@@ -10,16 +10,19 @@ definicion de funciones del scheduler
 #include "i386.h"
 
 void sched_inicializar(){
-	jugador_actual = 1; //0: A - 1:B
+	jugador_actual = 0; //0: A - 1:B
 	jugadorA_pirata_actual = 0;
 	jugadorB_pirata_actual = 0;
-	game_inicializar();
+}
+
+uint sched_tick(){
+	game_tick();
+	return sched_proxima_a_ejecutar();
 }
 
 //0 significa que no tiene que cambiar de tarea
 uint sched_proxima_a_ejecutar(){
 	//cambio de jugador
-	jugador_actual = !jugador_actual;
 
 	//TODO: hay que ir a la tarea inicial?
 	if ((jugadorA.cant_piratas == 0) && (jugadorB.cant_piratas == 0)){
@@ -52,12 +55,11 @@ uint sched_proxima_a_ejecutar(){
 	//Tiene que ejecutar a partir de la siguiente de la tarea actual
 	int i;
 	for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
+		jugador_actual = !jugador_actual;
 		int siguiente = (pirata_actual + i +1) % MAX_CANT_PIRATAS_VIVOS;
 
 		if(gdt[siguiente + gdt_offset].p == 1) {
-			//TODO: ELIMINAR DEBUG
-			// print_hex(siguiente, 10, 10, 10, (0x7 << 4) | 0x4);
-			// __asm__ ("xchg %bx, %bx");
+
 			pirata_actual = siguiente;
 			return siguiente + gdt_offset;
 		}

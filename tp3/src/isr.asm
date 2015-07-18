@@ -65,8 +65,6 @@ interrupcion_19_len equ    $ - interrupcion_19
 
 BITS 32
 
-offset: dd 0
-selector: dw 0
 ;; PIC
 extern fin_intr_pic1
 
@@ -133,6 +131,8 @@ _isr%1:
 
 ;;
 ;; Datos
+offset: dd 0
+selector: dw 0
 ;; -------------------------------------------------------------------------- ;;
 ; Scheduler
 
@@ -141,23 +141,21 @@ _isr%1:
 ;; -------------------------------------------------------------------------- ;;
 
 ; Rutina de atención del RELOJ
+extern sched_tick
 global _isr32
 _isr32:
     pusha
     call fin_intr_pic1
-    call screen_actualizar_reloj_global
-    call screen_actualizar
-    call sched_proxima_a_ejecutar
-    cmp ax, 0
-    je .fin
-    cmp ax, 14
+    call sched_tick
+    shl ax, 3
+    ;Me fijo si es la misma tarea
+    str bx
+    cmp ax, bx
     je .fin
 
-    shl ax, 3
     mov [selector], ax
     jmp far [offset]
 
-    ;fin scheduler
     .fin:
     popa
     iret
@@ -178,6 +176,7 @@ _isr33:
 
 ;TODO: hay que desaoljar la tarea mediante el scheduler para dar paso a la prox tarea
 ; Rutina de atención de 0x46
+extern jugador_actual
 global _isr46
 _isr46:
     pusha
@@ -237,7 +236,3 @@ ISR 17
 ISR 18
 ISR 19
 ;--------------------------------------------------------------------------------;;
-
-extern screen_actualizar_reloj_global
-extern screen_actualizar
-extern jugador_actual

@@ -154,7 +154,8 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
     return i;
 }
 
-void game_tick(uint id_pirata){
+void game_tick(){
+    screen_actualizar();
 }
 
 void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){

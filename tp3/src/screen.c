@@ -27,10 +27,13 @@ void screen_actualizar_reloj_global()
     screen_pintar(reloj[reloj_global], C_BW, 49, 79);
 }
 
-void screen_actualizar_reloj_pirata(uint x, uint y){
+void screen_actualizar_reloj_pirata(uint id_jugador, uint id_pirata){
     static uint reloj_pirata = 0;
 
     reloj_pirata = (reloj_pirata + 1) % reloj_size;
+
+    uint x = 4+id_pirata*2 + id_jugador*56;
+    uint y = 48;
 
     screen_pintar(reloj[reloj_pirata], C_BW, x, y);
 }
@@ -148,17 +151,12 @@ void screen_inicializar(){
     return;
 }
 
-coord_t getStatusCoords(uint id_jugador, uint id_pirata){
-    return (coord_t){
-        .x = 4+id_pirata*2 + id_jugador*56,
-        .y = 48
-    };
-}
-
 void screen_actualizar_pirata(){
-    coord_t coord = getStatusCoords(jugador_actual, pirata_actual);
     if(id_pirata2pirata(pirata_actual)->vivo){
-        screen_actualizar_reloj_pirata(coord.y, coord.x);
+        // //TODO: ELIMINAR DEBUG
+        // print_hex(pirata_actual, 10, 10, 10, (0x7 << 4) | 0x4);
+        // __asm__ ("xchg %bx, %bx");
+        screen_actualizar_reloj_pirata(jugador_actual, pirata_actual);
     } else {
         screen_pintar(0x78, C_FG_RED, 48, jugador_actual*56 + (4+pirata_actual*2));
     }
@@ -168,6 +166,7 @@ void screen_actualizar_pirata(){
 void screen_actualizar(){
     print_hex(jugadorA.monedas, 1, 36, 47, C_BG_RED + C_FG_WHITE);
     print_hex(jugadorB.monedas, 1, 46, 47, C_BG_BLUE + C_FG_WHITE);
+    screen_actualizar_reloj_global();
     screen_actualizar_pirata();
     return;
 }

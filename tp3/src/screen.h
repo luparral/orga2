@@ -47,7 +47,6 @@ void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int c
 void screen_inicializar();
 void screen_pintar_puntajes();
 
-coord_t getStatusCoords(uint id_jugador, uint id_pirata);
 void screen_actualizar_reloj_global();
 void screen_actualizar_reloj_pirata (uint, uint);
 void screen_actualizar_pirata();
