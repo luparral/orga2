@@ -13,6 +13,8 @@
 
 uint jugador_actual;
 uint pirata_actual;
+uint jugadorA_pirata_actual;
+uint jugadorB_pirata_actual;
 
 uint modo_debug;
 

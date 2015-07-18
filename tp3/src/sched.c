@@ -11,7 +11,8 @@ definicion de funciones del scheduler
 
 void sched_inicializar(){
 	jugador_actual = 1; //0: A - 1:B
-	pirata_actual = 0;
+	jugadorA_pirata_actual = 0;
+	jugadorB_pirata_actual = 0;
 	game_inicializar();
 }
 
@@ -25,16 +26,27 @@ uint sched_proxima_a_ejecutar(){
 		return 14;
 	}
 
-	int gdt_offset = (jugador_actual == JUGADOR_A) ? GDT_OFFSET_TSS_JUG_A: GDT_OFFSET_TSS_JUG_B;
+	int gdt_offset;
+
+	//Dectecto que jugador esta corriendo, asigno las variables pertinentes
+	if(jugador_actual == JUGADOR_A){
+		gdt_offset = GDT_OFFSET_TSS_JUG_A;
+		pirata_actual = jugadorA_pirata_actual;
+	} else {
+		gdt_offset = GDT_OFFSET_TSS_JUG_B;
+		pirata_actual = jugadorB_pirata_actual;
+	}
 
 	//Si hay un solo jugador corriendo, devuelvo el offset de el
 	if(jugadorA.cant_piratas == 0){
 		jugador_actual = JUGADOR_B;
-		gdt_offset = GDT_OFFSET_TSS_JUG_A;
+		gdt_offset = GDT_OFFSET_TSS_JUG_B;
+		pirata_actual = jugadorB_pirata_actual;
 	}
 	if(jugadorB.cant_piratas == 0){
 		jugador_actual = JUGADOR_A;
-		gdt_offset = GDT_OFFSET_TSS_JUG_B;
+		gdt_offset = GDT_OFFSET_TSS_JUG_A;
+		pirata_actual = jugadorA_pirata_actual;
 	}
 
 	//Tiene que ejecutar a partir de la siguiente de la tarea actual
@@ -43,9 +55,11 @@ uint sched_proxima_a_ejecutar(){
 		int siguiente = (pirata_actual + i +1) % MAX_CANT_PIRATAS_VIVOS;
 
 		if(gdt[siguiente + gdt_offset].p == 1) {
+			//TODO: ELIMINAR DEBUG
+			// print_hex(siguiente, 10, 10, 10, (0x7 << 4) | 0x4);
+			// __asm__ ("xchg %bx, %bx");
 			pirata_actual = siguiente;
-
-			return pirata_actual + gdt_offset;
+			return siguiente + gdt_offset;
 		}
 	}
 	return 0;

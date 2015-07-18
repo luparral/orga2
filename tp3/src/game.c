@@ -157,10 +157,6 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
 void game_tick(uint id_pirata){
 }
 
-//TODO: ELIMINAR DEBUG
-// print_hex((uint)destino_virtual, 10, 10, 10, (0x7 << 4) | 0x4);
-// __asm__ ("xchg %bx, %bx");
-
 void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
 
