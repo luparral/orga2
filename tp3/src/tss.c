@@ -23,7 +23,7 @@ void tss_inicializar() {
     tss_idle.ss = GDT_IDX_DS_OS_DESC << 3;
     tss_idle.ds = GDT_IDX_DS_OS_DESC << 3;
     tss_idle.gs = GDT_IDX_DS_OS_DESC << 3;
-    tss_idle.fs = GDT_IDX_DS_OS_DESC << 3;
+    tss_idle.fs = GDT_IDX_VIDEO_DESC << 3;
 }
 
 uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
@@ -48,7 +48,7 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     pointerTss->ss = (GDT_IDX_DS_USR_DESC << 3) + 3;
     pointerTss->ds = (GDT_IDX_DS_USR_DESC << 3) + 3;
     pointerTss->gs = (GDT_IDX_DS_USR_DESC << 3) + 3;
-    pointerTss->fs = (GDT_IDX_DS_USR_DESC << 3) + 3;
+    pointerTss->fs = (GDT_IDX_VIDEO_DESC << 3) + 3;
 
     pointerTss->eax = 0;
     pointerTss->ecx = 0;

@@ -32,8 +32,8 @@ void screen_actualizar_reloj_pirata(uint id_jugador, uint id_pirata){
 
     reloj_pirata = (reloj_pirata + 1) % reloj_size;
 
-    uint x = 4+id_pirata*2 + id_jugador*56;
-    uint y = 48;
+    uint x = 48;
+    uint y = 4+id_pirata*2 + id_jugador*56;
 
     screen_pintar(reloj[reloj_pirata], C_BW, x, y);
 }
