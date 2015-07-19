@@ -151,23 +151,12 @@ void screen_inicializar(){
     return;
 }
 
-void screen_actualizar_pirata(){
-    if(id_pirata2pirata(pirata_actual)->vivo){
-        // //TODO: ELIMINAR DEBUG
-        // print_hex(pirata_actual, 10, 10, 10, (0x7 << 4) | 0x4);
-        // __asm__ ("xchg %bx, %bx");
-        screen_actualizar_reloj_pirata(jugador_actual, pirata_actual);
-    } else {
-        screen_pintar(0x78, C_FG_RED, 48, jugador_actual*56 + (4+pirata_actual*2));
-    }
-    return;
-}
-
 void screen_actualizar(){
     print_hex(jugadorA.monedas, 1, 36, 47, C_BG_RED + C_FG_WHITE);
     print_hex(jugadorB.monedas, 1, 46, 47, C_BG_BLUE + C_FG_WHITE);
     screen_actualizar_reloj_global();
-    screen_actualizar_pirata();
+    if(id_pirata2pirata(pirata_actual)->vivo)
+        screen_actualizar_reloj_pirata(jugador_actual, pirata_actual);
     return;
 }
 

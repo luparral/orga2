@@ -26,9 +26,6 @@ int game_proximo_pirata(int id_jugador, uint id_pirata){
 	for (i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++) {
 		int siguiente = (id_pirata + 1 + i) % MAX_CANT_PIRATAS_VIVOS;
 		if(j->piratas[siguiente].vivo){
-			//TODO: ELIMINAR DEBUG
-			// print_hex(siguiente, 10, 10, 8, (0x7 << 4) | 0x4);
-			// __asm__ ("xchg %bx, %bx");
 			return siguiente;
 		}
 	}
@@ -66,5 +63,5 @@ uint sched_proxima_a_ejecutar(){
 
 	//cambio de jugador
 	jugador_actual = (jugador_actual == JUGADOR_A) ? JUGADOR_B : JUGADOR_A;
-	return pirata_actual + gdt_offset-1;
+	return pirata_actual + gdt_offset;
 }
