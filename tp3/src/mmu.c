@@ -7,6 +7,7 @@
 
 #include "mmu.h"
 #include "i386.h"
+#include "screen.h"
 /* Atributos paginas */
 /* -------------------------------------------------------------------------- */
 uint* next_page;
@@ -34,69 +35,65 @@ uint mmu_inicializar_dir_pirata(jugador_t* j, pirata_t* p){
 	page_entry* pd = (page_entry*)mmu_new_page();
 	mmu_empty_mapping(pd);
 
-	page_entry* pt = (page_entry*)mmu_new_page();
-	mmu_identity_mapping(pt);
-
 	//pierdo los primeros 3 hexa
-	pd[0].dir_base = (uint)pt >> 12;
-	pd[0].us = 0;
+	pd[0].dir_base = (uint)pt_kernel >> 12;
 	pd[0].p = 1;
 	pd[0].rw = 1;
+	pd[0].us = 0;
 
-	//mapear el codigo del pirata a la direccion 0x400000
-	uint* destino = (uint*)CODIGO_BASE;
-	uint* destino_fisico = (uint*)(game_xy2lineal(p->coord.x, p->coord.y) + MAPA_BASE_FISICA);
-	uint* codigo = p->codigo;
-	mmu_mapear_y_copiar_pagina(destino, (uint*)pd, destino_fisico, codigo);
+	//mapear todas las posiciones del mapa visitados
+	// int i;
+	// for (i = 0; i < MAPA_ALTO*MAPA_ANCHO}; i++) {
+	// 	if(j->explorado[i] == 1){
+	// 		mmu_mapear_pagina(i * PAGE_SIZE + MAPA_BASE_FISICA, (uint*)pd, i * PAGE_SIZE + MAPA_BASE_FISICA);
+	// 	}
+	// }
+
+	//mover el codigo del pirata a la direccion 0x400000
+	uint cr3 = rcr3();
+	lcr3((uint)pd);
+	mmu_mapear_pagina(CODIGO_BASE, rcr3(), game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_FISICA);
+	mmu_copiar_pagina((uint*)CODIGO_BASE, p->codigo);
+	lcr3(cr3);
 
 	return (uint)pd;
 }
 
-void mmu_mapear_y_copiar_pagina(uint* destino_virtual, uint* pd, uint* destino_fisico, uint* fuente){
-	//tengo que cambiar de cr3 para mapearlo, copiarlo y luego desmapearlo
-	tlbflush();
-	uint cr3 = rcr3();
-	lcr3((uint)pd);
-	mmu_mapear_pagina((uint)destino_virtual, (uint)pd, (uint)destino_fisico);
+void mmu_copiar_pagina(uint* destino, uint* fuente){
 	int i;
 	for (i = 0; i < 1024; i++) {
-		destino_virtual[i] = fuente[i];
+		destino[i] = fuente[i];
 	}
-	//desmapeo y vuelvo al viejo cr3
-	//mmu_unmapear_pagina((uint)destino_virtual, (uint)pd);
-	lcr3(cr3);
-
-	return;
 }
 
 void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){
 
 	//pierdo los ultimos 12 bits queson de attributos, queda direccion de 4k
 	page_entry* pd = (page_entry*)(cr3 & 0xFFFFF000);
+	page_entry* pt;
 	//separo la direccion virtual en los diferentes offset
-
 	uint pd_offset = virtual >> 22;
 	uint pt_offset = (virtual << 10) >> 22;
-
 	//si no hay una entrada presente, pedir 4k y crear una nueva pagina
 	if(!pd[pd_offset].p){
 		//pido pagina nueva
-		page_entry* page = (page_entry*)mmu_new_page();
+		pt = (page_entry*)mmu_new_page();
 		//vacio pagina
-		mmu_empty_mapping(page);
-		pd[pd_offset].dir_base = (uint)page >> 12;
-		pd[pd_offset].us = 0;
+		mmu_empty_mapping(pt);
+		pd[pd_offset].dir_base = (uint)pt >> 12;
+		pd[pd_offset].us = 1;
 		pd[pd_offset].p = 1;
 		pd[pd_offset].rw = 1;
 	}
 
-	page_entry* pt = (page_entry*)(pd[pd_offset].dir_base << 12);
+	pt = (page_entry*)(pd[pd_offset].dir_base << 12);
 
 	//asignar la entrada a la direccion fisica
 	pt[pt_offset].dir_base = (uint)fisica >> 12;
-	pt[pt_offset].us = 0;
+	pt[pt_offset].us = 1;
 	pt[pt_offset].p = 1;
 	pt[pt_offset].rw = 1;
+	tlbflush();
 
 	return;
 }
@@ -119,6 +116,7 @@ void mmu_unmapear_pagina(uint virtual, uint cr3){
 	//limpiar entradas
 	pt[pt_offset].p = 0;
 	pd[pd_offset].p = 0;
+	tlbflush();
 
 	return;
 }
@@ -132,7 +130,7 @@ uint* mmu_new_page(){
 }
 void mmu_empty_mapping(page_entry* pt){
 	int i;
-	for (i = 1; i < 1024; i++) {
+	for (i = 0; i < 1024; i++) {
 		pt[i].p = 0;
 	}
 	return;

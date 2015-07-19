@@ -31,7 +31,7 @@ typedef struct str_page_entry{
 void mmu_inicializar();
 void mmu_inicializar_dir_kernel();
 uint mmu_inicializar_dir_pirata(jugador_t* jugador, pirata_t* pirata);
-void mmu_mapear_y_copiar_pagina(uint* destino_virtual, uint* pd, uint* destino_fisico, uint* fuente);
+void mmu_copiar_pagina(uint* destino, uint* fuente);
 void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica);
 void mmu_unmapear_pagina(uint virtual, uint cr3);
 void mmu_identity_mapping(page_entry* pt);

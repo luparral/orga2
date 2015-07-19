@@ -37,15 +37,15 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     pointerTss->eflags = 0x202;
     pointerTss->cr3 = mmu_inicializar_dir_pirata(j, p);
     pointerTss->iomap = 0xFFFF;
-    pointerTss->eip = 0x400000;
-    pointerTss->esp = 0x401000-12;
-    pointerTss->ebp = 0x401000-12;
+    pointerTss->eip = CODIGO_BASE;
+    pointerTss->esp = CODIGO_BASE+PAGE_SIZE-12;
+    pointerTss->ebp = CODIGO_BASE+PAGE_SIZE-12;
     pointerTss->cs = (GDT_IDX_CS_USR_DESC << 3) + 3;
     pointerTss->es = (GDT_IDX_DS_USR_DESC << 3) + 3;
     pointerTss->ss = (GDT_IDX_DS_USR_DESC << 3) + 3;
     pointerTss->ds = (GDT_IDX_DS_USR_DESC << 3) + 3;
     pointerTss->gs = (GDT_IDX_DS_USR_DESC << 3) + 3;
-    pointerTss->fs = (GDT_IDX_VIDEO_DESC << 3) + 3;
+    pointerTss->fs = (GDT_IDX_DS_USR_DESC << 3) + 3;
 
     pointerTss->eax = 0;
     pointerTss->ecx = 0;
@@ -53,7 +53,7 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     pointerTss->ebx = 0;
     pointerTss->esi = 0;
     pointerTss->edi = 0;
-    pointerTss->esp0 = (uint)mmu_new_page() + 0x1000;
+    pointerTss->esp0 = (uint)mmu_new_page() + PAGE_SIZE;
     pointerTss->ss0 = GDT_IDX_DS_OS_DESC << 3;
     return (uint*)pointerTss;
 }
