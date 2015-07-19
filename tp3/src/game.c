@@ -95,21 +95,8 @@ void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
 
 
 void game_inicializar(){
-
-
-    // print_hex((uint)&jugadorA, 10, 10, 12, (0x7 << 4) | 0x4);
-    // __asm__ ("xchg %bx, %bx");
-
-
-    // print_hex((uint)&jugadorB, 10, 10, 14, (0x7 << 4) | 0x4);
-    // __asm__ ("xchg %bx, %bx");
-
-
     game_jugador_inicializar(&jugadorA, JUGADOR_A);
-
     game_jugador_inicializar(&jugadorB, JUGADOR_B);
-
-
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug){
@@ -117,8 +104,6 @@ void game_jugador_inicializar_mapa(jugador_t *jug){
 
 
 void game_jugador_inicializar(jugador_t* j, uint id){
-    // print_hex((uint)&j, 15, 10, 20+(j->id*2), (0x7 << 4) | 0x4);
-    // __asm__ ("xchg %bx, %bx");
     j->id = id;
     int i;
     for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
@@ -145,13 +130,6 @@ void game_jugador_inicializar(jugador_t* j, uint id){
         j->codigo_explorador = (uint*)CODIGO_TAREA_B_E;
         j->codigo_minero = (uint*)CODIGO_TAREA_B_M;
     }
-
-    print_dec(j->piratas[i].vivo, 15, 10, 7+(j->id*2), (0x7 << 4) | 0x4);
-    __asm__ ("xchg %bx, %bx");
-
-    print_dec(game_id_jugador2jugador(JUGADOR_B)->piratas[i].vivo, 15, 10, 7+(j->id*2), (0x7 << 4) | 0x4);
-    __asm__ ("xchg %bx, %bx");
-
     return;
 }
 
