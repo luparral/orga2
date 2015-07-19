@@ -33,9 +33,9 @@ uint game_posicion_valida(int x, int y) {
 
 pirata_t* id_pirata2pirata(uint id_pirata){
     if(jugador_actual == JUGADOR_A){
-        return jugadorA.piratas[id_pirata];
+        return &jugadorA.piratas[id_pirata];
     } else {
-        return jugadorB.piratas[id_pirata];
+        return &jugadorB.piratas[id_pirata];
     }
 	return NULL;
 }
@@ -95,21 +95,20 @@ void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
 
 
 void game_inicializar(){
-    game_jugador_inicializar(&jugadorA);
-    game_jugador_inicializar(&jugadorB);
+    game_jugador_inicializar(&jugadorA, JUGADOR_A);
+    game_jugador_inicializar(&jugadorB, JUGADOR_B);
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug){
 }
 
-void game_jugador_inicializar(jugador_t* j){
-    static int id = 0;
-    j->id = id++;
 
+void game_jugador_inicializar(jugador_t* j, uint id){
+    j->id = id;
     int i;
     for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
-        j->piratas[i]->id = i;
-        j->piratas[i]->vivo = FALSE;
+        j->piratas[i].id = i;
+        j->piratas[i].vivo = FALSE;
     }
     j->monedas = 0;
     j->cant_piratas = 0;
@@ -131,7 +130,6 @@ void game_jugador_inicializar(jugador_t* j){
         j->codigo_explorador = (uint*)CODIGO_TAREA_B_E;
         j->codigo_minero = (uint*)CODIGO_TAREA_B_M;
     }
-
     return;
 }
 
@@ -140,16 +138,23 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
     //busco que pirata esta libre
     int i;
     for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
-        if(j->piratas[i]->vivo == FALSE)
+        if(j->piratas[i].vivo == FALSE)
             break;
     }
 
-    j->piratas[i]->id = i;
-    j->piratas[i]->coord = j->coord_puerto;
-    j->piratas[i]->tipo = tipo;
-    j->piratas[i]->ticks = 0;
-    j->piratas[i]->vivo = TRUE;
-    j->piratas[i]->codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero;
+    j->piratas[i].id = i;
+    j->piratas[i].coord = j->coord_puerto;
+    j->piratas[i].tipo = tipo;
+    j->piratas[i].ticks = 0;
+    j->piratas[i].vivo = TRUE;
+
+    print_hex(j->piratas[i].vivo, 10, 10, 12, (0x7 << 4) | 0x4);
+    __asm__ ("xchg %bx, %bx");
+
+    print_hex(game_id_jugador2jugador(JUGADOR_B)->piratas[i].vivo, 10, 10, 14, (0x7 << 4) | 0x4);
+    __asm__ ("xchg %bx, %bx");
+
+    j->piratas[i].codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero;
 
     return i;
 }
@@ -268,7 +273,7 @@ void game_pirata_exploto(uint id){
     jugador_t* j= game_get_jugador_actual();
     j->cant_piratas--;
 
-    if(j->piratas[id]->tipo == PIRATA_E){
+    if(j->piratas[id].tipo == PIRATA_E){
         j->cant_exploradores--;
     } else {
         j->cant_mineros--;
