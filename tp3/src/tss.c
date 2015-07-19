@@ -25,7 +25,7 @@ void tss_inicializar() {
 
 uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     jugador_t* j = id_jugador2jugador(id_jugador);
-    pirata_t* p = id_pirata2pirata(id_pirata);
+    pirata_t* p = id_pirata2pirata(j, id_pirata);
 
     tss* pointerTss;
     if(id_jugador == JUGADOR_A){

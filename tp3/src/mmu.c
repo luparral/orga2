@@ -39,23 +39,25 @@ uint mmu_inicializar_dir_pirata(jugador_t* j, pirata_t* p){
 
 	//pierdo los primeros 3 hexa
 	pd[0].dir_base = (uint)pt >> 12;
+	pd[0].us = 0;
 	pd[0].p = 1;
 	pd[0].rw = 1;
 
+	//mapear el codigo del pirata a la direccion 0x400000
 	uint* destino = (uint*)CODIGO_BASE;
 	uint* destino_fisico = (uint*)(game_xy2lineal(p->coord.x, p->coord.y) + MAPA_BASE_FISICA);
 	uint* codigo = p->codigo;
-
 	mmu_mapear_y_copiar_pagina(destino, (uint*)pd, destino_fisico, codigo);
 
 	return (uint)pd;
 }
 
 void mmu_mapear_y_copiar_pagina(uint* destino_virtual, uint* pd, uint* destino_fisico, uint* fuente){
-	mmu_mapear_pagina((uint)destino_virtual, (uint)pd, (uint)destino_fisico);
 	//tengo que cambiar de cr3 para mapearlo, copiarlo y luego desmapearlo
+	tlbflush();
 	uint cr3 = rcr3();
 	lcr3((uint)pd);
+	mmu_mapear_pagina((uint)destino_virtual, (uint)pd, (uint)destino_fisico);
 	int i;
 	for (i = 0; i < 1024; i++) {
 		destino_virtual[i] = fuente[i];
@@ -83,6 +85,7 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){
 		//vacio pagina
 		mmu_empty_mapping(page);
 		pd[pd_offset].dir_base = (uint)page >> 12;
+		pd[pd_offset].us = 0;
 		pd[pd_offset].p = 1;
 		pd[pd_offset].rw = 1;
 	}
@@ -91,9 +94,9 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){
 
 	//asignar la entrada a la direccion fisica
 	pt[pt_offset].dir_base = (uint)fisica >> 12;
+	pt[pt_offset].us = 0;
 	pt[pt_offset].p = 1;
 	pt[pt_offset].rw = 1;
-	tlbflush();
 
 	return;
 }

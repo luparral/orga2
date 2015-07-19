@@ -154,7 +154,8 @@ void screen_actualizar(){
     print_hex(jugadorA.monedas, 1, 36, 47, C_BG_RED + C_FG_WHITE);
     print_hex(jugadorB.monedas, 1, 46, 47, C_BG_BLUE + C_FG_WHITE);
     screen_actualizar_reloj_global();
-    screen_actualizar_reloj_pirata(id_jugador2jugador(jugador_actual), id_pirata2pirata(pirata_actual));
+    jugador_t* j = id_jugador2jugador(jugador_actual);
+    screen_actualizar_reloj_pirata(j, id_pirata2pirata(j, pirata_actual));
     return;
 }
 

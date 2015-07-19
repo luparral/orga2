@@ -31,13 +31,8 @@ uint game_posicion_valida(int x, int y) {
 	return (x >= 0 && y >= 0 && x < MAPA_ANCHO && y < MAPA_ALTO);
 }
 
-pirata_t* id_pirata2pirata(uint id_pirata){
-    if(jugador_actual == JUGADOR_A){
-        return &jugadorA.piratas[id_pirata];
-    } else {
-        return &jugadorB.piratas[id_pirata];
-    }
-	return NULL;
+pirata_t* id_pirata2pirata(jugador_t* j, uint id_pirata){
+    return &j->piratas[id_pirata];
 }
 
 jugador_t* game_get_jugador_actual(){
@@ -153,7 +148,6 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
     j->piratas[i].ticks = 0;
     j->piratas[i].vivo = TRUE;
     j->piratas[i].codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero;
-
     return i;
 }
 
@@ -215,7 +209,8 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
 }
 
 uint* game_buscarBotin(uint id){
-    pirata_t* pirata = id_pirata2pirata(id);
+    jugador_t* j = id_jugador2jugador(jugador_actual);
+    pirata_t* pirata = id_pirata2pirata(j, id);
 
     int i;
     for(i = 0; i < BOTINES_CANTIDAD; i++)
@@ -228,7 +223,8 @@ uint* game_buscarBotin(uint id){
 //TODO: si no hay mas botin se debe liberar al pirata
 //el parametro id por donde lo recibe?
 uint game_syscall_cavar(uint id) {
-    pirata_t* pirata = id_pirata2pirata(id);
+    jugador_t* j = id_jugador2jugador(jugador_actual);
+    pirata_t* pirata = id_pirata2pirata(j, id);
 
     if (pirata->tipo != PIRATA_M){
         return 0;
@@ -251,7 +247,8 @@ uint game_syscall_cavar(uint id) {
 uint game_syscall_pirata_posicion(uint id, int idx){
     //para que es la variable id?
     //TODO: test
-    pirata_t* pirataABuscar = id_pirata2pirata(idx);
+    jugador_t* j = id_jugador2jugador(jugador_actual);
+    pirata_t* pirataABuscar = id_pirata2pirata(j, idx);
 
     uint x = pirataABuscar->coord.x;
     uint y = pirataABuscar->coord.y;
