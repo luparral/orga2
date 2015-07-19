@@ -76,6 +76,7 @@ typedef struct jugador_t{
     coord_t coord_exploradas[MAPA_ALTO*MAPA_ANCHO];
     uint* codigo_explorador;
     uint* codigo_minero;
+    uint explorado[MAPA_ALTO*MAPA_ANCHO];
     // coordenadas puerto, posiciones exploradas, mineros pendientes, etc
 } jugador_t;
 

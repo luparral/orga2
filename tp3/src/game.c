@@ -130,6 +130,11 @@ void game_jugador_inicializar(jugador_t* j, uint id){
         j->codigo_explorador = (uint*)CODIGO_TAREA_B_E;
         j->codigo_minero = (uint*)CODIGO_TAREA_B_M;
     }
+
+    //inicializo el mapa no explorado
+    for (i = 0; i < MAPA_ALTO*MAPA_ANCHO; i++) {
+        j->explorado[i] = -1;
+    }
     return;
 }
 

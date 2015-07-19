@@ -96,9 +96,9 @@ modo_protegido:
     call mmu_inicializar
 
     ; Cargar directorio de paginas
-    mov eax, [pdt_kernel]
+    mov eax, [pd_kernel]
     mov cr3, eax
-
+    xchg bx, bx
     ; Habilitar paginacion
     mov eax, cr0
     or eax, 0x80000000
@@ -161,7 +161,7 @@ extern mmu_inicializar_dir_pirata
 extern tss_inicializar
 extern sched_inicializar
 extern game_inicializar
-extern pdt_kernel
+extern pd_kernel
 
 extern resetear_pic
 extern habilitar_pic
