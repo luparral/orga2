@@ -147,13 +147,6 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
     j->piratas[i].tipo = tipo;
     j->piratas[i].ticks = 0;
     j->piratas[i].vivo = TRUE;
-
-    print_hex(j->piratas[i].vivo, 10, 10, 12, (0x7 << 4) | 0x4);
-    __asm__ ("xchg %bx, %bx");
-
-    print_hex(game_id_jugador2jugador(JUGADOR_B)->piratas[i].vivo, 10, 10, 14, (0x7 << 4) | 0x4);
-    __asm__ ("xchg %bx, %bx");
-
     j->piratas[i].codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero;
 
     return i;

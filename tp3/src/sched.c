@@ -25,7 +25,7 @@ int game_proximo_pirata(int id_jugador, uint id_pirata){
 	jugador_t* j = (id_jugador == JUGADOR_A) ? &jugadorA : &jugadorB;
 	for (i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++) {
 		int siguiente = (id_pirata + 1 + i) % MAX_CANT_PIRATAS_VIVOS;
-		if(j->piratas[siguiente]->vivo){
+		if(j->piratas[siguiente].vivo){
 			//TODO: ELIMINAR DEBUG
 			// print_hex(siguiente, 10, 10, 8, (0x7 << 4) | 0x4);
 			// __asm__ ("xchg %bx, %bx");
