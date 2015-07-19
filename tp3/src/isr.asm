@@ -120,8 +120,8 @@ _isr%1:
         mov ax, 14
 
         shl ax, 3
-        mov [selector], ax
-        jmp far [offset]
+        mov [sched_tarea_selector], ax
+        jmp far [sched_tarea_offset]
 
         popad
         iret
@@ -131,8 +131,8 @@ _isr%1:
 
 ;;
 ;; Datos
-offset: dd 0
-selector: dw 0
+sched_tarea_offset:     dd 0x00
+sched_tarea_selector:   dw 0x00
 ;; -------------------------------------------------------------------------- ;;
 ; Scheduler
 
@@ -145,6 +145,7 @@ extern sched_tick
 global _isr32
 _isr32:
     pusha
+    cli
     call fin_intr_pic1
     call sched_tick
     shl ax, 3
@@ -153,10 +154,11 @@ _isr32:
     cmp ax, bx
     je .fin
 
-    mov [selector], ax
-    jmp far [offset]
+    mov [sched_tarea_selector], ax
+    jmp far [sched_tarea_offset]
 
     .fin:
+    sti
     popa
     iret
 

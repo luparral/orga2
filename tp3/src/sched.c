@@ -10,7 +10,7 @@ definicion de funciones del scheduler
 #include "i386.h"
 
 void sched_inicializar(){
-	jugador_actual = 0; //0: A - 1:B
+	jugador_actual = JUGADOR_A; //0: A - 1:B
 	jugadorA_pirata_actual = 0;
 	jugadorB_pirata_actual = 0;
 }
@@ -20,49 +20,51 @@ uint sched_tick(){
 	return sched_proxima_a_ejecutar();
 }
 
-//0 significa que no tiene que cambiar de tarea
-uint sched_proxima_a_ejecutar(){
-	//cambio de jugador
+int game_proximo_pirata(int id_jugador, uint id_pirata){
+	int i;
+	jugador_t* j = (id_jugador == JUGADOR_A) ? &jugadorA : &jugadorB;
+	for (i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++) {
+		int siguiente = (id_pirata + 1 + i) % MAX_CANT_PIRATAS_VIVOS;
+		if(j->piratas[siguiente]->vivo){
+			//TODO: ELIMINAR DEBUG
+			// print_hex(siguiente, 10, 10, 8, (0x7 << 4) | 0x4);
+			// __asm__ ("xchg %bx, %bx");
+			return siguiente;
+		}
+	}
+	return -1;
+}
 
-	//TODO: hay que ir a la tarea inicial?
-	if ((jugadorA.cant_piratas == 0) && (jugadorB.cant_piratas == 0)){
-		return 14;
+// //TODO: ELIMINAR DEBUG
+// print_hex(id_jugador, 10, 10, 8, (0x7 << 4) | 0x4);
+// __asm__ ("xchg %bx, %bx");
+
+
+uint sched_proxima_a_ejecutar(){
+	if(game_proximo_pirata(JUGADOR_B, jugadorB_pirata_actual) == -1 && game_proximo_pirata(JUGADOR_A, jugadorA_pirata_actual) == -1){
+		return GDT_IDX_TSS_IDLE_DESC;
 	}
 
 	int gdt_offset;
-
-	//Dectecto que jugador esta corriendo, asigno las variables pertinentes
-	if(jugador_actual == JUGADOR_A){
-		gdt_offset = GDT_OFFSET_TSS_JUG_A;
-		pirata_actual = jugadorA_pirata_actual;
-	} else {
-		gdt_offset = GDT_OFFSET_TSS_JUG_B;
-		pirata_actual = jugadorB_pirata_actual;
-	}
-
-	//Si hay un solo jugador corriendo, devuelvo el offset de el
-	if(jugadorA.cant_piratas == 0){
+	int proximoA = game_proximo_pirata(JUGADOR_A, jugadorA_pirata_actual);
+	int proximoB =  game_proximo_pirata(JUGADOR_B, jugadorB_pirata_actual);
+	if(proximoA == -1 || jugador_actual == JUGADOR_B){
 		jugador_actual = JUGADOR_B;
 		gdt_offset = GDT_OFFSET_TSS_JUG_B;
-		pirata_actual = jugadorB_pirata_actual;
+		pirata_actual = proximoB;
+		jugadorB_pirata_actual = proximoB;
 	}
-	if(jugadorB.cant_piratas == 0){
+	if(proximoB == -1 || jugador_actual == JUGADOR_A){
 		jugador_actual = JUGADOR_A;
 		gdt_offset = GDT_OFFSET_TSS_JUG_A;
-		pirata_actual = jugadorA_pirata_actual;
+		pirata_actual = proximoA;
+		jugadorA_pirata_actual = proximoA;
 	}
 
-	//Tiene que ejecutar a partir de la siguiente de la tarea actual
-	int i;
-	for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
-		jugador_actual = !jugador_actual;
-		int siguiente = (pirata_actual + i +1) % MAX_CANT_PIRATAS_VIVOS;
+	//tengo que obtener el pirata que viene para poder devolverlo en la gdt
+	//ademas intercambiar entre jugadores y el siguiente pirata a iterar de cada uno
 
-		if(gdt[siguiente + gdt_offset].p == 1) {
-
-			pirata_actual = siguiente;
-			return siguiente + gdt_offset;
-		}
-	}
-	return 0;
+	//cambio de jugador
+	jugador_actual = (jugador_actual == JUGADOR_A) ? JUGADOR_B : JUGADOR_A;
+	return pirata_actual + gdt_offset-1;
 }
