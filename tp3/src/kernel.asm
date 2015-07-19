@@ -98,7 +98,7 @@ modo_protegido:
     ; Cargar directorio de paginas
     mov eax, [pd_kernel]
     mov cr3, eax
-    xchg bx, bx
+
     ; Habilitar paginacion
     mov eax, cr0
     or eax, 0x80000000
