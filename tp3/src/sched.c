@@ -38,6 +38,7 @@ int game_proximo_pirata(int id_jugador, uint id_pirata){
 
 
 uint sched_proxima_a_ejecutar(){
+	jugador_actual = (jugador_actual == JUGADOR_A) ? JUGADOR_B : JUGADOR_A;
 	if(game_proximo_pirata(JUGADOR_B, jugadorB_pirata_actual) == -1 && game_proximo_pirata(JUGADOR_A, jugadorA_pirata_actual) == -1){
 		return GDT_IDX_TSS_IDLE_DESC;
 	}
@@ -62,6 +63,5 @@ uint sched_proxima_a_ejecutar(){
 	//ademas intercambiar entre jugadores y el siguiente pirata a iterar de cada uno
 
 	//cambio de jugador
-	jugador_actual = (jugador_actual == JUGADOR_A) ? JUGADOR_B : JUGADOR_A;
 	return pirata_actual + gdt_offset;
 }

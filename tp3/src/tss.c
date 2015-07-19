@@ -8,9 +8,6 @@
 #include "tss.h"
 #include "mmu.h"
 
-tss tss_inicial;
-tss tss_idle;
-
 void tss_inicializar() {
     tss_idle.cr3 = rcr3();
     tss_idle.eflags = 0x202;
@@ -27,7 +24,7 @@ void tss_inicializar() {
 }
 
 uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
-    jugador_t* j = game_id_jugador2jugador(id_jugador);
+    jugador_t* j = id_jugador2jugador(id_jugador);
     pirata_t* p = id_pirata2pirata(id_pirata);
 
     tss* pointerTss;

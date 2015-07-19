@@ -60,10 +60,7 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata);
 tss tss_jugadorA[MAX_CANT_PIRATAS_VIVOS];
 tss tss_jugadorB[MAX_CANT_PIRATAS_VIVOS];
 
-extern tss tss_inicial;
-extern tss tss_idle;
-
-extern tss tss_jugadorA[MAX_CANT_PIRATAS_VIVOS];
-extern tss tss_jugadorB[MAX_CANT_PIRATAS_VIVOS];
+tss tss_inicial;
+tss tss_idle;
 
 #endif  /* !__TSS_H__ */

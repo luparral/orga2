@@ -18,24 +18,23 @@ const char reloj[] = "|/-\\";
 #define reloj_size 4
 
 
-void screen_actualizar_reloj_global()
-{
+void screen_actualizar_reloj_global(){
     static uint reloj_global = 0;
-
     reloj_global = (reloj_global + 1) % reloj_size;
-
     screen_pintar(reloj[reloj_global], C_BW, 49, 79);
 }
 
-void screen_actualizar_reloj_pirata(uint id_jugador, uint id_pirata){
-    static uint reloj_pirata = 0;
-
-    reloj_pirata = (reloj_pirata + 1) % reloj_size;
-
+void screen_actualizar_reloj_pirata(jugador_t* j, pirata_t* p){
     uint x = 48;
-    uint y = 4+id_pirata*2 + id_jugador*56;
-
-    screen_pintar(reloj[reloj_pirata], C_BW, x, y);
+    uint y = 4+p->id*2 + j->id*56;
+    if(p->vivo){
+        p->ticks = (p->ticks + 1) % reloj_size;
+        screen_pintar(reloj[p->ticks], C_BW, x, y);
+    } else {
+        char color = (j->id == JUGADOR_A) ? C_FG_RED : C_FG_BLUE;
+        screen_pintar('x', C_BG_BLACK | color, x, y);
+    }
+    return;
 }
 
 
@@ -141,11 +140,11 @@ void screen_inicializar(){
 
     //pinto el numero de jugadores
     for (i = 0; i < 8; i++) {
-        screen_pintar(0x31+i, C_FG_WHITE, 46, 4+i*2);
-        screen_pintar(0x78, C_FG_RED, 48, 4+i*2);
+        screen_pintar(i+'0', C_FG_WHITE, 46, 4+i*2);
+        screen_pintar('x', C_FG_RED, 48, 4+i*2);
         //-4 for the margin, -16 for the text start
-        screen_pintar(0x31+i, C_FG_WHITE, 46, VIDEO_COLS-20+i*2);
-        screen_pintar(0x78, C_FG_RED, 48, VIDEO_COLS-20+i*2);
+        screen_pintar(i+'0', C_FG_WHITE, 46, VIDEO_COLS-20+i*2);
+        screen_pintar('x', C_FG_BLUE, 48, VIDEO_COLS-20+i*2);
     }
 
     return;
@@ -155,8 +154,7 @@ void screen_actualizar(){
     print_hex(jugadorA.monedas, 1, 36, 47, C_BG_RED + C_FG_WHITE);
     print_hex(jugadorB.monedas, 1, 46, 47, C_BG_BLUE + C_FG_WHITE);
     screen_actualizar_reloj_global();
-    if(id_pirata2pirata(pirata_actual)->vivo)
-        screen_actualizar_reloj_pirata(jugador_actual, pirata_actual);
+    screen_actualizar_reloj_pirata(id_jugador2jugador(jugador_actual), id_pirata2pirata(pirata_actual));
     return;
 }
 

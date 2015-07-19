@@ -15,7 +15,7 @@ extern jugador_t jugadorA, jugadorB;
 // ~ auxiliares dadas ~
 uint game_xy2lineal();
 pirata_t* id_pirata2pirata(uint id);
-jugador_t* game_id_jugador2jugador(uint id);
+jugador_t* id_jugador2jugador(uint id);
 
 // ~ auxiliares sugeridas o requeridas (segun disponga enunciado) ~
 void game_inicializar();

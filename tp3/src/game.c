@@ -48,7 +48,7 @@ jugador_t* game_get_jugador_actual(){
 }
 
 
-jugador_t* game_id_jugador2jugador(uint id){
+jugador_t* id_jugador2jugador(uint id){
     if(id == JUGADOR_A)
         return &jugadorA;
     else
@@ -308,11 +308,11 @@ void game_atender_teclado(unsigned char tecla){
     //debug de teclado
     print_hex(tecla, 3, 30, 30, C_BG_LIGHT_GREY | C_FG_RED);
     if(tecla == KB_shiftA){
-        j = game_id_jugador2jugador(JUGADOR_A);
+        j = id_jugador2jugador(JUGADOR_A);
         game_jugador_lanzar_pirata(j,0);
     }
     if(tecla == KB_shiftB){
-        j = game_id_jugador2jugador(JUGADOR_B);
+        j = id_jugador2jugador(JUGADOR_B);
         game_jugador_lanzar_pirata(j,0);
     }
     if(tecla == KB_y){
