@@ -15,7 +15,7 @@ typedef struct str_page_entry{
     uint    p:1;
     uint    rw:1;
     uint    us:1;
-    uint    attr:7;
+    uint    attr:9;
     uint    dir_base:20;
 } __attribute__((__packed__)) page_entry;
 

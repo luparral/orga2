@@ -20,6 +20,7 @@ void mmu_inicializar_dir_kernel(){
 	pd_kernel[0].dir_base = (uint)pt_kernel >> 12;
 	pd_kernel[0].p = 1;
 	pd_kernel[0].rw = 1;
+	pd_kernel[0].us = 0;
 
 	return;
 }
@@ -138,6 +139,7 @@ void mmu_identity_mapping(page_entry* pt){
 	int i;
 	for (i = 0; i < 1024; i++) {
 		pt[i].dir_base = i;
+		pt[i].us = 0;
 		pt[i].p = 1;
 		pt[i].rw = 1;
 	}
