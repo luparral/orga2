@@ -26,7 +26,7 @@ void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y
 void game_pirata_exploto(uint id);
 jugador_t* game_get_jugador_actual();
 
-void game_jugador_inicializar(jugador_t* j);
+void game_jugador_inicializar(jugador_t* j, uint id);
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo);
 uint game_jugador_erigir_pirata(jugador_t *j, uint tipo);
 void game_jugador_anotar_punto(jugador_t *j);
