@@ -41,20 +41,21 @@ uint mmu_inicializar_dir_pirata(jugador_t* j, pirata_t* p){
 	pd[0].rw = 1;
 	pd[0].us = 0;
 
-	//mapear todas las posiciones del mapa visitados
-	// int i;
-	// for (i = 0; i < MAPA_ALTO*MAPA_ANCHO}; i++) {
-	// 	if(j->explorado[i] == 1){
-	// 		mmu_mapear_pagina(i * PAGE_SIZE + MAPA_BASE_FISICA, (uint*)pd, i * PAGE_SIZE + MAPA_BASE_FISICA);
-	// 	}
-	// }
-
 	//mover el codigo del pirata a la direccion 0x400000
 	uint cr3 = rcr3();
 	lcr3((uint)pd);
-	mmu_mapear_pagina(CODIGO_BASE, rcr3(), game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_FISICA);
+	mmu_mapear_pagina(CODIGO_BASE, rcr3(), game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
 	mmu_copiar_pagina((uint*)CODIGO_BASE, p->codigo);
 	lcr3(cr3);
+
+	// mapear todas las posiciones del mapa visitados
+	int i;
+	for (i = 0; i < MAPA_ALTO*MAPA_ANCHO; i++) {
+		if(j->explorado[i] == 1){
+			mmu_mapear_pagina(i * PAGE_SIZE + MAPA_BASE_VIRTUAL, (uint)pd, i * PAGE_SIZE + MAPA_BASE_FISICA, 0);
+		}
+	}
+
 
 	return (uint)pd;
 }
@@ -66,7 +67,7 @@ void mmu_copiar_pagina(uint* destino, uint* fuente){
 	}
 }
 
-void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){
+void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint rw){
 
 	//pierdo los ultimos 12 bits queson de attributos, queda direccion de 4k
 	page_entry* pd = (page_entry*)(cr3 & 0xFFFFF000);
@@ -92,7 +93,7 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica){
 	pt[pt_offset].dir_base = (uint)fisica >> 12;
 	pt[pt_offset].us = 1;
 	pt[pt_offset].p = 1;
-	pt[pt_offset].rw = 1;
+	pt[pt_offset].rw = rw;
 	tlbflush();
 
 	return;
@@ -125,7 +126,7 @@ void mmu_unmapear_pagina(uint virtual, uint cr3){
 
 uint* mmu_new_page(){
 	uint* aux = next_page;
-	next_page += PAGE_SIZE;
+	next_page += PAGE_SIZE/sizeof(uint);
 	return aux;
 }
 void mmu_empty_mapping(page_entry* pt){

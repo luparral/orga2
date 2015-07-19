@@ -73,22 +73,6 @@ uint game_valor_tesoro(uint x, uint y){
 	return 0;
 }
 
-// dada una posicion (x,y) guarda las posiciones de alrededor en dos arreglos, uno para las x y otro para las y
-void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y){
-	int next = 0;
-	int i, j;
-	for (i = -1; i <= 1; i++)
-	{
-		for (j = -1; j <= 1; j++)
-		{
-			vistas_x[next] = x + j;
-			vistas_y[next] = y + i;
-			next++;
-		}
-	}
-}
-
-
 void game_inicializar(){
     game_jugador_inicializar(&jugadorA, JUGADOR_A);
     game_jugador_inicializar(&jugadorB, JUGADOR_B);
@@ -126,7 +110,6 @@ void game_jugador_inicializar(jugador_t* j, uint id){
         j->codigo_minero = (uint*)CODIGO_TAREA_B_M;
     }
 
-    //inicializo el mapa no explorado
     for (i = 0; i < MAPA_ALTO*MAPA_ANCHO; i++) {
         j->explorado[i] = -1;
     }
@@ -134,7 +117,7 @@ void game_jugador_inicializar(jugador_t* j, uint id){
 }
 
 //devuelve el indice del pirata
-uint game_pirata_inicializar(jugador_t *j, uint tipo){
+pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
     //busco que pirata esta libre
     int i;
     for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
@@ -148,7 +131,7 @@ uint game_pirata_inicializar(jugador_t *j, uint tipo){
     j->piratas[i].ticks = 0;
     j->piratas[i].vivo = TRUE;
     j->piratas[i].codigo = (tipo == PIRATA_E) ? j->codigo_explorador : j->codigo_minero;
-    return i;
+    return &j->piratas[i];
 }
 
 void game_tick(){
@@ -158,29 +141,6 @@ void game_tick(){
 void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
 
-uint game_jugador_erigir_pirata(jugador_t *j, uint tipo){
-    uint id_pirata = game_pirata_inicializar(j, tipo);
-
-    int gdt_offset;
-    if(j->id == JUGADOR_A){
-        gdt_offset = GDT_OFFSET_TSS_JUG_A;
-    } else {
-        gdt_offset = GDT_OFFSET_TSS_JUG_B;
-    }
-
-    //Busco tss libre para el pirata
-    int i;
-    for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
-        if(gdt[gdt_offset+i].p == 0) break;
-    }
-
-    uint* dir_tss = tss_inicializar_pirata(j->id, id_pirata);
-    gdt_incializar_pirata(gdt_offset+i, dir_tss);
-
-	return id_pirata;
-}
-
-
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
     if(j->cant_piratas <= MAX_CANT_PIRATAS_VIVOS){
         j->cant_piratas++;
@@ -189,13 +149,37 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
         }else{
             j->cant_mineros++;
         }
-        game_jugador_erigir_pirata(j, tipo);
+
+        pirata_t* p = game_pirata_inicializar(j, tipo);
+        game_jugador_habilitar_posicion(j, p);
+
+        int gdt_offset;
+        if(j->id == JUGADOR_A){
+            gdt_offset = GDT_OFFSET_TSS_JUG_A;
+        } else {
+            gdt_offset = GDT_OFFSET_TSS_JUG_B;
+        }
+
+        //Busco tss libre para el pirata
+        int i;
+        for(i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++){
+            if(gdt[gdt_offset+i].p == 0) break;
+        }
+
+        uint* dir_tss = tss_inicializar_pirata(j->id, p->id);
+        gdt_incializar_pirata(gdt_offset+i, dir_tss);
     }
     return;
 }
 
-void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y){
-
+void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
+    int i, k;
+    for (i = -1; i <= 1; i++) {
+        for (k = -1; k <= 1; k++) {
+            j->explorado[game_xy2lineal(p->coord.x+i, p->coord.y+k)] = 1;
+        }
+    }
+    return;
 }
 
 

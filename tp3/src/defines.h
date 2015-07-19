@@ -73,11 +73,9 @@ typedef struct jugador_t{
     uint cant_exploradores;
     uint cant_mineros;
     coord_t coord_puerto;
-    coord_t coord_exploradas[MAPA_ALTO*MAPA_ANCHO];
     uint* codigo_explorador;
     uint* codigo_minero;
-    uint explorado[MAPA_ALTO*MAPA_ANCHO];
-    // coordenadas puerto, posiciones exploradas, mineros pendientes, etc
+    unsigned char explorado[MAPA_ALTO*MAPA_ANCHO];
 } jugador_t;
 
 /* Constantes basicas */
