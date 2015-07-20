@@ -10,6 +10,8 @@
 #include "screen.h"
 /* Atributos paginas */
 /* -------------------------------------------------------------------------- */
+page_entry* pd_kernel;
+page_entry* pt_kernel;
 uint* next_page;
 
 void mmu_inicializar_dir_kernel(){
@@ -48,14 +50,12 @@ uint mmu_inicializar_dir_pirata(jugador_t* j, pirata_t* p){
 	mmu_copiar_pagina((uint*)CODIGO_BASE, p->codigo);
 	lcr3(cr3);
 
-	// mapear todas las posiciones del mapa visitados
 	int i;
-	for (i = 0; i < MAPA_ALTO*MAPA_ANCHO; i++) {
-		if(j->explorado[i] == 1){
+	for (i = 0; i < MAPA_ANCHO*MAPA_ALTO; i++) {
+		if(j->explorado[i]){
 			mmu_mapear_pagina(i * PAGE_SIZE + MAPA_BASE_VIRTUAL, (uint)pd, i * PAGE_SIZE + MAPA_BASE_FISICA, 0);
 		}
 	}
-
 
 	return (uint)pd;
 }

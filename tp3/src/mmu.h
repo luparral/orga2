@@ -38,7 +38,4 @@ void mmu_identity_mapping(page_entry* pt);
 void mmu_empty_mapping(page_entry* pt);
 uint* mmu_new_page();
 
-page_entry* pd_kernel;
-page_entry* pt_kernel;
-
 #endif	/* !__MMU_H__ */

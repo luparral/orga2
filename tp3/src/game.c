@@ -111,7 +111,7 @@ void game_jugador_inicializar(jugador_t* j, uint id){
     }
 
     for (i = 0; i < MAPA_ALTO*MAPA_ANCHO; i++) {
-        j->explorado[i] = -1;
+        j->explorado[i] = FALSE;
     }
     return;
 }
@@ -177,7 +177,7 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
     int i, k;
     for (i = -1; i <= 1; i++) {
         for (k = -1; k <= 1; k++) {
-            j->explorado[game_xy2lineal(p->coord.x+i, p->coord.y+k)] = 1;
+            j->explorado[game_xy2lineal(p->coord.x+i, p->coord.y+k)] = TRUE;
         }
     }
     return;
@@ -187,13 +187,12 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
 void game_explorar_posicion(jugador_t *jugador, int c, int f){
 }
 
-
 uint game_syscall_pirata_mover(uint id, direccion dir){
     // ~ completar
     return 0;
 }
 
-uint* game_buscarBotin(uint id){
+uint* game_buscar_botin(uint id){
     jugador_t* j = id_jugador2jugador(jugador_actual);
     pirata_t* pirata = id_pirata2pirata(j, id);
 
@@ -206,16 +205,15 @@ uint* game_buscarBotin(uint id){
 }
 
 //TODO: si no hay mas botin se debe liberar al pirata
-//el parametro id por donde lo recibe?
-uint game_syscall_cavar(uint id) {
+uint game_syscall_cavar(uint id_pirata) {
     jugador_t* j = id_jugador2jugador(jugador_actual);
-    pirata_t* pirata = id_pirata2pirata(j, id);
+    pirata_t* pirata = id_pirata2pirata(j, id_pirata);
 
     if (pirata->tipo != PIRATA_M){
         return 0;
     }
     //es explorador
-    uint* botin = game_buscarBotin(id);
+    uint* botin = game_buscar_botin(id_pirata);
     if (botin != NULL){
         //Recorrer las coordenadas con botines hardocdeadas y ver si una matchea
         if(game_valor_tesoro(pirata->coord.x, pirata->coord.y) == 0){
@@ -229,11 +227,11 @@ uint game_syscall_cavar(uint id) {
     return 0;
 }
 
-uint game_syscall_pirata_posicion(uint id, int idx){
+uint game_syscall_pirata_posicion(uint id_pirata, int param){
     //para que es la variable id?
     //TODO: test
     jugador_t* j = id_jugador2jugador(jugador_actual);
-    pirata_t* pirataABuscar = id_pirata2pirata(j, idx);
+    pirata_t* pirataABuscar = id_pirata2pirata(j, id_pirata);
 
     uint x = pirataABuscar->coord.x;
     uint y = pirataABuscar->coord.y;
@@ -243,9 +241,22 @@ uint game_syscall_pirata_posicion(uint id, int idx){
     return res;
 }
 
-uint game_syscall_manejar(uint syscall, uint param1){
-    // ~ completar ~
-    return 0;
+void game_syscall_manejar(uint syscall, uint param1){
+    uint id_pirata = pirata_actual;
+    switch(syscall){
+        case 1:
+            game_syscall_pirata_mover(id_pirata, param1);
+            break;
+        case 2:
+            game_syscall_cavar(id_pirata);
+            break;
+        case 3:
+            game_syscall_pirata_posicion(id_pirata, param1);
+            break;
+        default:
+            break;
+    }
+    return;
 }
 
 //TODO: terminar esta funcion

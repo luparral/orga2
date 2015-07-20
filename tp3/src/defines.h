@@ -42,7 +42,7 @@ typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion
 #define POS_INIT_A_X                      1
 #define POS_INIT_A_Y                      1
 #define POS_INIT_B_X         MAPA_ANCHO - 2
-#define POS_INIT_B_Y          MAPA_ALTO - 2
+#define POS_INIT_B_Y          MAPA_ALTO - 1
 
 #define CANT_POSICIONES_VISTAS            9
 #define MAX_SIN_CAMBIOS                 999

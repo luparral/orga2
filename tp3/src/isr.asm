@@ -65,31 +65,12 @@ interrupcion_19_len equ    $ - interrupcion_19
 
 BITS 32
 
-;; PIC
-extern fin_intr_pic1
-
-;; Sched
-extern sched_tick
-extern sched_tarea_actual
-extern sched_proxima_a_ejecutar
-
-;Metodos de modo_debug
-extern screen_pantalla_debug
-extern load_screen
-extern modo_debug
-
-; Atender interrupcion de teclado
-extern game_atender_teclado
-
-;Llamados a rutinas de syscalls
-extern game_syscall_cavar
-extern game_syscall_pirata_mover
-extern game_syscall_pirata_posicion
-
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
-
+extern load_screen
+extern screen_pantalla_debug
+extern modo_debug
 %macro ISR 1
 global _isr%1
 
@@ -139,8 +120,28 @@ sched_tarea_selector:   dw 0x00
 ;;
 ;; Rutina de atención de las EXCEPCIONES
 ;; -------------------------------------------------------------------------- ;;
+ISR 0
+ISR 2
+ISR 3
+ISR 4
+ISR 5
+ISR 6
+ISR 7
+ISR 8
+ISR 9
+ISR 10
+ISR 11
+ISR 12
+ISR 13
+ISR 14
+ISR 15
+ISR 16
+ISR 17
+ISR 18
+ISR 19
 
 ; Rutina de atención del RELOJ
+extern fin_intr_pic1
 extern sched_tick
 global _isr32
 _isr32:
@@ -163,6 +164,7 @@ _isr32:
     iret
 
 ; Rutina de atención del TECLADO
+extern game_atender_teclado
 global _isr33
 _isr33:
     pusha
@@ -175,66 +177,25 @@ _isr33:
     popa
     iret
 
-
-;TODO: hay que desaoljar la tarea mediante el scheduler para dar paso a la prox tarea
+;;
+;; Rutinas de atención de las SYSCALLS
+;; -------------------------------------------------------------------------- ;;
 ; Rutina de atención de 0x46
-extern jugador_actual
+extern game_syscall_manejar
 global _isr70
 _isr70:
     pusha
     ;en eax tiene el tipo de syscall recibida
     ;en ecx esta la direccion?
-    cmp eax, 0x1
-    je .sysCallMoverse
-    cmp eax, 0x2
-    je .sysCallCavar
-    cmp eax, 0x3
-    je .sysCallPosicion
-    jmp .fin
-
-    .fin:
-        popa
-        iret
-
-    .sysCallMoverse:
-        push ecx
-        call game_syscall_pirata_mover
-        pop ecx
-        jmp .fin
-
-    .sysCallCavar:
-        mov ecx, [jugador_actual]
-        push ecx
-        call game_syscall_cavar
-        pop ecx
-        jmp .fin
-
-    .sysCallPosicion:
-        ;TODO: Chequear cual es el parametro que hay que pasar y donde esta
-        call game_syscall_pirata_posicion
-        jmp .fin
-
-;;
-;; Rutinas de atención de las SYSCALLS
-;; -------------------------------------------------------------------------- ;;
-
-ISR 0
-ISR 2
-ISR 3
-ISR 4
-ISR 5
-ISR 6
-ISR 7
-ISR 8
-ISR 9
-ISR 10
-ISR 11
-ISR 12
-ISR 13
-ISR 14
-ISR 15
-ISR 16
-ISR 17
-ISR 18
-ISR 19
+    push ecx
+    push eax
+    call game_syscall_manejar
+    add esp, 8
+    ;saltar a idle
+    mov ax, 14
+    shl ax, 3
+    mov [sched_tarea_selector], ax
+    jmp far [sched_tarea_offset]
+    popa
+    iret
 ;--------------------------------------------------------------------------------;;
