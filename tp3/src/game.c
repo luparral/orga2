@@ -153,12 +153,6 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
         if(tipo == PIRATA_E){
             j->cant_exploradores++;
         }
-        //esto se hace cuando se encuentra un botin
-
-        //else{
-        //    j->cant_mineros++;
-        //}
-
         pirata_t* p = game_pirata_inicializar(j, tipo);
 
         int gdt_offset;
@@ -185,7 +179,18 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
     int i, k;
     for (i = -1; i <= 1; i++) {
         for (k = -1; k <= 1; k++) {
-            j->explorado[game_xy2lineal(p->coord.x+i, p->coord.y+k)] = TRUE;
+            int x = p->coord.x + i;
+            int y = p->coord.y + k;
+            if(game_posicion_valida(x, y)){
+                j->explorado[game_xy2lineal(x, y)] = TRUE;
+                if(game_valor_tesoro(x, y)){
+                    j->cant_mineros++;
+                    j->botin = (coord_t){
+                        .x = x,
+                        .y = y
+                    };
+                }
+            }
         }
     }
     return;
