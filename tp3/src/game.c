@@ -231,12 +231,13 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
     pirata_t* p = id_pirata2pirata(j, id);
     coord_t c = game_dir2coord(dir);
 
-    if(!game_posicion_valida(p->coord.x + c.x, p->coord.y + c.y))
+    if(!game_posicion_valida(p->coord.x + c.x, p->coord.y + c.y)){
         return 0;
-
+    }
     //chequeo si es minero y la posicion no fue mapeada
-    if(p->tipo == PIRATA_M && !j->explorado[game_xy2lineal(p->coord.x, p->coord.y)])
+    if(p->tipo == PIRATA_M && !j->explorado[game_xy2lineal(p->coord.x, p->coord.y)]){
         return 0;
+    }
 
     //actualizo posicion del pirata
     p->coord.x += c.x;
@@ -293,35 +294,21 @@ uint game_syscall_cavar(uint id_pirata) {
 }
 
 uint game_syscall_pirata_posicion(uint id_pirata, int param){
-    //para que es la variable id?
-    //TODO: test
     jugador_t* j = id_jugador2jugador(jugador_actual);
-    pirata_t* pirataABuscar = id_pirata2pirata(j, id_pirata);
-
-    uint x = pirataABuscar->coord.x;
-    uint y = pirataABuscar->coord.y;
-
-    uint res = y << 8 | x;
-
-    return res;
+    int id = (param == -1) ? pirata_actual : param;
+    pirata_t* p = id_pirata2pirata(j, id);
+    return p->coord.y << 8 | p->coord.x;
 }
 
-void game_syscall_manejar(uint syscall, uint param1){
+uint game_syscall_manejar(uint syscall, uint param1){
     uint id_pirata = pirata_actual;
     switch(syscall){
-        case 1:
-            game_syscall_pirata_mover(id_pirata, param1);
-            break;
-        case 2:
-            game_syscall_cavar(id_pirata);
-            break;
-        case 3:
-            game_syscall_pirata_posicion(id_pirata, param1);
-            break;
-        default:
-            break;
+        case 1: return game_syscall_pirata_mover(id_pirata, param1);
+        case 2: return game_syscall_cavar(id_pirata);
+        case 3: return game_syscall_pirata_posicion(id_pirata, param1);
+        default: break;
     }
-    return;
+    return 0;
 }
 
 void game_pirata_exploto(){
