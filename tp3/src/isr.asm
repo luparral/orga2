@@ -179,8 +179,8 @@ _isr33:
 ;TODO: hay que desaoljar la tarea mediante el scheduler para dar paso a la prox tarea
 ; Rutina de atención de 0x46
 extern jugador_actual
-global _isr46
-_isr46:
+global _isr70
+_isr70:
     pusha
     ;en eax tiene el tipo de syscall recibida
     ;en ecx esta la direccion?

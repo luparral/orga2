@@ -66,6 +66,6 @@ void idt_inicializar() {
 
     IDT_ENTRY(32);      //clock
     IDT_ENTRY(33);      //keyboard
-    IDT_ENTRY(46);      //0x46
+    IDT_ENTRY(70);      //0x46
     idt[70].attr = (unsigned short) 0xEE00;
 }

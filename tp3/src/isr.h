@@ -31,6 +31,6 @@ void _isr19();
 
 void _isr32();      //clock
 void _isr33();      //keyboard
-void _isr46();      //algo
+void _isr70();      //algo
 
 #endif  /* !__ISR_H__ */
