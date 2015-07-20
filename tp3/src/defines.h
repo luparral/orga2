@@ -109,6 +109,7 @@ typedef struct jugador_t{
     uint cant_exploradores;
     uint cant_mineros;
     coord_t coord_puerto;
+    coord_t botin;
     uint* codigo_explorador;
     uint* codigo_minero;
     unsigned char explorado[MAPA_ALTO*MAPA_ANCHO];
