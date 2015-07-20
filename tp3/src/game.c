@@ -152,9 +152,12 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
         j->cant_piratas++;
         if(tipo == PIRATA_E){
             j->cant_exploradores++;
-        }else{
-            j->cant_mineros++;
         }
+        //esto se hace cuando se encuentra un botin
+
+        //else{
+        //    j->cant_mineros++;
+        //}
 
         pirata_t* p = game_pirata_inicializar(j, tipo);
         game_jugador_habilitar_posicion(j, p);
