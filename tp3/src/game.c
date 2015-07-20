@@ -148,7 +148,7 @@ void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
 
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
-    if(j->cant_piratas <= MAX_CANT_PIRATAS_VIVOS){
+    if(j->cant_piratas < MAX_CANT_PIRATAS_VIVOS){
         j->cant_piratas++;
         if(tipo == PIRATA_E){
             j->cant_exploradores++;
