@@ -232,6 +232,15 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
     pirata_t* p = id_pirata2pirata(j, id);
     coord_t c = game_dir2coord(dir);
 
+    // Mapeo paginas exploradas por otros piratas en el tiempo que estuvo idle
+    int i;
+    for (i = 0; i < MAPA_ALTO*MAPA_ALTO; i++) {
+        if(j->explorado[i]){
+            mmu_mapear_pagina(i * PAGE_SIZE + MAPA_BASE_VIRTUAL, rcr3(), i * PAGE_SIZE + MAPA_BASE_FISICA, 1);
+        }
+    }
+
+
     if(!game_posicion_valida(p->coord.x + c.x, p->coord.y + c.y)){
         return 0;
     }
@@ -241,6 +250,8 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
     }
 
     //actualizo posicion del pirata
+    int x = p->coord.x;
+    int y = p->coord.y;
     p->coord.x += c.x;
     p->coord.y += c.y;
 
@@ -249,7 +260,9 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
         game_jugador_habilitar_posicion(j, p);
 
     //mover el codigo de la posicion anterior a la nueva
-	mmu_copiar_pagina((uint*)(game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_VIRTUAL), (uint*)CODIGO_BASE);
+    mmu_unmapear_pagina(CODIGO_BASE, rcr3());
+    mmu_mapear_pagina(CODIGO_BASE, rcr3(), game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
+	mmu_copiar_pagina((uint*)CODIGO_BASE, (uint*)(game_xy2lineal(x,y) * PAGE_SIZE + MAPA_BASE_VIRTUAL));
 
     // pintar el pirata en la nueva posicion
     screen_pintar_pirata(j, p);
