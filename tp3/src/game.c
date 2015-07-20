@@ -183,8 +183,9 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
             int y = p->coord.y + k;
             if(game_posicion_valida(x, y)){
                 j->explorado[game_xy2lineal(x, y)] = TRUE;
+                mmu_mapear_pagina(game_xy2lineal(x, y) * PAGE_SIZE + MAPA_BASE_VIRTUAL, rcr3(), game_xy2lineal(x, y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
                 if(game_valor_tesoro(x, y)){
-                    j->cant_mineros++;
+                    // j->cant_mineros++;
                     j->botin = (coord_t){
                         .x = x,
                         .y = y
@@ -247,9 +248,8 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
     if(p->tipo == PIRATA_E && !j->explorado[game_xy2lineal(p->coord.x, p->coord.y)])
         game_jugador_habilitar_posicion(j, p);
 
-    // mapear las nuevas posiciones y mover el codigo
-    mmu_mapear_pagina(CODIGO_BASE, rcr3(), game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
-	mmu_copiar_pagina((uint*)CODIGO_BASE, p->codigo);
+    //mover el codigo de la posicion anterior a la nueva
+	mmu_copiar_pagina((uint*)(game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_VIRTUAL), (uint*)CODIGO_BASE);
 
     // pintar el pirata en la nueva posicion
     screen_pintar_pirata(j, p);

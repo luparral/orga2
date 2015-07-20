@@ -61,7 +61,6 @@ uint sched_proxima_a_ejecutar(){
 
 	//tengo que obtener el pirata que viene para poder devolverlo en la gdt
 	//ademas intercambiar entre jugadores y el siguiente pirata a iterar de cada uno
-
 	//cambio de jugador
 	return pirata_actual + gdt_offset;
 }

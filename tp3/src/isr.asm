@@ -187,15 +187,17 @@ _isr70:
     pusha
     ;en eax tiene el tipo de syscall recibida
     ;en ecx esta la direccion?
+    cli
     push ecx
     push eax
     call game_syscall_manejar
     add esp, 8
-    ;saltar a idle
+    ;saltar a la idle
     mov ax, 14
     shl ax, 3
     mov [sched_tarea_selector], ax
     jmp far [sched_tarea_offset]
+    sti
     popa
     iret
 ;--------------------------------------------------------------------------------;;
