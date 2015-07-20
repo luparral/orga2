@@ -187,10 +187,71 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
 void game_explorar_posicion(jugador_t *jugador, int c, int f){
 }
 
+coord_t castearDir(direccion dir) {
+	coord_t coord;
+
+  if(IZQ){
+    coord.x = -1;
+    coord.y = 0;
+  }else if(DER){
+    coord.x = 1;
+    coord.y =0;
+  }else if(ARR){
+    coord.x = 0;
+    coord.y =-1;
+  }else{
+    //ABA
+    coord.x = 0;
+    coord.y =1;
+  }
+  return coord;
+}
+
 
 uint game_syscall_pirata_mover(uint id, direccion dir){
-    // ~ completar
+    //obtengo al pirata
+    pirata_t* pirata = (jugador_actual, id)
+
+    // TOOD: Mapear páginas visitadas del mapa (por si hubo cambios) ??
+
+    //casteo la direccion que me pasan a x e y
+    coord_t direccionAMoverse = castearDir(dir);
+
+    //busco la nueva posicion del pirata que se va a mover
+    uint x = pirata->coord.x + direccionAMoverse.x;
+    uint y = pirata->coord.y + direccionAMoverse.y;
+
+    //chequeo que sea una posicion valida
+    if(!es_posicion_valida(x,y)){
+        return 0;
+    }
+
+    //chequeo si es minero y la posicion no fue mapeada
+    if(pirata->tipo == PIRATA_M) {
+      if(!(j->exploradas[game_xy2lineal(x,y)])){
+        return 0;
+      }
+    }
+
+
+    unsigned char *copia = (unsigned char*) CODIGO_BASE;
+    unsigned char *pagina_mapa_anterior = (unsigned char*) dame_pagina_mapa_virtual(pirata->posicion_x, pirata->posicion_y);
+
+
+
+
+
+
     return 0;
+}
+
+  //unsigned char explorado[MAPA_ALTO*MAPA_ANCHO];
+  //uint game_xy2lineal (uint x, uint y);
+
+
+uint es_posicion_valida(int x, int y) {
+  //si devuelve 0, NO es posicion valida
+	return (x >= 0 	&& y >= 1	&& x <= MAPA_ANCHO - 1	&& y <= MAPA_ALTO);
 }
 
 uint* game_buscarBotin(uint id){
