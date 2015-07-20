@@ -71,6 +71,7 @@ BITS 32
 extern load_screen
 extern screen_pantalla_debug
 extern modo_debug
+extern game_pirata_exploto
 %macro ISR 1
 global _isr%1
 
@@ -96,10 +97,9 @@ _isr%1:
         call load_screen
 
     .fin:
-        ;TODO: destruir pirata
+        call game_pirata_exploto
         ;despues de llamar a pantalla debug hay que desalojar la tarea actual, por lo que saltamos a idle
         mov ax, 14
-
         shl ax, 3
         mov [sched_tarea_selector], ax
         jmp far [sched_tarea_offset]

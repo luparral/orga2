@@ -259,18 +259,28 @@ void game_syscall_manejar(uint syscall, uint param1){
     return;
 }
 
-//TODO: terminar esta funcion
-void game_pirata_exploto(uint id){
+void game_pirata_exploto(){
+    uint id_pirata = pirata_actual;
     jugador_t* j= game_get_jugador_actual();
+    pirata_t* p = id_pirata2pirata(j, id_pirata);
+    p->vivo = FALSE;
     j->cant_piratas--;
 
-    if(j->piratas[id].tipo == PIRATA_E){
+    gdt[pirata_actual + jugador_actual*8 + 15].p = 0;
+
+    char text;
+    if(p->tipo == PIRATA_E){
+        text = 'E';
         j->cant_exploradores--;
     } else {
+        text = 'M';
         j->cant_mineros--;
     }
 
-    gdt[pirata_actual + jugador_actual*8 + 15].p = 0;
+    char color_bg = (j->id == JUGADOR_A) ? C_BG_RED : C_BG_BLUE;
+    char color_txt = (j->id == JUGADOR_A) ? C_FG_LIGHT_RED : C_FG_LIGHT_BLUE;
+    screen_pintar(text, color_bg | color_txt, p->coord.y, p->coord.x);
+    screen_actualizar_reloj_pirata(j, p);
 }
 
 pirata_t* game_pirata_en_posicion(uint x, uint y){
@@ -279,27 +289,14 @@ pirata_t* game_pirata_en_posicion(uint x, uint y){
 
 
 void game_jugador_anotar_punto(jugador_t *j){
+    j->monedas++;
+    return;
 }
 
 
 
 void game_terminar_si_es_hora(){
 }
-
-
-#define KB_w_Aup    0x11 // 0x91
-#define KB_s_Ado    0x1f // 0x9f
-#define KB_a_Al     0x1e // 0x9e
-#define KB_d_Ar     0x20 // 0xa0
-#define KB_e_Achg   0x12 // 0x92
-#define KB_q_Adir   0x10 // 0x90
-#define KB_i_Bup    0x17 // 0x97
-#define KB_k_Bdo    0x25 // 0xa5
-#define KB_j_Bl     0x24 // 0xa4
-#define KB_l_Br     0x26 // 0xa6
-#define KB_shiftA   0x2a // 0xaa
-#define KB_shiftB   0x36 // 0xb6
-#define KB_y   0x15
 
 void game_atender_teclado(unsigned char tecla){
     jugador_t* j;
@@ -315,6 +312,11 @@ void game_atender_teclado(unsigned char tecla){
     }
     if(tecla == KB_y){
         modo_debug = !modo_debug;
+    }
+
+    //TODO: DEBUG pirata exploto
+    if(tecla == 0x20){
+        game_pirata_exploto();
     }
 
     return;

@@ -25,7 +25,7 @@ int game_proximo_pirata(int id_jugador, uint id_pirata){
 	jugador_t* j = (id_jugador == JUGADOR_A) ? &jugadorA : &jugadorB;
 	for (i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++) {
 		int siguiente = (id_pirata + 1 + i) % MAX_CANT_PIRATAS_VIVOS;
-		if(j->piratas[siguiente].vivo){
+		if(gdt[j->piratas[siguiente].id + j->id*8 + 15].p){
 			return siguiente;
 		}
 	}

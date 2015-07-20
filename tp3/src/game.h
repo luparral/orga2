@@ -21,7 +21,7 @@ jugador_t* id_jugador2jugador(uint id);
 void game_inicializar();
 
 pirata_t* game_pirata_inicializar(jugador_t *jugador, uint tipo);
-void game_pirata_exploto(uint id);
+void game_pirata_exploto();
 jugador_t* game_get_jugador_actual();
 
 void game_jugador_inicializar(jugador_t* j, uint id);
