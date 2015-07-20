@@ -333,7 +333,10 @@ void screen_pintar_3x3(unsigned char color, int f, int c) {
     int i, j;
     for (i = f - 1; i < f + 2; ++i){
         for (j = c - 1; j < c + 2; ++j){
-            screen_cambiar_color(color, i, j);
+            if(game_posicion_valida(j, i)){
+                screen_cambiar_color(color, i, j);
+            }
+
         }
     }
 }

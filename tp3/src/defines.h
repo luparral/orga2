@@ -63,7 +63,7 @@
 
 /* Indices en la gdt */
 /* -------------------------------------------------------------------------- */
-#define GDT_COUNT 30
+#define GDT_COUNT 31
 #define GDT_IDX_NULL_DESC           0
 #define GDT_IDX_CS_OS_DESC          8
 #define GDT_IDX_DS_OS_DESC          9
