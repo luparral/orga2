@@ -309,3 +309,41 @@ void load_screen(){
         }
     }
 }
+
+void screen_pintar_pirata(jugador_t *j, pirata_t *pirata){
+    uint tipoInt = pirata->tipo;
+
+    uint x = pirata->coord.x;
+    uint y = pirata->coord.y;
+
+    unsigned char color_borde = j->id == JUGADOR_A ? C_BG_GREEN : C_BG_CYAN;
+    unsigned char color = j->id == JUGADOR_A ? C_BG_RED : C_BG_BLUE;
+
+    screen_pintar_3x3(color_borde, y, x);
+
+    if(tipoInt == PIRATA_E){
+      screen_pintar('E', color | C_FG_WHITE, y, x);
+    }else{
+      screen_pintar('M', color | C_FG_WHITE, y, x);
+    }
+
+
+}
+
+void screen_pintar_3x3(unsigned char color, int f, int c) {
+    int i, j;
+    for (i = f - 1; i < f + 2; ++i){
+        for (j = c - 1; j < c + 2; ++j){
+            screen_cambiar_color(color, i, j);
+        }
+    }
+}
+
+void screen_cambiar_color(unsigned char color, uint f, uint c){
+    unsigned char char_ant = p[f][c].c;
+    unsigned char color_ant = p[f][c].a;
+
+    unsigned char nuevo_color = (color & 0xF0) | (color_ant & 0x0F);
+
+    screen_pintar(char_ant, nuevo_color, f, c);
+}

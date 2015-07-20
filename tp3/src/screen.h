@@ -52,6 +52,9 @@ void screen_actualizar_reloj_pirata (jugador_t* j, pirata_t* p);
 unsigned char screen_color_jugador(jugador_t *j);
 unsigned char screen_caracter_pirata(unsigned int tipo);
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata);
+void screen_pintar_3x3(unsigned char color, int f, int c);
+void screen_cambiar_color(unsigned char color, uint f, uint c);
+
 void screen_borrar_pirata(jugador_t *j, pirata_t *pirata);
 void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata);
 void screen_pintar_reloj_piratas(jugador_t *j);

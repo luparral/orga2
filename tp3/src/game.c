@@ -168,6 +168,7 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
 
         uint* dir_tss = tss_inicializar_pirata(j->id, p->id);
         gdt_incializar_pirata(gdt_offset+i, dir_tss);
+        screen_pintar_pirata(j, p);
     }
     return;
 }
