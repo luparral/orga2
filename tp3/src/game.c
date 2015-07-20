@@ -136,22 +136,30 @@ pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
 
 void game_tick(){
     screen_actualizar();
+    jugador_t* jugador = id_jugador2jugador(jugador_actual);
+    if((jugador->cant_mineros > 0) & (jugador->cant_piratas<8)){
+        game_jugador_lanzar_pirata(jugador, PIRATA_M);
+        jugador->cant_mineros--;
+        jugador->cant_piratas--;
+    }
 }
 
 void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
 
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
-    if(j->cant_piratas <= MAX_CANT_PIRATAS_VIVOS){
+    if(j->cant_piratas < MAX_CANT_PIRATAS_VIVOS){
         j->cant_piratas++;
         if(tipo == PIRATA_E){
             j->cant_exploradores++;
-        }else{
-            j->cant_mineros++;
         }
+        //esto se hace cuando se encuentra un botin
+
+        //else{
+        //    j->cant_mineros++;
+        //}
 
         pirata_t* p = game_pirata_inicializar(j, tipo);
-        game_jugador_habilitar_posicion(j, p);
 
         int gdt_offset;
         if(j->id == JUGADOR_A){
@@ -187,8 +195,60 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
 void game_explorar_posicion(jugador_t *jugador, int c, int f){
 }
 
+coord_t game_dir2coord(direccion dir) {
+	coord_t coord;
+    switch(dir){
+        case IZQ:
+            coord.x = -1;
+            coord.y = 0;
+            break;
+        case DER:
+            coord.x = 1;
+            coord.y =0;
+            break;
+        case ARR:
+            coord.x = 0;
+            coord.y =-1;
+            break;
+        case ABA:
+            coord.x = 0;
+            coord.y =1;
+            break;
+        default:
+            break;
+    }
+    return coord;
+}
+
+
 uint game_syscall_pirata_mover(uint id, direccion dir){
-    // ~ completar
+    jugador_t* j = game_get_jugador_actual();
+    pirata_t* p = id_pirata2pirata(j, id);
+    coord_t c = game_dir2coord(dir);
+
+    if(!game_posicion_valida(p->coord.x + c.x, p->coord.y + c.y))
+        return 0;
+
+    //chequeo si es minero y la posicion no fue mapeada
+    if(p->tipo == PIRATA_M && !j->explorado[game_xy2lineal(p->coord.x, p->coord.y)])
+        return 0;
+
+    //actualizo posicion del pirata
+    p->coord.x += c.x;
+    p->coord.y += c.y;
+
+    //guardar las posiciones exploradas si es explorador
+    if(p->tipo == PIRATA_E && !j->explorado[game_xy2lineal(p->coord.x, p->coord.y)])
+        game_jugador_habilitar_posicion(j, p);
+
+    // mapear las nuevas posiciones y mover el codigo
+    mmu_mapear_pagina(CODIGO_BASE, rcr3(), game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
+	mmu_copiar_pagina((uint*)CODIGO_BASE, p->codigo);
+
+    // pintar el pirata en la nueva posicion
+    screen_pintar_pirata(j, p);
+
+    //TODO: incrementar la cantidad de mineros si encontro un botin
     return 0;
 }
 
