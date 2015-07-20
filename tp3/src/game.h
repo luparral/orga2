@@ -14,6 +14,8 @@ extern jugador_t jugadorA, jugadorB;
 
 // ~ auxiliares dadas ~
 uint game_xy2lineal();
+coord_t game_dir2coord(direccion dir);
+uint game_posicion_valida(int x, int y);
 pirata_t* id_pirata2pirata(jugador_t* j, uint id);
 jugador_t* id_jugador2jugador(uint id);
 
