@@ -136,19 +136,28 @@ pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
 
 void game_tick(){
     screen_actualizar();
+    jugador_t* jugador = id_jugador2jugador(jugador_actual);
+    if((jugador->cant_mineros > 0) & (jugador->cant_piratas<8)){
+        game_jugador_lanzar_pirata(jugador, PIRATA_M);
+        jugador->cant_mineros--;
+        jugador->cant_piratas--;
+    }
 }
 
 void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 }
 
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
-    if(j->cant_piratas <= MAX_CANT_PIRATAS_VIVOS){
+    if(j->cant_piratas < MAX_CANT_PIRATAS_VIVOS){
         j->cant_piratas++;
         if(tipo == PIRATA_E){
             j->cant_exploradores++;
-        }else{
-            j->cant_mineros++;
         }
+        //esto se hace cuando se encuentra un botin
+
+        //else{
+        //    j->cant_mineros++;
+        //}
 
         pirata_t* p = game_pirata_inicializar(j, tipo);
 
