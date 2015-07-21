@@ -368,8 +368,6 @@ void game_terminar_si_es_hora(){
 
 void game_atender_teclado(unsigned char tecla){
     jugador_t* j;
-    //debug de teclado
-    print_hex(tecla, 3, 30, 30, C_BG_LIGHT_GREY | C_FG_RED);
     if(tecla == KB_shiftA){
         j = id_jugador2jugador(JUGADOR_A);
         game_jugador_lanzar_pirata(j,0);
@@ -381,8 +379,6 @@ void game_atender_teclado(unsigned char tecla){
     if(tecla == KB_y){
         modo_debug = !modo_debug;
     }
-
-    //TODO: DEBUG pirata exploto
     if(tecla == 0x20){
         game_pirata_exploto();
     }

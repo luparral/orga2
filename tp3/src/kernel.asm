@@ -105,9 +105,6 @@ modo_protegido:
     or eax, 0x80000000
     mov cr0, eax
 
-    ;Inicializar mmu
-    call mmu_inicializar
-
     ; Inicializar tss
     call gdt_inicializar_tareas
     call tss_inicializar

@@ -95,6 +95,9 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint rw){
 	pt[pt_offset].rw = rw;
 	tlbflush();
 
+	//TODO: ELIMINAR DEBUG
+	print_hex((uint)next_page, 10, 10, 8, (0x7 << 4) | 0x4);
+
 	return;
 }
 
