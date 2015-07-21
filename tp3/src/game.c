@@ -3,20 +3,12 @@
 TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 ================================================================================
 */
-#include "sched.h"
-#include "mmu.h"
-#include "screen.h"
-#include <stdarg.h>
-
+#include "game.h"
 
 uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {30,  3, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {49, 38, 50}, {64, 21, 100}, {34, 21, 100}
                                     };
-
-jugador_t jugadorA;
-jugador_t jugadorB;
-
 
 void* error(){
 	__asm__ ("int3");
@@ -28,7 +20,7 @@ uint game_xy2lineal (uint x, uint y) {
 }
 
 uint game_posicion_valida(int x, int y) {
-	return (x >= 0 && y >= 0 && x < MAPA_ANCHO && y < MAPA_ALTO);
+	return (x >= 0 && y >= 1 && x < MAPA_ANCHO-1 && y < MAPA_ALTO);
 }
 
 pirata_t* id_pirata2pirata(jugador_t* j, uint id_pirata){
@@ -76,6 +68,15 @@ uint game_valor_tesoro(uint x, uint y){
 void game_inicializar(){
     game_jugador_inicializar(&jugadorA, JUGADOR_A);
     game_jugador_inicializar(&jugadorB, JUGADOR_B);
+    return;
+}
+
+void game_inicializar_botines(){
+    //pinto los botines
+    int i;
+    for (i = 0; i < BOTINES_CANTIDAD; i++) {
+        screen_pintar('o', C_BG_BLACK | C_FG_WHITE, botines[i][1], botines[i][0]);
+    }
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug){
@@ -92,7 +93,7 @@ void game_jugador_inicializar(jugador_t* j, uint id){
     j->monedas = 0;
     j->cant_piratas = 0;
     j->cant_exploradores = 0;
-    j->cant_mineros = 0;
+    j->mineros_disponibles = 0;
 
     if(j->id == JUGADOR_A){
         j->coord_puerto = (coord_t){
@@ -137,10 +138,10 @@ pirata_t* game_pirata_inicializar(jugador_t *j, uint tipo){
 void game_tick(){
     screen_actualizar();
     jugador_t* jugador = id_jugador2jugador(jugador_actual);
-    if((jugador->cant_mineros > 0) & (jugador->cant_piratas<8)){
+    if((jugador->mineros_disponibles > 0) & (jugador->cant_piratas<8)){
         game_jugador_lanzar_pirata(jugador, PIRATA_M);
-        jugador->cant_mineros--;
-        jugador->cant_piratas--;
+        jugador->mineros_disponibles--;
+        jugador->cant_piratas++;
     }
 }
 
@@ -149,12 +150,8 @@ void game_pirata_relanzar(jugador_t *j, pirata_t *pirata, uint tipo){
 
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
     if(j->cant_piratas < MAX_CANT_PIRATAS_VIVOS){
-        j->cant_piratas++;
-        if(tipo == PIRATA_E){
-            j->cant_exploradores++;
-        }
+        //inicializo todas las estructuras necesarias
         pirata_t* p = game_pirata_inicializar(j, tipo);
-
         int gdt_offset;
         if(j->id == JUGADOR_A){
             gdt_offset = GDT_OFFSET_TSS_JUG_A;
@@ -168,9 +165,24 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
             if(gdt[gdt_offset+i].p == 0) break;
         }
 
-        uint* dir_tss = tss_inicializar_pirata(j->id, p->id);
+        uint* dir_tss = (uint*)tss_inicializar_pirata(j->id, p->id);
         gdt_incializar_pirata(gdt_offset+i, dir_tss);
         screen_pintar_pirata(j, p);
+
+        //actualizo variables de juego
+        j->cant_piratas++;
+        if(tipo == PIRATA_E){
+            j->cant_exploradores++;
+        } else {
+            //muevo coordenadas al stack para los mineros
+            uint cr3 = rcr3();
+            lcr3(((tss_t*)dir_tss)->cr3);
+            int* botin_x = (int*)(CODIGO_BASE+PAGE_SIZE-8);
+            int* botin_y = (int*)(CODIGO_BASE+PAGE_SIZE-4);
+            *botin_x = j->botin.x;
+            *botin_y = j->botin.y;
+            lcr3(cr3);
+        }
     }
     return;
 }
@@ -185,7 +197,7 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
                 j->explorado[game_xy2lineal(x, y)] = TRUE;
                 mmu_mapear_pagina(game_xy2lineal(x, y) * PAGE_SIZE + MAPA_BASE_VIRTUAL, rcr3(), game_xy2lineal(x, y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
                 if(game_valor_tesoro(x, y)){
-                    // j->cant_mineros++;
+                    j->mineros_disponibles++;
                     j->botin = (coord_t){
                         .x = x,
                         .y = y
@@ -232,14 +244,6 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
     pirata_t* p = id_pirata2pirata(j, id);
     coord_t c = game_dir2coord(dir);
 
-    Mapeo paginas exploradas por otros piratas en el tiempo que estuvo idle
-    int i;
-    for (i = 0; i < MAPA_ALTO*MAPA_ALTO; i++) {
-        if(j->explorado[i]){
-            mmu_mapear_pagina(i * PAGE_SIZE + MAPA_BASE_VIRTUAL, rcr3(), i * PAGE_SIZE + MAPA_BASE_FISICA, 1);
-        }
-    }
-
     if(!game_posicion_valida(p->coord.x + c.x, p->coord.y + c.y)){
         return 0;
     }
@@ -263,43 +267,42 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
     mmu_mapear_pagina(CODIGO_BASE, rcr3(), game_xy2lineal(p->coord.x, p->coord.y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
 	mmu_copiar_pagina((uint*)CODIGO_BASE, (uint*)(game_xy2lineal(x,y) * PAGE_SIZE + MAPA_BASE_VIRTUAL));
 
+    // actualizar color de la posicion anterior
+    char color = j->id == JUGADOR_A ? C_BG_GREEN : C_BG_CYAN;
+    char tipo = (p->tipo == PIRATA_E) ? 'E' : 'M';
+    screen_pintar(tipo, color | C_FG_BLACK, y, x);
     // pintar el pirata en la nueva posicion
     screen_pintar_pirata(j, p);
 
-    //TODO: incrementar la cantidad de mineros si encontro un botin
     return 0;
 }
 
-uint* game_buscar_botin(uint id){
+uint game_buscar_botin(uint id_pirata){
     jugador_t* j = id_jugador2jugador(jugador_actual);
-    pirata_t* pirata = id_pirata2pirata(j, id);
+    pirata_t* p = id_pirata2pirata(j, id_pirata);
 
     int i;
     for(i = 0; i < BOTINES_CANTIDAD; i++)
-        if(pirata->coord.x == botines[i][0] && pirata->coord.y == botines[i][1])
-            return botines[i];
+        if(p->coord.x == botines[i][0] && p->coord.y == botines[i][1])
+            return i;
 
-    return NULL;
+    return -1;
 }
 
-//TODO: si no hay mas botin se debe liberar al pirata
 uint game_syscall_cavar(uint id_pirata) {
     jugador_t* j = id_jugador2jugador(jugador_actual);
-    pirata_t* pirata = id_pirata2pirata(j, id_pirata);
-
-    if (pirata->tipo != PIRATA_M){
+    pirata_t* p = id_pirata2pirata(j, id_pirata);
+    uint monedas = game_valor_tesoro(p->coord.x, p->coord.y);
+    if(monedas == 0){
+        game_pirata_exploto();
         return 0;
     }
-    //es explorador
-    uint* botin = game_buscar_botin(id_pirata);
-    if (botin != NULL){
-        //Recorrer las coordenadas con botines hardocdeadas y ver si una matchea
-        if(game_valor_tesoro(pirata->coord.x, pirata->coord.y) == 0){
-            //liberarMinero()
-        }else{
-            game_get_jugador_actual()->monedas++;
-            botin[2]--;
-        }
+    j->monedas++;
+    int id_botin = game_buscar_botin(p->id);
+    botines[id_botin][2]--;
+    monedas = game_valor_tesoro(p->coord.x, p->coord.y);
+    if(monedas == 0){
+        game_pirata_exploto();
     }
 
     return 0;
@@ -338,7 +341,6 @@ void game_pirata_exploto(){
         j->cant_exploradores--;
     } else {
         text = 'M';
-        j->cant_mineros--;
     }
 
     char color_bg = (j->id == JUGADOR_A) ? C_BG_RED : C_BG_BLUE;

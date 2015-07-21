@@ -9,6 +9,7 @@
 #ifndef __DEFINES_H__
 #define __DEFINES_H__
 
+#include "i386.h"
 /* Tipos basicos */
 /* -------------------------------------------------------------------------- */
 #define NULL                    0
@@ -47,7 +48,7 @@
 #define MAPA_ANCHO                      80
 #define MAPA_ALTO                       44
 #define POS_INIT_A_X                    1
-#define POS_INIT_A_Y                    1
+#define POS_INIT_A_Y                    2
 #define POS_INIT_B_X       MAPA_ANCHO - 2
 #define POS_INIT_B_Y        MAPA_ALTO - 1
 #define CANT_POSICIONES_VISTAS          9
@@ -107,7 +108,7 @@ typedef struct jugador_t{
     pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
     uint cant_piratas;
     uint cant_exploradores;
-    uint cant_mineros;
+    uint mineros_disponibles;
     coord_t coord_puerto;
     coord_t botin;
     uint* codigo_explorador;

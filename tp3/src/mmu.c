@@ -6,8 +6,7 @@
 */
 
 #include "mmu.h"
-#include "i386.h"
-#include "screen.h"
+
 /* Atributos paginas */
 /* -------------------------------------------------------------------------- */
 page_entry* pd_kernel;

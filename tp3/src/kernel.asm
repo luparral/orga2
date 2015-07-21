@@ -88,6 +88,7 @@ modo_protegido:
 
     ; Inicializar pantalla
     call screen_inicializar
+    call game_inicializar_botines
 
     ; Inicializar el manejador de memoria
     call mmu_inicializar_dir_kernel
@@ -161,6 +162,7 @@ extern mmu_inicializar_dir_pirata
 extern tss_inicializar
 extern sched_inicializar
 extern game_inicializar
+extern game_inicializar_botines
 extern pd_kernel
 
 extern resetear_pic

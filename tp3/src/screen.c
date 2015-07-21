@@ -6,8 +6,6 @@ definicion de funciones del scheduler
 */
 
 #include "screen.h"
-#include "game.h"
-
 
 extern jugador_t jugadorA, jugadorB;
 
@@ -121,7 +119,12 @@ void screen_inicializar(){
             p[i][j].a = C_BG_LIGHT_GREY;
         }
     }
-    print("SnakeII/Nokia1100", 63, 0, C_BG_LIGHT_GREY | C_FG_RED );
+    //pintar linea negra arriba
+    for (i = 0; i < VIDEO_COLS; i++) {
+        p[0][i].c = 0;
+        p[0][i].a = C_BG_BLACK;
+    }
+    print("SnakeII/Nokia1100", 63, 0, C_BG_BLACK | C_FG_RED );
     //pintar panel de jugador
     for (i = 45; i < VIDEO_FILS ; i++) {
         for (j = 0; j < VIDEO_COLS; j++) {
@@ -201,7 +204,7 @@ void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp,
     }
 
 
-    tss pirata;
+    tss_t pirata;
     if (jugador_actual == JUGADOR_A){
         pirata = tss_jugadorA[pirata_actual];
     }else{
@@ -311,14 +314,14 @@ void load_screen(){
 }
 
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata){
-    uint tipoInt = pirata->tipo;
+    uint tipo = pirata->tipo;
 
     uint x = pirata->coord.x;
     uint y = pirata->coord.y;
 
     unsigned char color = j->id == JUGADOR_A ? C_BG_RED : C_BG_BLUE;
 
-    if(tipoInt == PIRATA_E){
+    if(tipo == PIRATA_E){
         unsigned char color_borde = j->id == JUGADOR_A ? C_BG_GREEN : C_BG_CYAN;
         screen_pintar_3x3(color_borde, y, x);
         screen_pintar('E', color | C_FG_WHITE, y, x);
@@ -333,10 +336,7 @@ void screen_pintar_3x3(unsigned char color, int f, int c) {
     int i, j;
     for (i = f - 1; i < f + 2; ++i){
         for (j = c - 1; j < c + 2; ++j){
-            if(game_posicion_valida(j, i)){
-                screen_cambiar_color(color, i, j);
-            }
-
+            screen_cambiar_color(color, i, j);
         }
     }
 }
