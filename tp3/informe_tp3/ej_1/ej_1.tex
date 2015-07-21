@@ -17,6 +17,10 @@ Una vez en modo protegido, asignamos los selectores de segmentos. Como ds, ss el
 
 Seteamos la pila del kernel en la direccion 0x27000.
 
-\subsection{Inicialización de la pantalla}
+\subsection{Inicialización de la pantalla y juego}
 
-Para esto tenemos la función \texttt{screen\_inicializar}, que pinta el fondo de gris, y el recuadro para cada jugador en azul y rojo.
+Usamos las funciones game\texttt{\_inicializar}, \texttt{screen\_inicializar} y \texttt{game\_inicializar\_botines}.
+
+La función \texttt{screen\_inicializar}, que pinta el fondo de gris, y el recuadro para cada jugador en azul y rojo.
+\texttt{game\_inicializar} arranca todas las variables del juego para su uso.
+\texttt{game\_inicializar\_botines} dibuja todos los botines en la pantalla
