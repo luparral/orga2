@@ -74,6 +74,12 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint rw){
 	//separo la direccion virtual en los diferentes offset
 	uint pd_offset = virtual >> 22;
 	uint pt_offset = (virtual << 10) >> 22;
+
+	print_hex((uint)pd, 10, 10, 7, (0x7 << 4) | 0x4);
+	print_hex((uint)&pd[pd_offset], 10, 10, 8, (0x7 << 4) | 0x4);
+	print_hex((uint)next_page, 10, 10, 9, (0x7 << 4) | 0x4);
+
+
 	//si no hay una entrada presente, pedir 4k y crear una nueva pagina
 	if(!pd[pd_offset].p){
 		//pido pagina nueva
@@ -95,9 +101,6 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint rw){
 	pt[pt_offset].rw = rw;
 	tlbflush();
 
-	//TODO: ELIMINAR DEBUG
-	print_hex((uint)next_page, 10, 10, 8, (0x7 << 4) | 0x4);
-
 	return;
 }
 
@@ -118,7 +121,6 @@ void mmu_unmapear_pagina(uint virtual, uint cr3){
 
 	//limpiar entradas
 	pt[pt_offset].p = 0;
-	pd[pd_offset].p = 0;
 	tlbflush();
 
 	return;
