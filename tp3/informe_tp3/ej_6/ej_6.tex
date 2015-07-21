@@ -1,0 +1,16 @@
+\section{Ejericio 6}
+\subsection{Inicialización de descriptores de TSS en GDT}
+
+En este punto, se nos pide definir las entradas en la GDT para ser usadas como descriptores de TSS a ser utilizadas para las tareas.
+En la entrada 14 tenemos el descriptor de TSS de la tarea inicial. Para este, seteamos como límite 0x67 y como base, la dirección \texttt{\&tss\_inicial}, con tipo 0x09 (Execute only accessed), el bit de presente habilitado, dpl 0 y granularidad 0.
+En la entrada 15, el descriptor de la TSS de la tarea idle, tiene los mismos atributos, excepto que la base es \texttt{\&tss\_idle}.
+Para la inicialización de las entradas de la GDT correspondientes a las tareas piratas, creamos una función gdt\_inicializar\_pirata que dado un un indice y una dirección de TSS, crea una entrada de gdt en la posición gdt[índice] que tiene como base la dirección de TSS, dpl 3, tipo 0x09 (Execute only accessed), límite 0x67, bit de presente en 1 y granularidad 0. Esta función será llamada al momento de lanzar un pirata con el offset correspondiente al jugador y número de tarea a lanzar, y la dirección de la tss inicializada previamente en la función \texttt{tss\_inicializar\_pirata} que será descrita a continuación.
+
+
+\subsection{Inicialización de TSS}
+
+A continuación, se nos pidió completar la entrada de TSS correspondiente a la tarea Idle. Para esto implementamos la función \texttt{tss\_inicializar} que completa los distintos campos, entre ellos el cr3, cargando el cr3 actual, los flags activados, el eip con la dirección 0x16000, que es donde según el enunciado se encuentra la tarea idle. El esp y ebp en 0x27000, dirección donde se encuentra el directorio de páginas de kernel, y donde cs es el segmento de código de nivel de supervisor, es, dd, ds, gs el segmento de datos de nivel supervisor y fs es el segmento de video.
+
+Luego, para completar una TSS libre con los datos de una tarea utilizamos la función \texttt{tss\_inicializar\_pirata} mencionada anteriormente, en la quedado un id de jugador y un id de pirata, obtenemos un puntero a la tss correspondiente a dicha tarea y completamos sus campos. Los flags activados, como eip la dirección 0x400000 (CODIGO\_BASE), que es donde se encuentra el código respectivo de la tarea, esp es \texttt{CODIGO\_BASE+PAGE\_SIZE-12} y ebp \texttt{CODIGO\_BASE+PAGE\_SIZE-12}. Cs es el segmento de código de nivel de usuario, es, ss, ds y fs el segmento de datos de nivel de usuario. Todos los registros son inicializados en 0.
+Ss0 corresponde también al segmento de datos a nivel usuario. Como anticipamos, esta función es llamada desde \texttt{game\_jugador\_lanzar\_pirata} antes de inicializar el descriptor de GDT de dicha tarea.
+

@@ -1,0 +1,8 @@
+\section{Introducción}
+\subsection{Introducción}
+
+El objetivo de este trabajo práctico es aplicar conceptos de System Programming al crear un sistema mínimo que permita correr hasta 16 tareas de manera concurrente a nivel de usuario, capaz de capturar cualquier problema que estas tareas puedan generar y tomar las acciones necesarias para desalojarlas.
+En este marco, implementamos un juego de dos jugadores, que tienen la posibilidad de lanzar exploradores hacia un mapa. Estos exploradores son tareas que se mueven por la memoira en busca de botines para consumir y acumular puntos, por lo que se necesitan piratas mineros que desentierren dichos botines.
+Cada jugador puede lanzar hasta 8 piratas entre exploradores y mineros. Los mineros liberan su slot tras desenterrar botines mientras que los exploradores quedan "vivos para siempre".
+Los piratas son capaces de moverse, de consultar su posición y la de los otros de su equipo y de excavar para desenterrar tesoros. Cada vez que desentierran un tesoro, ese botin pierde una moneda hasta quedar vacío.
+El juego termina cuando se agotan todos los botines o bien todos los slots de piratas estén ocupados y los piratas actuales no sean capaces de desenterrar los botines, donde en dicho caso, el juego acaba tras un tiempo prudencial. En ambos casos, gana el jugador con más monedas.

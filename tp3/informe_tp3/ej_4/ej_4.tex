@@ -1,0 +1,15 @@
+\section{Ejericio 4}
+
+\subsection{Manejo de memoria para las tareas}
+
+En este ejercicio, con el fin de poder manejar la memoria utilizada por las distintas tareas, creamos tomando como base las sugerencias dadas en el enunciado, las siguientes funciones que permiten inicializar un directorio de páginas para una tarea, así como mapear y desmapear páginas.
+
+Rutina \texttt{inicializar\_mmu} para administrar la memoria en el área libre. Esta función setea la variable global next\_page en la primer página no usada (\texttt{AREA\_LIBRE} = 0x100000).
+
+\texttt{mmu\_inicializar\_dir\_pirata} inicializa un directorio de páginas y tablas de página para una tarea, según la figura. Para esto, copiamos el código de la tarea a su área asignada (posición dentro del mapa indicada por el jugador) y mapear dichas páginas a partir de la dirección virtual 0x0400000. Además, mapea las posiciones ya descubiertas por los exploradores del jugador.
+
+\texttt{mmu\_mapear\_pagina} permite mapear la página física en la dirección virtual pasada como parámetros, utilizando cr3. Para esto, recibimos el cr3 y a partir de este obtenemos la dirección de la page directory. Del parámetro virtual obtenemos el offset para la entrada en la page directory y de la page table. Si la entrada de page directory no está presente, creamos una nueva página y para esta entrada, hacemos \texttt{empty\_mapping} sobre las 1024 entradas, es decir, las seteamos como no presentes.
+Luego, para la entrada correspondiente al offset de page directory, ponemos como base la dirección de la página creada, y atributos 0x03. 
+Finalmente, obtenemos la dirección de la tabla creada y para el offset calculado inicialmente, ponemos como base la dirección física, y como atributos permisos de usuario, presente habilitado y lectura/escritura o solo lectura según corresponda.
+
+\texttt{mmu\_unmapear\_pagina} borra el mapeo creado en la dirección virtual utilizando cr3. Par esto, como en \texttt{mmu\_mapear\_pagina}, calculamos el offset de directorio y tabla a partir de la dirección virtual. Luego, si la entrada correspondiente no existe, significa que ya se encontraba desmapeada y no hacemos nada. Caso contrario, limpiamos las entradas de page directory y page table correspondiente, seteando en 0 el bit de presente.

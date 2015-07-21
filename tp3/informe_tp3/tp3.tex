@@ -1,0 +1,97 @@
+\documentclass[10pt, a4paper,english,spanish]{article}
+%\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc} % para poder usar tildes en archivos UTF-8
+\usepackage[spanish]{babel} % para que comandos como \today den el resultado en castellano
+\usepackage[conEntregas]{caratula}
+\usepackage{fullpage} %small margins
+\usepackage[parfill]{parskip} %genera saltos entre parrafos
+\usepackage{color}
+\definecolor{gray}{gray}{0.35}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{soul}
+\usepackage{amsmath} %big brackets
+\usepackage[pdftex]{graphicx}
+\lstset{
+    numbers=left,
+    breaklines=true,
+    tabsize=2,
+    basicstyle=\ttfamily\color{gray},
+}
+\setlength{\parindent}{8pt}
+\usepackage{mathtools}
+\usepackage[margin=50pt]{geometry}
+\usepackage{amsfonts}
+\usepackage{flafter}
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\setlength{\parindent}{0pt} %remueve indent
+
+%paquete para setear colores a las tablas para graficar registros
+\usepackage{xcolor,colortbl}
+%define de colores
+\definecolor{Orange}{rgb}{1, 0.64, 0}
+\definecolor{Green}{rgb}{0.32,1,0.62}
+%\definecolor{Purple}{rgb}{0.44,0.20,0.81}
+%define de columnas
+\newcolumntype{o}{>{\columncolor{Orange}}c}
+\newcolumntype{g}{>{\columncolor{Green}}c}
+%\newcolumntype{p}{>{\columncolor{Purple}}c}
+%holi
+\begin{document}
+
+\materia{Organización del Computador II}
+\submateria{Trabajo Práctico Nro. 3}
+\titulo{Informe - Grupo: SnakeII/Nokia1100}
+\fecha{\today}
+\integrante{Pablo Gomez}{156/13}{mago-1986@hotmail.com}
+\integrante{Lucía Parral}{162/13}{luciaparral@gmail.com}
+\integrante{Petr Romachov}{412/13}{promachov@gmail.com}
+\maketitle
+\newpage
+
+\tableofcontents
+
+\newpage
+% Comienzo Introducción
+\input{introduccion/introduccion}
+% Fin Introducción
+
+\newpage
+% Comienzo Ejercicio 1
+\input{ej_1/ej_1}
+% Fin Ejercicio 1
+
+\newpage
+% Comienzo Ejercicio 2
+\input{ej_2/ej_2}
+% Fin Ejercicio 2
+
+\newpage	
+% Comienzo Ejercicio 3
+\input{ej_3/ej_3}
+% Fin Ejercicio 3
+
+\newpage	
+% Comienzo Ejercicio 4
+\input{ej_4/ej_4}
+% Fin Ejercicio 4
+
+\newpage	
+% Comienzo Ejercicio 5
+\input{ej_5/ej_5}
+% Fin Ejercicio 5
+
+\newpage	
+% Comienzo Ejercicio 6
+\input{ej_6/ej_6}
+% Fin Ejercicio 6
+
+\newpage	
+% Comienzo Ejercicio 7
+\input{ej_7/ej_7}
+% Fin Ejercicio 7
+
+\end{document}
