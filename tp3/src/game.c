@@ -5,6 +5,8 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 */
 #include "game.h"
 
+//TODO: arreglar page fault misterioso
+
 uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {30,  3, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {49, 38, 50}, {64, 21, 100}, {34, 21, 100}
@@ -75,7 +77,7 @@ void game_inicializar_botines(){
     //pinto los botines
     int i;
     for (i = 0; i < BOTINES_CANTIDAD; i++) {
-        screen_pintar('o', C_BG_BLACK | C_FG_WHITE, botines[i][1], botines[i][0]);
+        screen_pintar('o', C_BG_LIGHT_GREY | C_FG_WHITE, botines[i][1], botines[i][0]);
     }
 }
 
@@ -140,8 +142,6 @@ void game_tick(){
     jugador_t* jugador = id_jugador2jugador(jugador_actual);
     if((jugador->mineros_disponibles > 0) & (jugador->cant_piratas<8)){
         game_jugador_lanzar_pirata(jugador, PIRATA_M);
-        jugador->mineros_disponibles--;
-        jugador->cant_piratas++;
     }
 }
 
@@ -182,6 +182,7 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint tipo){
             *botin_x = j->botin.x;
             *botin_y = j->botin.y;
             lcr3(cr3);
+            j->mineros_disponibles--;
         }
     }
     return;
@@ -193,14 +194,15 @@ void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *p){
         for (k = -1; k <= 1; k++) {
             int x = p->coord.x + i;
             int y = p->coord.y + k;
-            if(game_posicion_valida(x, y)){
+            if(game_posicion_valida(x, y) && !j->explorado[game_xy2lineal(x, y)]){
                 j->explorado[game_xy2lineal(x, y)] = TRUE;
                 mmu_mapear_pagina(game_xy2lineal(x, y) * PAGE_SIZE + MAPA_BASE_VIRTUAL, rcr3(), game_xy2lineal(x, y) * PAGE_SIZE + MAPA_BASE_FISICA, 1);
                 if(game_valor_tesoro(x, y)){
                     j->mineros_disponibles++;
+                    //TODO: FIX hardoded 2, where do they come from?
                     j->botin = (coord_t){
-                        .x = x,
-                        .y = y
+                        .x = x+2,
+                        .y = y-2
                     };
                 }
             }
@@ -259,7 +261,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir){
     p->coord.y += c.y;
 
     //guardar las posiciones exploradas si es explorador
-    if(p->tipo == PIRATA_E && !j->explorado[game_xy2lineal(p->coord.x, p->coord.y)])
+    if(p->tipo == PIRATA_E)
         game_jugador_habilitar_posicion(j, p);
 
     //mover el codigo de la posicion anterior a la nueva

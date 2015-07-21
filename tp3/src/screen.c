@@ -131,11 +131,11 @@ void screen_inicializar(){
             p[i][j].c = 0;
             p[i][j].a = C_BG_BLACK;
         }
-        for(j = 30; j < 40; j++){
+        for(j = 33; j < 40; j++){
             p[i][j].c = 0;
             p[i][j].a = C_BG_RED;
         }
-        for(j = 40; j < 50; j++){
+        for(j = 40; j < 47; j++){
             p[i][j].c = 0;
             p[i][j].a = C_BG_BLUE;
         }
@@ -154,8 +154,8 @@ void screen_inicializar(){
 }
 
 void screen_actualizar(){
-    print_hex(jugadorA.monedas, 1, 36, 47, C_BG_RED + C_FG_WHITE);
-    print_hex(jugadorB.monedas, 1, 46, 47, C_BG_BLUE + C_FG_WHITE);
+    print_dec(jugadorA.monedas, 3, 35, 47, C_BG_RED + C_FG_WHITE);
+    print_dec(jugadorB.monedas, 3, 42, 47, C_BG_BLUE + C_FG_WHITE);
     screen_actualizar_reloj_global();
     jugador_t* j = id_jugador2jugador(jugador_actual);
     screen_actualizar_reloj_pirata(j, id_pirata2pirata(j, pirata_actual));
