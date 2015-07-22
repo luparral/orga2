@@ -7,7 +7,7 @@ El campo límite para estas entradas es 0xF3FF y la base 0x0000, con granularida
 También tenemos una entrada de datos para el segmento de video, con base 0xB800 y límite 0xC0000, con dpl 0, pues es para ser utilizado sólo por el kernel, presente y permisos de lectura/escritura. Este descriptor tendrá índice 12. 
 
 \subsection{Pasaje a modo protegido}
-En primer lugar, cambiamos el modo de video a 80x50.
+En primer lugar, cambiamos el modo de video a 80x44.
 Habilitamos a20 llamando a \texttt{habilitar\_A20}.
 Cargamos la GDT  con la instrucción \texttt{lgdt}.
 
@@ -22,5 +22,5 @@ Seteamos la pila del kernel en la direccion 0x27000.
 Usamos las funciones game\texttt{\_inicializar}, \texttt{screen\_inicializar} y \texttt{game\_inicializar\_botines}.
 
 La función \texttt{screen\_inicializar}, que pinta el fondo de gris, y el recuadro para cada jugador en azul y rojo.
-\texttt{game\_inicializar} arranca todas las variables del juego para su uso.
+\texttt{game\_inicializar} arranca todas las variables del juego para su uso llamando a \texttt{game\_juagdor\_inicializar} para cada jugador. A su vez, esta última función completa la estructura del jugador correspondiente.
 \texttt{game\_inicializar\_botines} dibuja todos los botines en la pantalla

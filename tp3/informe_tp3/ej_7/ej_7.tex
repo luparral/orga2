@@ -18,3 +18,6 @@ Para realizar esto, en la macro realizada para las excepciones de la 1 a la 19, 
 Finalmente se setea como próximo selector al de la tarea Idle y se realiza un jmp far a esta.
 El flag de modo debug se setea en 0 o 1 (de acuerdo al valor previo del flag) en \texttt{game\_atender\_teclado} cuando se detecta que la tecla presionada fue Y.
 La función \texttt{screen\_pantalla\_debug} salva el estado inicial de la pantalla con \texttt{save\_screen} y printea en pantalla la pantalla de debug según se muestra en la ilustración, con los datos correspondientes para la tarea que lanzó la excepción.
+Como cuando se lanza una excepción de una tarea nivel que está corriendo en nivel 3 se cambia el nivel de privilegio y este pasa a ser 0, se guardan en el stack varios parámetros que usaremos para mostrar en pantalla de debug, ya que estos argumentos obtenidos de la pila son usados como sus parámetros. Además, como utilizamos la instrucción pushad antes de llamar a la función, guardamos en la pila todos los registros de propósito general. 
+
+

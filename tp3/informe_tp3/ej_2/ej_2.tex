@@ -3,7 +3,7 @@
 \subsection{Creación de las estructuras de la IDT} 
 
 En la función \texttt{idt\_inicializar} inicializamos las entradas iniciales de la IDT (de la 20 a la 31 estan reservadas para Intel).
-Ademas inicializamos las entradas 32 para reloj, 33 para teclado y 46 para las syscalls a ser utilizadas por las tareas.
+Ademas inicializamos las entradas 32 para reloj, 33 para teclado y 70 para las syscalls a ser utilizadas por las tareas.
 Las entradas de la IDT estan definidas por una macro en la que elegimos el número que representa su índice. 
 A la entrada para la syscall le damos los siguientes atributos: 0xEE00.
 A todas las demás: 0x8E00.
