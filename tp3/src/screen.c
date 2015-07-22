@@ -175,11 +175,8 @@ void save_screen(){
 
 void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp, unsigned int falsoesp, unsigned int ebx, unsigned int edx, unsigned int ecx, unsigned int eax, unsigned int errorCode, unsigned int eip, unsigned int cs, unsigned int eflags, unsigned int esp, unsigned int ss){
 
-    ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
-    int i = 0, j = 0;
-
     save_screen();
-
+    int i, j;
     //Recuadro
     for (i = 25; i< 55; i++){
         p[6][i].c = ' ';
@@ -195,14 +192,12 @@ void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp,
         p[j][54].a = C_BG_BLACK;
     }
 
-    //Fondo gris
     for (j = 8; j<41; j++){
         for (i = 26; i<54; i++){
             p[j][i].c = ' ';
             p[j][i].a = C_BG_LIGHT_GREY;
         }
     }
-
 
     tss_t pirata;
     if (jugador_actual == JUGADOR_A){
@@ -303,8 +298,7 @@ void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp,
 }
 
 void load_screen(){
-    ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
-    int i = 0, j = 0;
+    int i, j;
 
     for (j = 0; j < VIDEO_FILS; j++){
         for (i = 0; i < VIDEO_COLS; i++){
