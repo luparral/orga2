@@ -18,7 +18,6 @@
 #include "colors.h"
 #include "defines.h"
 #include "tss.h"
-#include "sched.h"
 
 /* Estructura de para acceder a memoria de video */
 typedef struct ca_s {

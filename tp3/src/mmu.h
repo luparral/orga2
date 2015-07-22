@@ -10,6 +10,7 @@
 
 #include "defines.h"
 #include "game.h"
+#include "screen.h"
 
 typedef struct str_page_entry{
     uint    p:1;

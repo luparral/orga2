@@ -6,7 +6,6 @@
 */
 
 #include "tss.h"
-#include "mmu.h"
 
 void tss_inicializar() {
     tss_idle.cr3 = rcr3();
@@ -23,11 +22,11 @@ void tss_inicializar() {
     tss_idle.fs = GDT_IDX_VIDEO_DESC << 3;
 }
 
-uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
+tss_t* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     jugador_t* j = id_jugador2jugador(id_jugador);
     pirata_t* p = id_pirata2pirata(j, id_pirata);
 
-    tss* pointerTss;
+    tss_t* pointerTss;
     if(id_jugador == JUGADOR_A){
         pointerTss = &tss_jugadorA[id_pirata];
     } else {
@@ -55,5 +54,5 @@ uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata){
     pointerTss->edi = 0;
     pointerTss->esp0 = (uint)mmu_new_page() + PAGE_SIZE;
     pointerTss->ss0 = GDT_IDX_DS_OS_DESC << 3;
-    return (uint*)pointerTss;
+    return pointerTss;
 }

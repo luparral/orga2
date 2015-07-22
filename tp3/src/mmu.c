@@ -6,8 +6,7 @@
 */
 
 #include "mmu.h"
-#include "i386.h"
-#include "screen.h"
+
 /* Atributos paginas */
 /* -------------------------------------------------------------------------- */
 page_entry* pd_kernel;
@@ -75,6 +74,7 @@ void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint rw){
 	//separo la direccion virtual en los diferentes offset
 	uint pd_offset = virtual >> 22;
 	uint pt_offset = (virtual << 10) >> 22;
+
 	//si no hay una entrada presente, pedir 4k y crear una nueva pagina
 	if(!pd[pd_offset].p){
 		//pido pagina nueva
@@ -116,7 +116,6 @@ void mmu_unmapear_pagina(uint virtual, uint cr3){
 
 	//limpiar entradas
 	pt[pt_offset].p = 0;
-	pd[pd_offset].p = 0;
 	tlbflush();
 
 	return;
