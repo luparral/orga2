@@ -10,19 +10,11 @@
 
 #include "game.h"
 #include "tss.h"
-
-uint jugador_actual;
-uint pirata_actual;
-uint jugadorA_pirata_actual;
-uint jugadorB_pirata_actual;
-
-uint modo_debug;
+#include "gdt.h"
+#include "screen.h"
 
 void sched_inicializar();
 uint sched_tick();
 uint sched_proxima_a_ejecutar();
-
-extern uint jugador_actual;
-extern uint pirata_actual;
 
 #endif	/* !__SCHED_H__ */

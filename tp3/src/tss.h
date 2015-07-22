@@ -9,9 +9,8 @@
 #define __TSS_H__
 
 #include "defines.h"
-#include "i386.h"
-#include "gdt.h"
 #include "game.h"
+#include "mmu.h"
 
 typedef struct str_tss {
     unsigned short  ptl;
@@ -52,15 +51,15 @@ typedef struct str_tss {
     unsigned short  unused10;
     unsigned short  dtrap;
     unsigned short  iomap;
-} __attribute__((__packed__, aligned (8))) tss;
+} __attribute__((__packed__, aligned (8))) tss_t;
 
 void tss_inicializar();
-uint* tss_inicializar_pirata(uint id_jugador, uint id_pirata);
+tss_t* tss_inicializar_pirata(uint id_jugador, uint id_pirata);
 
-tss tss_jugadorA[MAX_CANT_PIRATAS_VIVOS];
-tss tss_jugadorB[MAX_CANT_PIRATAS_VIVOS];
+tss_t tss_jugadorA[MAX_CANT_PIRATAS_VIVOS];
+tss_t tss_jugadorB[MAX_CANT_PIRATAS_VIVOS];
 
-tss tss_inicial;
-tss tss_idle;
+tss_t tss_inicial;
+tss_t tss_idle;
 
 #endif  /* !__TSS_H__ */

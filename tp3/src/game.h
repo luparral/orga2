@@ -8,14 +8,26 @@
 #define __GAME_H__
 
 #include "defines.h"
-#include "sched.h"
+#include "mmu.h"
+#include "gdt.h"
+#include "screen.h"
+#include "tss.h"
+#include <stdarg.h>
 
-extern jugador_t jugadorA, jugadorB;
+jugador_t jugadorA;
+jugador_t jugadorB;
+uint jugador_actual;
+uint pirata_actual;
+uint jugadorA_pirata_actual;
+uint jugadorB_pirata_actual;
+
+uint modo_debug;
 
 // ~ auxiliares dadas ~
 uint game_xy2lineal();
 coord_t game_dir2coord(direccion dir);
 uint game_posicion_valida(int x, int y);
+uint game_buscar_botin(uint id);
 pirata_t* id_pirata2pirata(jugador_t* j, uint id);
 jugador_t* id_jugador2jugador(uint id);
 
@@ -25,6 +37,7 @@ void game_inicializar();
 pirata_t* game_pirata_inicializar(jugador_t *jugador, uint tipo);
 void game_pirata_exploto();
 jugador_t* game_get_jugador_actual();
+void game_incializar_botines();
 
 void game_jugador_inicializar(jugador_t* j, uint id);
 void game_jugador_habilitar_posicion(jugador_t *j, pirata_t *pirata);
@@ -37,7 +50,7 @@ pirata_t* game_pirata_en_posicion(uint x, uint y);
 
 uint game_syscall_pirata_posicion(uint id, int idx);
 uint game_syscall_pirata_mover(uint id, direccion key);
-void game_syscall_manejar(uint syscall, uint param1);
+uint game_syscall_manejar(uint syscall, uint param1);
 void game_tick();
 void game_terminar_si_es_hora();
 void game_atender_teclado(unsigned char tecla);

@@ -88,6 +88,7 @@ modo_protegido:
 
     ; Inicializar pantalla
     call screen_inicializar
+    call game_inicializar_botines
 
     ; Inicializar el manejador de memoria
     call mmu_inicializar_dir_kernel
@@ -103,9 +104,6 @@ modo_protegido:
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
-
-    ;Inicializar mmu
-    call mmu_inicializar
 
     ; Inicializar tss
     call gdt_inicializar_tareas
@@ -161,6 +159,7 @@ extern mmu_inicializar_dir_pirata
 extern tss_inicializar
 extern sched_inicializar
 extern game_inicializar
+extern game_inicializar_botines
 extern pd_kernel
 
 extern resetear_pic

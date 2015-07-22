@@ -6,8 +6,6 @@ definicion de funciones del scheduler
 */
 
 #include "screen.h"
-#include "game.h"
-
 
 extern jugador_t jugadorA, jugadorB;
 
@@ -121,18 +119,23 @@ void screen_inicializar(){
             p[i][j].a = C_BG_LIGHT_GREY;
         }
     }
-    print("SnakeII/Nokia1100", 63, 0, C_BG_LIGHT_GREY | C_FG_RED );
+    //pintar linea negra arriba
+    for (i = 0; i < VIDEO_COLS; i++) {
+        p[0][i].c = 0;
+        p[0][i].a = C_BG_BLACK;
+    }
+    print("SnakeII/Nokia1100", 63, 0, C_BG_BLACK | C_FG_RED );
     //pintar panel de jugador
     for (i = 45; i < VIDEO_FILS ; i++) {
         for (j = 0; j < VIDEO_COLS; j++) {
             p[i][j].c = 0;
             p[i][j].a = C_BG_BLACK;
         }
-        for(j = 30; j < 40; j++){
+        for(j = 33; j < 40; j++){
             p[i][j].c = 0;
             p[i][j].a = C_BG_RED;
         }
-        for(j = 40; j < 50; j++){
+        for(j = 40; j < 47; j++){
             p[i][j].c = 0;
             p[i][j].a = C_BG_BLUE;
         }
@@ -151,8 +154,8 @@ void screen_inicializar(){
 }
 
 void screen_actualizar(){
-    print_hex(jugadorA.monedas, 1, 36, 47, C_BG_RED + C_FG_WHITE);
-    print_hex(jugadorB.monedas, 1, 46, 47, C_BG_BLUE + C_FG_WHITE);
+    print_dec(jugadorA.monedas, 3, 35, 47, C_BG_RED + C_FG_WHITE);
+    print_dec(jugadorB.monedas, 3, 42, 47, C_BG_BLUE + C_FG_WHITE);
     screen_actualizar_reloj_global();
     jugador_t* j = id_jugador2jugador(jugador_actual);
     screen_actualizar_reloj_pirata(j, id_pirata2pirata(j, pirata_actual));
@@ -172,11 +175,8 @@ void save_screen(){
 
 void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp, unsigned int falsoesp, unsigned int ebx, unsigned int edx, unsigned int ecx, unsigned int eax, unsigned int errorCode, unsigned int eip, unsigned int cs, unsigned int eflags, unsigned int esp, unsigned int ss){
 
-    ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
-    int i = 0, j = 0;
-
     save_screen();
-
+    int i, j;
     //Recuadro
     for (i = 25; i< 55; i++){
         p[6][i].c = ' ';
@@ -192,7 +192,6 @@ void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp,
         p[j][54].a = C_BG_BLACK;
     }
 
-    //Fondo gris
     for (j = 8; j<41; j++){
         for (i = 26; i<54; i++){
             p[j][i].c = ' ';
@@ -200,8 +199,7 @@ void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp,
         }
     }
 
-
-    tss pirata;
+    tss_t pirata;
     if (jugador_actual == JUGADOR_A){
         pirata = tss_jugadorA[pirata_actual];
     }else{
@@ -300,8 +298,7 @@ void screen_pantalla_debug(unsigned int edi, unsigned int esi, unsigned int ebp,
 }
 
 void load_screen(){
-    ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
-    int i = 0, j = 0;
+    int i, j;
 
     for (j = 0; j < VIDEO_FILS; j++){
         for (i = 0; i < VIDEO_COLS; i++){
@@ -311,14 +308,14 @@ void load_screen(){
 }
 
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata){
-    uint tipoInt = pirata->tipo;
+    uint tipo = pirata->tipo;
 
     uint x = pirata->coord.x;
     uint y = pirata->coord.y;
 
     unsigned char color = j->id == JUGADOR_A ? C_BG_RED : C_BG_BLUE;
 
-    if(tipoInt == PIRATA_E){
+    if(tipo == PIRATA_E){
         unsigned char color_borde = j->id == JUGADOR_A ? C_BG_GREEN : C_BG_CYAN;
         screen_pintar_3x3(color_borde, y, x);
         screen_pintar('E', color | C_FG_WHITE, y, x);
