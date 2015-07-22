@@ -18,7 +18,7 @@ uint sched_tick(){
 	return sched_proxima_a_ejecutar();
 }
 
-int game_proximo_pirata(int id_jugador, uint id_pirata){
+int sched_proximo_pirata(int id_jugador, uint id_pirata){
 	int i;
 	jugador_t* j = (id_jugador == JUGADOR_A) ? &jugadorA : &jugadorB;
 	for (i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++) {
@@ -37,13 +37,13 @@ int game_proximo_pirata(int id_jugador, uint id_pirata){
 
 uint sched_proxima_a_ejecutar(){
 	jugador_actual = (jugador_actual == JUGADOR_A) ? JUGADOR_B : JUGADOR_A;
-	if(game_proximo_pirata(JUGADOR_B, jugadorB_pirata_actual) == -1 && game_proximo_pirata(JUGADOR_A, jugadorA_pirata_actual) == -1){
+	if(sched_proximo_pirata(JUGADOR_B, jugadorB_pirata_actual) == -1 && sched_proximo_pirata(JUGADOR_A, jugadorA_pirata_actual) == -1){
 		return GDT_IDX_TSS_IDLE_DESC;
 	}
 
 	int gdt_offset;
-	int proximoA = game_proximo_pirata(JUGADOR_A, jugadorA_pirata_actual);
-	int proximoB =  game_proximo_pirata(JUGADOR_B, jugadorB_pirata_actual);
+	int proximoA = sched_proximo_pirata(JUGADOR_A, jugadorA_pirata_actual);
+	int proximoB =  sched_proximo_pirata(JUGADOR_B, jugadorB_pirata_actual);
 	if(proximoA == -1 || jugador_actual == JUGADOR_B){
 		jugador_actual = JUGADOR_B;
 		gdt_offset = GDT_OFFSET_TSS_JUG_B;
