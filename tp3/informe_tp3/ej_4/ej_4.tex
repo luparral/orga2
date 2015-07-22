@@ -2,14 +2,29 @@
 
 \subsection{Manejo de memoria para las tareas}
 
-En este ejercicio, con el fin de poder manejar la memoria utilizada por las distintas tareas, creamos tomando como base las sugerencias dadas en el enunciado, las siguientes funciones que permiten inicializar un directorio de páginas para una tarea, así como mapear y desmapear páginas.
+En este ejercicio, con el fin de poder manejar la memoria utilizada por las distintas tareas, creamos tomando como base las sugerencias dadas en el enunciado, las siguientes funciones que permiten inicializar un directorio de páginas para una tarea, así como mapear y desmapear páginas.\\
 
-Rutina \texttt{inicializar\_mmu} para administrar la memoria en el área libre. Esta función setea la variable global next\_page en la primer página no usada (\texttt{AREA\_LIBRE} = 0x100000).
+Rutina \texttt{inicializar\_mmu} para administrar la memoria en el área libre. Esta función setea la variable global next\_page en la primer página no usada (\texttt{AREA\_LIBRE} = 0x100000). \\
 
-\texttt{mmu\_inicializar\_dir\_pirata} inicializa un directorio de páginas y tablas de página para una tarea, según la figura. Para esto, copiamos el código de la tarea a su área asignada (posición dentro del mapa indicada por el jugador) y mapear dichas páginas a partir de la dirección virtual 0x0400000. Además, mapea las posiciones ya descubiertas por los exploradores del jugador.
+\texttt{mmu\_inicializar\_dir\_pirata}  donde pedimos una nueva pagina para el directorio de páginas y seteamos en su primer entrada la tabla del kernel con p=1 y r/w=1. Luego mapeamos la pagina de codigo (0x400000) con la posicion fisica del pirata en el mapa y copiamos el codigo pertinente del pirata que corresponde. Además se mapean todas las posiciones ya exploradas por el jugador.\\
 
-\texttt{mmu\_mapear\_pagina} permite mapear la página física en la dirección virtual pasada como parámetros, utilizando cr3. Para esto, recibimos el cr3 y a partir de este obtenemos la dirección de la page directory. Del parámetro virtual obtenemos el offset para la entrada en la page directory y de la page table. Si la entrada de page directory no está presente, creamos una nueva página y para esta entrada, hacemos \texttt{empty\_mapping} sobre las 1024 entradas, es decir, las seteamos como no presentes.
-Luego, para la entrada correspondiente al offset de page directory, ponemos como base la dirección de la página creada, y atributos 0x03. 
+Para esto inicializamos una page directory nueva, ya que cada tarea dispondrá de la suya propia. Con este fin, en primer lugar pedimos una página libre con \texttt{mmu\_new\_page} que da la dirección a la próxima página a mapear libre.\\\\ Luego hacemos empty mapping sobre sus entradas.\\\\
+La primer entrada será usada para mapear el kernel, por lo tanto pone el código como su base, la setea en presente y con permisos de supervisor.\\\\
+A continuación mapeamos la página del código. Para esto vamos a cambiar el cr3 (previamente lo guardamos para no perderlo haciendo uint cr3 = rcr3) y hacemos \texttt{mmu\_mapear\_pagina} pasando como parámetros la dirección en la que va a estar el código del pirata (0x400000) y el área del mapa en la cuál está la tarea. Es decir, mapea el área del mapa en donde está la tarea a 0x400000.\\\\
+De esta forma, $game$\_$xy2lineal(p->coord.x, p->coord.y) * PAGE$\_$SIZE + MAPA$\_$BASE$\_$FISICA$ es nada más una traducción a la dirección física del mapa correspondiente a la posición (x, y) del pirata.\\
+
+\texttt{mmu\_copiar} recibe una dirección fuente y una destino (como punteros a unsigned int) y copia el contenido de una en la otra.\\
+
+Esto se concreta a través de un simple "for" que itera por ambas páginas, asignando fuente[i] a destino[i]. Como el tamaño de una página es 4096 y se va copiando de a 4 bytes, el número de iteraciones es 1024. Con esta función que recibe como dirección fuente el código específico de la tarea y como dirección destino la 0x400000 copiamos el código a la dirección mapeada previamente.\\
+
+
+Por ultimo se mapean todas las pocisiones del mapa que fueron exploradas por el jugador específico al pirata.\\ 
+
+
+\texttt{mmu\_mapear\_pagina} permite mapear la página física en la dirección virtual pasada como parámetros, utilizando cr3. Para esto, recibimos el cr3 y a partir de este obtenemos la dirección de la page directory. Del parámetro virtual obtenemos el offset para la entrada en la page directory y de la page table. Si la entrada de page directory no está presente, creamos una nueva página y para esta entrada, hacemos \texttt{empty\_mapping} sobre las 1024 entradas, es decir, las seteamos como no presentes.\\
+
+Luego, para la entrada correspondiente al offset de page directory, ponemos como base la dirección de la página creada, y atributos 0x03.\\
+
 Finalmente, obtenemos la dirección de la tabla creada y para el offset calculado inicialmente, ponemos como base la dirección física, y como atributos permisos de usuario, presente habilitado y lectura/escritura o solo lectura según corresponda.
 
 \texttt{mmu\_unmapear\_pagina} borra el mapeo creado en la dirección virtual utilizando cr3. Par esto, como en \texttt{mmu\_mapear\_pagina}, calculamos el offset de directorio y tabla a partir de la dirección virtual. Luego, si la entrada correspondiente no existe, significa que ya se encontraba desmapeada y no hacemos nada. Caso contrario, limpiamos las entradas de page directory y page table correspondiente, seteando en 0 el bit de presente.
