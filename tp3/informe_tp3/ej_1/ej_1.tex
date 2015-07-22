@@ -1,26 +1,66 @@
 \section{Ejericio 1}
 
 \subsection{Completar la tabla de descriptores globales}
-Para esto completamos el indice 0 de la GDT con el descriptor nulo. Las siguientes 7 entradas por requerimientos de este trabajo debian ser nulas.
-A continuación, completamos con entradas para código y datos para sistema operativo (nivel 0) y para usuario (nivel 3). Los segmentos de código y datos del sistema operativo están descritos en las entradas 8 y 9 respectivamente, mientras que los de usuario en las entradas 10 y 11. 
-El campo límite para estas entradas es 0xF3FF y la base 0x0000, con granularidad 1, ya que direccionan  500MB de memoria. El tipo para los los descriptores de código es 0x8, correspondiente a código de sólo-ejecución, mientras que para los de datos es de 0x2, para segmentos de datos de lectura/escritura. También es relevante indicar que para todas estas entradas, el campo p es 1, ya que los segmentos se encuentran presentes.
-También tenemos una entrada de datos para el segmento de video, con base 0xB800 y límite 0xC0000, con dpl 0, pues es para ser utilizado sólo por el kernel, presente y permisos de lectura/escritura. Este descriptor tendrá índice 12. 
+Para esto completamos el indice 0 de la GDT con el descriptor nulo. Las siguientes 7 entradas por requerimientos de este trabajo debian ser nulas.\\\\
+A continuación, completamos con entradas para código y datos para sistema operativo (nivel 0) y para usuario (nivel 3). Los segmentos de código y datos del sistema operativo están descritos en las entradas 8 y 9 respectivamente, mientras que los de usuario en las entradas 10 y 11.\\\\
+El campo límite para estas entradas es 0xF3FF y la base 0x0000, con granularidad 1, ya que direccionan  500MB de memoria. El tipo para los los descriptores de código es 0x8, correspondiente a código de sólo-ejecución, mientras que para los de datos es de 0x2, para segmentos de datos de lectura/escritura. También es relevante indicar que para todas estas entradas, el campo p es 1, ya que los segmentos se encuentran presentes.\\\\
+También tenemos una entrada de datos para el segmento de video, con base 0xB800 y límite 0xC0000, con dpl 0, pues es para ser utilizado sólo por el kernel, presente y permisos de lectura/escritura. Este descriptor tendrá índice 12.\\\\
 
 \subsection{Pasaje a modo protegido}
-En primer lugar, cambiamos el modo de video a 80x44.
-Habilitamos a20 llamando a \texttt{habilitar\_A20}.
-Cargamos la GDT  con la instrucción \texttt{lgdt}.
 
-Para pasar a modo protegido, seteamos en 1 el bit PE del registro CR0 y hacemos jump far con un selector de segmento de código de nivel 0 y offset \texttt{modo\_protegido} (etiqueta que declaramos a continuación)
+En primer lugar, cambiamos el modo de video a 80x44.\\
+Habilitamos a20 llamando a \texttt{habilitar\_A20}.\\
+Cargamos la GDT  con la instrucción \texttt{lgdt}.\\
 
-Una vez en modo protegido, asignamos los selectores de segmentos. Como ds, ss elegimos segmento de datos de nivel 0, y para fs el segmento de video.
+Para pasar a modo protegido, seteamos en 1 el bit PE del registro CR0 y hacemos jump far con un selector de segmento de código de nivel 0 y offset \texttt{modo\_protegido} (etiqueta que declaramos a continuación).\\
 
-Seteamos la pila del kernel en la direccion 0x27000.
+Una vez en modo protegido, asignamos los selectores de segmentos. Como ds, ss elegimos segmento de datos de nivel 0, y para fs el segmento de video.\\
+
+Seteamos la pila del kernel en la direccion 0x27000.\\
 
 \subsection{Inicialización de la pantalla y juego}
 
-Usamos las funciones game\texttt{\_inicializar}, \texttt{screen\_inicializar} y \texttt{game\_inicializar\_botines}.
+Usamos las funciones game\texttt{\_inicializar}, \texttt{screen\_inicializar} y \texttt{game\_inicializar\_botines}.\\
 
-La función \texttt{screen\_inicializar}, que pinta el fondo de gris, y el recuadro para cada jugador en azul y rojo.
-\texttt{game\_inicializar} arranca todas las variables del juego para su uso llamando a \texttt{game\_juagdor\_inicializar} para cada jugador. A su vez, esta última función completa la estructura del jugador correspondiente.
-\texttt{game\_inicializar\_botines} dibuja todos los botines en la pantalla
+La función \texttt{screen\_inicializar}, que pinta el fondo de gris, y el recuadro para cada jugador en azul y rojo.\\
+\texttt{game\_inicializar} arranca todas las variables del juego para su uso llamando a \texttt{game\_juagdor\_inicializar} para cada jugador. A su vez, esta última función completa la estructura del jugador correspondiente.\\
+\texttt{game\_inicializar\_botines} dibuja todos los botines en la pantalla.\\
+
+\textbf{Struct pirata\_t:}\\
+
+\texttt{Id:} Identificador de numero de pirata del jugador.
+
+\texttt{coord:} Coordenada actual del pirata en el mapa.
+
+\texttt{tipo:} El tipo de pirata que es (Explorador o Minero).
+
+\texttt{ticks:} Se usa para ir actualizando el reloj respectivo del pirata.
+
+\texttt{vivo:} Es el estado del pirata, cuando se lanza se pasa a TRUE y si se destruye de nuevo a FALSE (inicialmente FALSE).
+
+\texttt{\*codigo:} contiene el código respectivo del pirata original.\\\\
+
+\textbf{Struct jugador\_t:}\\
+
+\texttt{id:} Identificador de que jugador es (A == 0 y B == 1).
+
+\texttt{monedas:} Cantidad de puntos acumulados durante el juego, (inicialmente 0).
+
+\texttt{piratas[MAX\_CANT\_PIRATAS\_VIVOS]:} es un arreglo de los piratas que puede llegar a tener el jugador.
+
+\texttt{cant\_piratas:} Se usa para ir incrementando y decrementando a lo largo de todo el juego con las diferentes acciones de crear y destruir piratas (inicialmente 0).
+
+\texttt{cant\_exploradores:} Mismo que antes, al crear y destruir exploradores se va incrementando y decrementando (inicialmente 0).
+
+\texttt{mineros\_disponibles:} Cada vez que un explorador encuentra un botín aumenta esta variable y así el jugador sabe que puede lanzar mineros y decrementa esta cantidad una vez lanzado (inicialmente 0).
+
+\texttt{coord\_puerto:} Contiene la coordenada inicial de partida para uno u otro jugador.
+
+\texttt{botin:} Puntos acumulados durante el juego (inicialmente 0).
+
+\texttt{*codigo\_explorador:} Contiene el puntero al código pertinente al explorador del jugador A o B.
+
+\texttt{*codigo\_minero:} mismo que antes.
+
+\texttt{explorado[MAPA\_ALTO\*MAPA\*ANCHO]:} Se va marcando todas las posiciones exploradas por el jugador para luego detectar que mapear y a donde moverse (inicialmente todo en FALSE).
+
